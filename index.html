@@ -88,7 +88,7 @@ input{font:16px Sarabun,sans-serif;background:#0e0a07;color:var(--ink);border:1p
 .slot .n{position:absolute;right:5px;bottom:2px;font-weight:800;font-size:13px}
 .slot .cd{position:absolute;inset:auto 0 0 0;background:rgba(0,0,0,.7)}
 .slot.lock{opacity:.35}
-#cross{position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px;border:2px solid rgba(255,240,210,.75);border-radius:50%}
+#cross{position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px;pointer-events:none}
 #cross::after{content:"";position:absolute;left:50%;top:50%;width:3px;height:3px;margin:-1.5px;background:#fff;border-radius:50%}
 #prompt{position:absolute;left:50%;top:58%;transform:translateX(-50%);background:rgba(0,0,0,.7);border:1px solid var(--line);padding:6px 14px;border-radius:6px;font-weight:600}
 #prompt b{color:var(--gold)}
@@ -178,7 +178,14 @@ table.k{border-collapse:collapse;width:100%;font-size:14px}table.k td{padding:5p
 .md i{font-style:normal;font-size:9px;letter-spacing:1px}.md.l1{border-color:#c9a24a}.md.l2{border-color:#d07a2e}.md.l3{border-color:#d0402a}.md.l4{border-color:#ff2a2a;animation:pl 1s infinite}
 .md.good{border-color:#6ad06a!important;animation:none}.md.good i{color:#6ad06a!important}
 .emo{display:grid;grid-template-columns:7em minmax(0,1fr) 3em;gap:8px;align-items:center;font-size:13px;margin:4px 0}.emo .t{height:9px;background:#2a2016;border-radius:5px;overflow:hidden}.emo .t i{display:block;height:100%}
-.md.l1 i{color:#c9a24a}.md.l2 i{color:#d07a2e}.md.l3 i{color:#e0503a}.md.l4 i{color:#ff3a3a}
+.md.l1 i{color:#c9a24a}
+#asp{position:absolute;left:50%;bottom:84px;transform:translateX(-50%);min-width:220px;padding:5px 12px 7px;background:rgba(10,7,4,.72);border:1px solid #4f7a3a;border-radius:8px;font-size:13px;color:#d8ecc0;text-align:center;pointer-events:none}
+#asp b{color:#9fd36e}#asp .k{color:var(--gold);font-size:11px}#asp .tr{font-family:Cinzel,serif;color:#e8d080;margin-left:6px}#asp .cdb{height:4px;background:#2a2016;border-radius:3px;margin-top:4px;overflow:hidden}#asp .cdb i{display:block;height:100%;background:#9fd36e}#asp.ready{box-shadow:0 0 10px rgba(159,211,110,.45)}
+#aspfx{position:absolute;inset:0;pointer-events:none;transition:background .3s,box-shadow .3s}#aspfx.echo{background:rgba(70,120,200,.16);box-shadow:inset 0 0 160px rgba(120,180,255,.5)}#aspfx.shroud{box-shadow:inset 0 0 220px rgba(40,10,70,.9);background:rgba(30,10,50,.18)}
+.matbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}.matbar span{background:#1c140d;border:1px solid var(--line2);border-radius:6px;padding:3px 8px;font-size:13px}.matbar b{color:var(--gold)}
+.rcp button{min-width:76px}.tierl{font-size:13px;margin:4px 0;padding:6px 8px;border-radius:6px;background:#140f0a;border:1px solid var(--line2)}.tierl.on{border-color:#4f7a3a;color:#d8ecc0}.tierl.off{color:#8a8070}
+.aspn{display:inline-block;margin:2px 4px;font-size:12px;color:var(--mut)}
+@media(max-width:1180px){#asp{left:auto;right:14px;transform:none;bottom:104px}}.md.l2 i{color:#d07a2e}.md.l3 i{color:#e0503a}.md.l4 i{color:#ff3a3a}
 #actbar{position:absolute;left:50%;bottom:92px;transform:translateX(-50%);width:280px;text-align:center;font-size:13px;font-weight:700;text-shadow:0 1px 3px #000}
 #actbar .bar{height:8px}#actbar .bar i{background:#e0c070}
 #sleepov{position:fixed;inset:0;z-index:4;pointer-events:none;background:rgba(2,2,6,.78);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;font:800 26px Cinzel,serif;color:#b0a8d8;text-shadow:0 2px 8px #000}
@@ -218,17 +225,24 @@ table.k{border-collapse:collapse;width:100%;font-size:14px}table.k td{padding:5p
 </div>
 
 <div id="create" class="screen hidden">
-  <div class="cp"><h2>เลือกเผ่าพันธุ์</h2><div id="raceGrid"></div></div>
+  <div class="cp"><h2 id="cTitle">เลือกเผ่าพันธุ์</h2><p id="cStep" style="color:var(--mut);margin:-6px 0 8px;font-size:13px">ขั้นที่ 1 / 2</p><div id="raceGrid"></div><div id="fateInfo" class="hidden"></div></div>
   <div class="cp">
+   <div id="step1">
     <h2 id="rName"></h2>
     <p id="rDesc" style="margin:0 0 8px"></p>
     <div id="rStats"></div>
     <p class="perk" id="rPerk"></p>
     <h3>ชื่อตัวละคร</h3>
     <input id="pname" maxlength="16" placeholder="Wanderer">
-    <h3>ชะตาลิขิต <small style="color:var(--mut);font-weight:400">(สุ่มได้ครั้งเดียว)</small></h3>
-    <div id="fate" class="fate"><button id="bRoll">สุ่ม Aspect และ Flaw</button></div>
-    <div class="cbtn"><button id="bStart" disabled>เริ่มการเดินทาง</button><button class="ghost" id="bBack">กลับ</button></div>
+    <div class="cbtn"><button id="bNext">ถัดไป: สุ่มชะตา →</button><button class="ghost" id="bBack">กลับ</button></div>
+   </div>
+   <div id="step2" class="hidden">
+    <h2 id="sRace"></h2>
+    <h3>ชะตาลิขิต <small style="color:var(--mut);font-weight:400">(สุ่มได้ครั้งเดียว เปลี่ยนเผ่าไม่ได้หลังสุ่ม)</small></h3>
+    <div id="fate" class="fate"></div>
+    <div id="tiers"></div>
+    <div class="cbtn"><button id="bStart" disabled>เริ่มการเดินทาง</button><button class="ghost" id="bBack2">← กลับไปเลือกเผ่า</button></div>
+   </div>
   </div>
 </div>
 
@@ -241,10 +255,12 @@ table.k{border-collapse:collapse;width:100%;font-size:14px}table.k td{padding:5p
   <div id="tr"><canvas id="mini" width="180" height="180"></canvas><div id="loc"></div></div>
   <div id="quests"></div>
   <div id="moods"></div>
+  <div id="aspfx"></div>
+  <div id="cross"></div>
+  <div id="asp"></div>
   <div id="actbar" class="hidden"><span></span><div class="bar"><i></i></div></div>
   <div id="boss" class="hidden"><b>The Rot King</b><div class="bar"><i></i></div></div>
   <div id="banner"><div class="a1">ACT I</div><div class="a2">The Rotting</div><div class="a3" id="bsub"></div></div>
-  <div id="cross"></div>
   <div id="prompt" class="hidden"></div>
   <div id="toasts"></div>
   <div id="bl">
@@ -355,25 +371,28 @@ const RACES=[
 ];
 const STATN=['HP','STA','STR','DEX','SPD','VIS'],STATMAX=[160,130,17,15,1.2,1.3];
 const FATES=[
- {a:['ตาเหยี่ยว','Eagle Eye','+30% ดาเมจระยะไกล กลางวันมองไกลขึ้น',{rangedMul:.3,visDay:.25}],f:['ตาบอดกลางคืน','Night Blind','กลางคืนมองเห็นสั้นลง 40%',{visNight:-.4}]},
- {a:['หนังเหล็ก','Iron Hide','+30% HP สูงสุด',{hpMul:.3}],f:['กระดูกหนัก','Heavy Bones','-15% ความเร็ว',{spdMul:-.15}]},
- {a:['เท้าลม','Swift Feet','+20% ความเร็ว',{spdMul:.2}],f:['ร่างบาง','Frail','-20% HP สูงสุด',{hpMul:-.2}]},
- {a:['เลือดคลั่ง','Berserker Blood','HP ต่ำกว่า 35% ดาเมจ +50%',{lowHp:.5}],f:['ใจร้อน','Short Temper','ฟื้นสแตมินาช้าลง 30%',{staRegen:-.3}]},
- {a:['สัมผัสโรคา','Plague-Touched','ต้านเชื้อ 60% ซอมบี้เห็นช้าลง 20%',{infectRes:.6,aggroMul:-.2}],f:['เนื้อเน่า','Rotting Flesh','HP ไม่ฟื้นตามธรรมชาติ',{noRegen:1}]},
- {a:['ดาวนำโชค','Lucky Star','+20% โอกาสของหายาก',{luck:.2}],f:['เหรียญต้องสาป','Cursed Coin','ราคาร้านค้า +30%',{priceMul:.3}]},
- {a:['นักล่ารัตติกาล','Night Stalker','กลางคืนดาเมจ +35%',{nightDmg:.35}],f:['ชิงชังตะวัน','Sun-Scorned','กลางวันดาเมจ -20%',{dayDmg:-.2}]},
- {a:['ปราชญ์','Scholar','+30% XP',{xpMul:.3}],f:['หนอนหนังสือ','Bookworm','-25% ดาเมจประชิด',{meleeMul:-.25}]},
- {a:['กำปั้นยักษ์','Giant Grip','+30% ดาเมจประชิด',{meleeMul:.3}],f:['มือสั่น','Shaky Hands','-25% ดาเมจระยะไกลและเวทย์',{rangedMul:-.25,magicMul:-.25}]},
- {a:['ย่างเงียบ','Silent Step','ซอมบี้เห็นช้าลง 35%',{aggroMul:-.35}],f:['ขาเปราะ','Brittle Legs','กระโดดต่ำลง 30% สแตมินา -20%',{jump:-.3,staMul:-.2}]},
- {a:['สัญญาโลหิต','Blood Pact','ดูดเลือด 8% ของดาเมจ',{lifesteal:.08}],f:['โลหิตจาง','Anemic','HP สูงสุด -15% ฟื้น HP ช้าลงครึ่งหนึ่ง',{hpMul:-.15,regenMul:-.5}]},
- {a:['ปอดเหล็ก','Iron Lungs','+40% สแตมินาสูงสุด',{staMul:.4}],f:['กลิ่นแรง','Pungent','ซอมบี้ได้กลิ่นไกลขึ้น 30%',{aggroMul:.3}]},
+ {id:'lantern',cd:40,a:['โคมรุ่งอรุณ','Dawn Lantern','สร้างลูกบอลแสงลอยอยู่ 12 วิ รักษาทุกคนในรัศมี 6 ม. 3 HP/วิ',{}],t:['ลูกบอลอยู่ 18 วิ รัศมี 8 ม. รักษา 4.5 HP/วิ','แสงเผาซอมบี้ที่เข้ามาในรัศมี','ลูกบอลลอยตามตัวคุณ และค่อยๆ ลดเชื้อซอมบี้'],f:['ร่างที่แสงเลือก','Light-Bound','รักษาตัวด้วยวิธีอื่นไม่ได้เลย: ยา การพัก โรงเตี๊ยม เลเวลอัป ดูดเลือด ไม่ฟื้น HP',{onlyAspectHeal:1}]},
+ {id:'grave',cd:45,a:['ปลุกศพ','Grave Call','ปลุกซากซอมบี้ใกล้ๆ 1 ตัวให้ลุกมาสู้แทน 25 วิ (ต้องมีซากในระยะ 14 ม.)',{}],t:['ปลุกได้ 2 ตัว อยู่ 35 วิ','ศพที่ปลุกระเบิดตอนหมดเวลา ทำดาเมจรอบตัว','ปลุก 3 ตัว แรงขึ้น 50%'],f:['ความตายเกาะติด','Death-Marked','โดนกัดแล้วติดเชื้อง่ายขึ้นเท่าตัว และเชื้อลามเร็วขึ้น',{infectRes:-1}]},
+ {id:'shadow',cd:12,a:['ก้าวเงา','Shadow Step','วาร์ปไปข้างหน้า 8 ม. ทะลุศัตรู',{}],t:['ระยะ 12 ม. จุดเดิมระเบิดเงาทำให้ซอมบี้รอบๆ ล้ม','เก็บได้ 2 ครั้ง','ปลายทางก็ระเบิดเงา และอมตะ 1 วิหลังวาร์ป'],f:['ชิงชังตะวัน','Sun-Scorned','ตอนกลางวันสแตมินาฟื้นช้าลงครึ่งหนึ่ง',{dayStaHalf:1}]},
+ {id:'frost',cd:18,a:['ลมหายใจน้ำแข็ง','Frost Breath','พ่นลมเย็นไปข้างหน้า 7 ม. ซอมบี้ช้าลง 70% นาน 4 วิ',{}],t:['ซอมบี้ธรรมดาแข็งตัวขยับไม่ได้ 2 วิ','ซอมบี้ที่ติดน้ำแข็งโดนดาเมจ +50%','ระยะ 10 ม. และพ่นได้รอบตัว'],f:['เลือดเย็น','Cold-Blooded','ร่างกายต้องเผาผลาญเพื่อคงความอุ่น หิวเร็วขึ้น 60%',{hungerMul:.6}]},
+ {id:'root',cd:20,a:['รากหนาม','Thorn Root','กระทืบพื้นให้รากหนามรัดซอมบี้รอบตัว 5 ม. ขยับไม่ได้ 3 วิ',{}],t:['รากทำดาเมจต่อเนื่อง','รัศมี 8 ม. รัดนาน 5 วิ','รากดูดพลังคืนสแตมินาตามจำนวนที่รัดได้'],f:['รากหยั่งลึก','Deep-Rooted','กระโดดไม่ได้',{noJump:1}]},
+ {id:'seek',cd:60,a:['สัมผัสสมบัติ','Treasure Sense','ส่งคลื่นสัมผัส เผยหีบสมบัติและถุงของรอบตัว 140 ม. เป็นลำแสง 25 วิ',{}],t:['เผยซอมบี้ระดับสูง (★) และบอสด้วย','หีบถัดไปที่เปิดได้ของเพิ่ม 1 ชิ้น','เก็บทรัพยากรได้ 2 เท่าระหว่างที่สัมผัสทำงาน'],f:['เหรียญต้องสาป','Cursed Coin','ร้านค้าขายแพงขึ้น 40%',{priceMul:.4}]},
+ {id:'shroud',cd:35,a:['ม่านรัตติกาล','Night Shroud','หายตัว 6 วิ ซอมบี้มองไม่เห็นและเลิกไล่ โจมตีครั้งแรกแรง 2 เท่า (โจมตีแล้วปรากฏตัว)',{}],t:['หายตัว 9 วิ','ฆ่าซอมบี้ระหว่างหายตัวจะต่อเวลา +2 วิ','โจมตีแล้วไม่ปรากฏตัว'],f:['ตาบอดกลางวัน','Day-Blind','กลางวันมองเห็นสั้นลง 35%',{visDay:-.35}]},
+ {id:'echo',cd:45,a:['จิตหยั่งรู้','Echo Mind','ทำให้โลกช้าลงเหลือ 35% นาน 4 วิ',{}],t:['นาน 6 วิ','ระหว่างนั้นไม่เสียสแตมินา','ระหว่างนั้นโจมตีติดคริติคอลทุกครั้ง'],f:['จิตแตกร้าว','Fractured Mind','เครียดง่ายขึ้น 60% และทุกครั้งที่ใช้ความสามารถ ความเครียด +12',{stressMul:.6}]},
+ {id:'titan',cd:16,a:['ทุบปฐพี','Titan Slam','กระโดดขึ้นแล้วทุบพื้นรัศมี 5 ม. ซอมบี้ล้มและกระเด็น',{}],t:['รัศมี 7 ม. ดาเมจ +50%','ทิ้งรอยแยกที่ทำให้ซอมบี้ช้าลง 6 วิ','ทุบได้ 2 ครั้งติดกัน'],f:['มือหนัก','Heavy-Handed','ใช้ธนูและเวทได้แย่มาก ดาเมจระยะไกลและเวท -60%',{rangedMul:-.6,magicMul:-.6}]},
+ {id:'gale',cd:10,a:['ลมกรด','Gale Dash','พุ่งไปข้างหน้าอย่างแรง ผลักและฟันซอมบี้ที่ขวาง',{}],t:['หลังพุ่งวิ่งไวขึ้น 30% 4 วิ','ซอมบี้ที่ถูกชนล้ม','สร้างพายุหมุนรอบตัว ผลักซอมบี้ออก 3 วิ'],f:['ร่างบาง','Frail','HP สูงสุด -20%',{hpMul:-.2}]},
+ {id:'blood',cd:14,a:['พิธีโลหิต','Blood Rite','เสีย 12% HP ปลดปล่อยหนามเลือดรัศมี 5 ม. ดาเมจรุนแรง และทำให้ซอมบี้เลือดไหล',{}],t:['ดาเมจ +50%','หนามดูดเลือดคืนเท่าที่เสียไป','รัศมี 8 ม. และไม่เสีย HP ถ้า HP ต่ำกว่า 30%'],f:['โลหิตจาง','Anemic','แผลเลือดไหลเร็วขึ้นเท่าตัว',{bleedMul:1}]},
+ {id:'beast',cd:50,a:['สหายป่า','Spirit Wolf','เรียกหมาป่าวิญญาณ 1 ตัวมาสู้ 30 วิ',{}],t:['เรียก 2 ตัว','ตอนเรียก หมาป่าหอนทำให้ซอมบี้รอบตัวล้ม','หมาป่าอยู่ 90 วิ และแรงขึ้นเท่าตัว'],f:['กลิ่นนักล่า','Predator Scent','สัตว์ป่าหนีไกลขึ้น และม้าไม่ยอมให้ขี่',{noMount:1}]},
 ];
+const TIER_T=[0,1200,3600,7200],ROMAN=['I','II','III','IV'];
 const RAR=[{id:'common',th:'ธรรมดา',c:'#c9c4b8',w:560,m:1,v:8},{id:'uncommon',th:'ไม่ธรรมดา',c:'#62c35c',w:260,m:1.2,v:16},{id:'rare',th:'หายาก',c:'#4f95ea',w:120,m:1.45,v:34},{id:'epic',th:'มหากาพย์',c:'#b067e6',w:42,m:1.8,v:70},{id:'legendary',th:'ตำนาน',c:'#f2a332',w:14,m:2.3,v:160},{id:'mythic',th:'เทพนิยาย',c:'#ff4d6d',w:4,m:3,v:380}];
 const W8=(n,cls,sub,kind,dmg,rate,range,m)=>({n,cls,sub,kind,dmg,rate,range,m});
 const WEAPONS={
  fist:W8('Bare Fists',null,null,'melee',4,.45,1.8,null),
  dagger:W8('Rusty Dagger',null,null,'melee',7,.42,2.1,'dagger'),
  club:W8('Wooden Club',null,null,'melee',11,.7,2.3,'club'),
+ stoneaxe:W8('Stone Hatchet',null,null,'melee',13,.62,2.3,'axe'),
+ spear:W8('Crude Spear',null,null,'melee',14,.7,3.3,'halberd'),
  arming:W8('Arming Sword','warrior','Knight','melee',17,.55,2.5,'sword'),
  longsword:W8('Longsword','warrior','Knight','melee',22,.7,2.9,'longsword'),
  axe:W8('Bearded Axe','warrior','Berserker','melee',20,.6,2.4,'axe'),
@@ -441,13 +460,14 @@ const CONS={potion:{th:'ยาฟื้นฟู',d:'ฟื้น 45% ของ 
  disinfect:{th:'แอลกอฮอล์ฆ่าเชื้อ',d:'ทำความสะอาดแผล รักษาแผลติดเชื้อ',v:8,ic:'flask',col:'#c8e0f0',med:1},suture:{th:'เข็มเย็บแผล',d:'เย็บแผลลึกให้เริ่มหาย',v:10,ic:'needle',col:'#c0c0c8',med:1},
  splint:{th:'เฝือกไม้',d:'ดามกระดูกหักให้หายไวขึ้น',v:6,ic:'splint',col:'#a0784a',med:1},painkill:{th:'ยาแก้ปวด',d:'ลดความเจ็บปวด 5 นาที',v:6,ic:'pill',col:'#f0f0f0'},
  ale:{th:'เบียร์',d:'คลายเครียด ลดความเศร้าและความเบื่อ แต่มึนเล็กน้อย 40 วิ',water:10,v:4,ic:'flask',col:'#d8a040'},novel:{th:'นิยายเก่า',d:'อ่านคลายเบื่อ ลดความเศร้าและความเครียด',v:6,ic:'book',col:'#c8a0d0'},
- kit:{th:'ชุดก่อไฟ',d:'ก่อกองไฟ 2 นาที: ย่างเนื้อ พักฟื้นแรงได้ไวขึ้น',v:8,ic:'fire',col:'#ff8a3a'},hide:{th:'หนังสัตว์',d:'วัตถุดิบ ขายให้พ่อค้าได้',v:8,ic:'hide',col:'#a08060'}};
+ wood:{th:'ไม้',d:'วัตถุดิบ: ตัดจากต้นไม้',v:1,ic:'wood',col:'#a07040',mat:1},stone:{th:'หิน',d:'วัตถุดิบ: ทุบจากก้อนหิน',v:1,ic:'stone',col:'#a0a098',mat:1},fiber:{th:'เส้นใยพืช',d:'วัตถุดิบ: เก็บจากพุ่มไม้',v:1,ic:'fiber',col:'#9ab060',mat:1},scrap:{th:'เศษเหล็ก',d:'วัตถุดิบ: ค้นจากซากปรักหักพัง',v:3,ic:'scrap',col:'#b0b4bc',mat:1},herb:{th:'สมุนไพร',d:'วัตถุดิบ: เก็บจากพุ่มไม้ ใช้ทำยา',v:2,ic:'herb',col:'#6ac060',mat:1},
+ kit:{th:'ชุดก่อไฟ',d:'ก่อกองไฟ 2 นาที: ย่างเนื้อ พักฟื้นแรงได้ไวขึ้น',v:8,ic:'fire',col:'#ff8a3a'},hide:{th:'หนังสัตว์',d:'วัตถุดิบ: ใช้ทำเกราะหนังและกระเป๋า',mat:1,v:8,ic:'hide',col:'#a08060'}};
 const BODY=[['head','ศีรษะ','head',.06],['torso','ลำตัว','chest',.2],['larm','แขนซ้าย','chest',.14],['rarm','แขนขวา','chest',.14],['lhand','มือซ้าย','hands',.11],['rhand','มือขวา','hands',.11],['lleg','ขาซ้าย','legs',.08],['rleg','ขาขวา','legs',.08],['lfoot','เท้าซ้าย','feet',.04],['rfoot','เท้าขวา','feet',.04]];
 const WOUND={scratch:{th:'แผลถลอก',bl:.12,h:120,pain:5,inf:.07,kn:8},lacer:{th:'แผลฉีกขาด',bl:.3,h:300,pain:12,inf:.25,kn:15},bite:{th:'แผลถูกกัด',bl:.4,h:420,pain:18,inf:.9,kn:30},deep:{th:'แผลลึก',bl:.7,h:480,pain:25,inf:.3,kn:15},frac:{th:'กระดูกหัก',bl:0,h:900,pain:35,inf:0,kn:0}};
 const emptyBody=()=>Object.fromEntries(BODY.map(b=>[b[0],[]]));
 const WW={dagger:.8,club:1.6,sword:2,longsword:2.8,axe:2.2,greataxe:5,mace:2.6,halberd:5.5,bow:1.2,longbow:1.8,crossbow:3.6,staff:2,scepter:1.5};
 const AWT={head:[1,2,3.5],chest:[3,6,11],legs:[2,4,7],feet:[1,1.5,3],hands:[.3,.6,1.2],neck:[.1,.1,.1],ring:[.05,.05,.05]};
-const CWT={potion:.3,antidote:.3,bread:.4,jerky:.2,apple:.2,meat_raw:.5,meat_cooked:.4,water:.7,kit:1,hide:1.2,ale:.5,novel:.4,bandage:.1,rag:.1,disinfect:.4,suture:.1,splint:.8,painkill:.1};
+const CWT={wood:.8,stone:1,fiber:.1,scrap:.6,herb:.05,potion:.3,antidote:.3,bread:.4,jerky:.2,apple:.2,meat_raw:.5,meat_cooked:.4,water:.7,kit:1,hide:1.2,ale:.5,novel:.4,bandage:.1,rag:.1,disinfect:.4,suture:.1,splint:.8,painkill:.1};
 const FOOD_ORDER=['meat_cooked','jerky','bread','apple','meat_raw'];
 const FOOD_MOOD={meat_cooked:{sad:-8,joy:6},meat_raw:{sad:8},bread:{sad:1.5},jerky:{sad:1.5},apple:{sad:-2,joy:1}};
 const ATTRS=[['str','STR','ความแข็งแรง','+ดาเมจประชิด'],['dex','DEX','ความคล่องแคล่ว','+ดาเมจระยะไกล/เวทย์ · +0.2% คริ'],['vit','VIT','พลังชีวิต','+8 HP สูงสุด'],['end','END','ความอึด','+6 สแตมินา · หิว กระหาย เหนื่อยช้าลง 1.5%'],['agi','AGI','ความว่องไว','+1% ความเร็ว'],['per','PER','การรับรู้','+2% ระยะมองเห็น · +0.5% โชค']];
@@ -471,7 +491,7 @@ const AFFIX=[['hpFlat','HP',q=>Math.round(6+q*10),''],['str','STR',q=>Math.max(1
  ['meleeMul','ดาเมจประชิด',q=>+(q*.04).toFixed(3),'%'],['rangedMul','ดาเมจระยะไกล',q=>+(q*.04).toFixed(3),'%'],['magicMul','ดาเมจเวทย์',q=>+(q*.04).toFixed(3),'%']];
 const BAGS=[['Cloth Pouch',4],['Leather Satchel',6],["Traveler's Pack",8],["Soldier's Rucksack",10],['Pathfinder Pack',12],['Abyssal Haversack',16]];
 const RUIN_NAMES=['Old Valdris','Greyhallow','Saint Morrow','Ashenford'];
-const IC={band:'<path d="M4 9 L20 9 L20 15 L4 15 Z" fill="currentColor" fill-opacity=".3"/><path d="M9 9 L9 15 M15 9 L15 15 M11 11 L13 13 M13 11 L11 13"/>',needle:'<path d="M5 19 L17 7 M17 7 Q20 4 19 3 Q18 2 15 5"/><path d="M5 19 Q3 15 7 14 Q10 13 9 10"/>',splint:'<path d="M7 3 L9 3 L9 21 L7 21 Z M15 3 L17 3 L17 21 L15 21 Z" fill="currentColor" fill-opacity=".35"/><path d="M6 8 L18 8 M6 16 L18 16"/>',pill:'<path d="M5 15 L15 5 Q19 3 20 8 Q21 11 19 13 L9 19 Q5 21 4 18 Q3 16 5 15 Z"/><path d="M10 10 L14 14"/>',meat:'<path d="M14 4 Q21 5 20 12 Q19 18 12 18 L8 20 L5 19 L4 16 L6 12 Q6 5 14 4 Z" fill="currentColor" fill-opacity=".35"/><circle cx="6" cy="18" r="1.6"/>',bread:'<path d="M4 14 Q4 7 12 7 Q20 7 20 14 L20 17 L4 17 Z" fill="currentColor" fill-opacity=".35"/><path d="M8 9 L9 12 M12 8 L12 12 M16 9 L15 12"/>',apple:'<path d="M12 7 Q6 4 5 11 Q5 19 12 20 Q19 19 19 11 Q18 4 12 7 Z" fill="currentColor" fill-opacity=".35"/><path d="M12 7 L13 3"/>',flask:'<path d="M10 3 L14 3 L14 6 Q19 8 19 14 Q19 21 12 21 Q5 21 5 14 Q5 8 10 6 Z"/><path d="M6 14 L18 14"/>',fire:'<path d="M12 3 Q18 9 16 14 Q20 12 18 18 Q16 21 12 21 Q7 21 6 17 Q5 13 9 11 Q9 14 11 14 Q8 8 12 3 Z" fill="currentColor" fill-opacity=".35"/><path d="M4 21 L20 21"/>',hide:'<path d="M6 4 L18 4 L20 8 L17 12 L20 18 L15 20 L12 17 L9 20 L4 18 L7 12 L4 8 Z" fill="currentColor" fill-opacity=".3"/>',sword:'<path d="M5 19 L17 7 M15 5 L19 9 M7 15 L9 17 M4 20 L6 18"/>',dagger:'<path d="M7 17 L15 9 M13 7 L17 11 M6 18 L8 16"/>',axe:'<path d="M6 20 L16 6"/><path d="M13 4 Q20 4 20 11 L15 8 Z" fill="currentColor"/>',
+const IC={wood:'<path d="M4 15 L16 7 L20 11 L8 19 Z" fill="currentColor" fill-opacity=".3"/><circle cx="18" cy="9" r="2.6"/>',stone:'<path d="M5 16 L8 8 L15 6 L20 12 L17 18 L9 19 Z" fill="currentColor" fill-opacity=".3"/>',fiber:'<path d="M6 20 Q8 10 7 4 M12 20 Q12 10 13 4 M18 20 Q16 11 18 5"/>',scrap:'<path d="M4 14 L10 8 L14 12 L20 6 L20 18 L4 18 Z" fill="currentColor" fill-opacity=".3"/><circle cx="9" cy="15" r="1.5"/>',herb:'<path d="M12 21 L12 9 M12 13 Q6 12 5 6 Q11 7 12 13 M12 11 Q18 10 19 4 Q13 5 12 11"/>',band:'<path d="M4 9 L20 9 L20 15 L4 15 Z" fill="currentColor" fill-opacity=".3"/><path d="M9 9 L9 15 M15 9 L15 15 M11 11 L13 13 M13 11 L11 13"/>',needle:'<path d="M5 19 L17 7 M17 7 Q20 4 19 3 Q18 2 15 5"/><path d="M5 19 Q3 15 7 14 Q10 13 9 10"/>',splint:'<path d="M7 3 L9 3 L9 21 L7 21 Z M15 3 L17 3 L17 21 L15 21 Z" fill="currentColor" fill-opacity=".35"/><path d="M6 8 L18 8 M6 16 L18 16"/>',pill:'<path d="M5 15 L15 5 Q19 3 20 8 Q21 11 19 13 L9 19 Q5 21 4 18 Q3 16 5 15 Z"/><path d="M10 10 L14 14"/>',meat:'<path d="M14 4 Q21 5 20 12 Q19 18 12 18 L8 20 L5 19 L4 16 L6 12 Q6 5 14 4 Z" fill="currentColor" fill-opacity=".35"/><circle cx="6" cy="18" r="1.6"/>',bread:'<path d="M4 14 Q4 7 12 7 Q20 7 20 14 L20 17 L4 17 Z" fill="currentColor" fill-opacity=".35"/><path d="M8 9 L9 12 M12 8 L12 12 M16 9 L15 12"/>',apple:'<path d="M12 7 Q6 4 5 11 Q5 19 12 20 Q19 19 19 11 Q18 4 12 7 Z" fill="currentColor" fill-opacity=".35"/><path d="M12 7 L13 3"/>',flask:'<path d="M10 3 L14 3 L14 6 Q19 8 19 14 Q19 21 12 21 Q5 21 5 14 Q5 8 10 6 Z"/><path d="M6 14 L18 14"/>',fire:'<path d="M12 3 Q18 9 16 14 Q20 12 18 18 Q16 21 12 21 Q7 21 6 17 Q5 13 9 11 Q9 14 11 14 Q8 8 12 3 Z" fill="currentColor" fill-opacity=".35"/><path d="M4 21 L20 21"/>',hide:'<path d="M6 4 L18 4 L20 8 L17 12 L20 18 L15 20 L12 17 L9 20 L4 18 L7 12 L4 8 Z" fill="currentColor" fill-opacity=".3"/>',sword:'<path d="M5 19 L17 7 M15 5 L19 9 M7 15 L9 17 M4 20 L6 18"/>',dagger:'<path d="M7 17 L15 9 M13 7 L17 11 M6 18 L8 16"/>',axe:'<path d="M6 20 L16 6"/><path d="M13 4 Q20 4 20 11 L15 8 Z" fill="currentColor"/>',
  mace:'<path d="M6 20 L14 10"/><circle cx="16" cy="8" r="3.5" fill="currentColor"/>',club:'<path d="M6 20 L14 10" stroke-width="3"/><circle cx="16" cy="8" r="3"/>',halberd:'<path d="M5 21 L19 3 M14 6 Q19 7 18 12 L15 9"/>',
  bow:'<path d="M7 3 Q19 12 7 21 M7 3 L7 21"/>',crossbow:'<path d="M12 4 L12 20 M4 8 Q12 14 20 8 M4 8 L12 12 L20 8"/>',staff:'<path d="M7 21 L15 7"/><path d="M15 3 L18 6 L15 9 L12 6 Z" fill="currentColor"/>',scepter:'<path d="M8 21 L14 9"/><circle cx="16" cy="6" r="3"/>',
  head:'<path d="M5 15 Q5 5 12 5 Q19 5 19 15 Z M5 15 L19 15 M12 9 L12 15"/>',chest:'<path d="M7 4 L10 6 L14 6 L17 4 L21 8 L18 11 L18 20 L6 20 L6 11 L3 8 Z"/>',legs:'<path d="M7 4 L17 4 L17 20 L13 20 L12 10 L11 20 L7 20 Z"/>',
@@ -699,11 +719,11 @@ if(Date.now()-Wd.start>MONTH){Wd.looted={};Wd.start=Date.now()}
 const saveWorld=()=>store.set(WKEY,Wd);
 
 // ================= settings & key bindings =================
-const ACTIONS=[['forward','เดินหน้า','KeyW'],['back','ถอยหลัง','KeyS'],['left','เดินซ้าย','KeyA'],['right','เดินขวา','KeyD'],['sprint','วิ่ง','ShiftLeft'],['jump','กระโดด','Space'],['interact','ใช้ / เก็บ / คุย','KeyE'],['potion','ยาฟื้นฟู','KeyR'],['antidote','ยาแก้เชื้อ','KeyF'],['eat','กินอาหาร','KeyG'],['drink','ดื่มน้ำ','KeyB'],['rest','นั่งพัก','KeyZ'],['skill1','สกิล 1','Digit1'],['skill2','สกิล 2','Digit2'],['char','ตัวละคร & กระเป๋า','KeyI'],['stats','อัพสเตท','KeyU'],['skills','สกิลทรี','KeyK'],['map','แผนที่','KeyM'],['quests','เควส','KeyJ'],['crouch','ย่อง (ลดเสียง)','KeyC'],['bandage','รักษาแผลด่วน','KeyX'],['health','สุขภาพ & บาดแผล','KeyH'],['camera','สลับมุมกล้อง','KeyV'],['help','วิธีเล่น','F1'],['settings','ตั้งค่า','KeyO'],['timeskip','เร่งเวลา (dev)','KeyT']];
+const ACTIONS=[['forward','เดินหน้า','KeyW'],['back','ถอยหลัง','KeyS'],['left','เดินซ้าย','KeyA'],['right','เดินขวา','KeyD'],['sprint','วิ่ง','ShiftLeft'],['jump','กระโดด','Space'],['interact','ใช้ / เก็บ / คุย','KeyE'],['potion','ยาฟื้นฟู','KeyR'],['antidote','ยาแก้เชื้อ','KeyF'],['eat','กินอาหาร','KeyG'],['drink','ดื่มน้ำ','KeyB'],['rest','นั่งพัก','KeyZ'],['skill1','สกิล 1','Digit1'],['skill2','สกิล 2','Digit2'],['char','ตัวละคร & กระเป๋า','KeyI'],['stats','อัพสเตท','KeyU'],['skills','สกิลทรี','KeyK'],['map','แผนที่','KeyM'],['quests','เควส','KeyJ'],['crouch','ย่อง (ลดเสียง)','KeyC'],['bandage','รักษาแผลด่วน','KeyX'],['health','สุขภาพ & บาดแผล','KeyH'],['camera','สลับมุมกล้อง','KeyV'],['dodge','หลบ (Dash)','KeyQ'],['aspect','ใช้ Aspect','KeyT'],['craft','สร้างสิ่งของ','KeyN'],['help','วิธีเล่น','F1'],['settings','ตั้งค่า','KeyO'],['timeskip','เร่งเวลา (dev)','KeyP']];
 const SETKEY='realmofash.settings';
 const CFG_DEF={vol:{master:.8,sfx:.9,amb:.7,music:.35},sens:1,invertY:false,shadows:true,grass:1,zMul:1,binds:{}};
 let CFG=Object.assign({},CFG_DEF,store.get(SETKEY)||{});CFG.vol=Object.assign({},CFG_DEF.vol,CFG.vol);CFG.binds=Object.assign({},CFG.binds);
-if(!CFG.binds.health&&CFG.binds.help==='KeyH')CFG.binds.help='F1';
+if(!CFG.binds.health&&CFG.binds.help==='KeyH')CFG.binds.help='F1';if(CFG.binds.timeskip==='KeyT'&&!CFG.binds.aspect)CFG.binds.timeskip='KeyP';
 for(const [a,,d] of ACTIONS)if(!CFG.binds[a])CFG.binds[a]=d;
 const saveCfg=()=>store.set(SETKEY,CFG);
 const down=a=>!!keys[CFG.binds[a]]||(a==='sprint'&&CFG.binds.sprint==='ShiftLeft'&&!!keys.ShiftRight);
@@ -796,10 +816,10 @@ function buildChunk(cx,cz){
   const idx=[];for(let j=0;j<CN;j++)for(let i=0;i<CN;i++){const a=j*N+i,b=a+1,c=a+N,d=c+1;idx.push(a,c,b,b,c,d)}
   const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(pos,3));geo.setAttribute('color',new THREE.BufferAttribute(col,3));geo.setIndex(idx);geo.computeVertexNormals();geo.computeBoundingSphere();
   const group=new THREE.Group(),mesh=new THREE.Mesh(geo,VMAT);mesh.receiveShadow=true;group.add(mesh);
-  const r=mulberry((cx*73856093)^(cz*19349663)^WORLD_SEED),colliders=[],bk={};
+  const r=mulberry((cx*73856093)^(cz*19349663)^WORLD_SEED),colliders=[],bk={},nodes=[];
   for(let n=0;n<44;n++){const px=x0+r()*CHUNK,pz=z0+r()*CHUNK,rot=r()*TAU,sc=.75+r()*.6,acc=r(),tr=r();
     const h=H(px,pz);if(h<.6||nearFlat(px,pz,8))continue;const b=biomeAt(px,pz,h);const V=VEG[b];if(acc>V.p*(1-urbanAt(px,pz)*.85))continue;
-    const ty=wpick(V.t,tr),SR=SCALE[ty],s2=SR[0]+(sc-.75)/.6*(SR[1]-SR[0]);(bk[ty]||(bk[ty]=[])).push([px,groundH(px,pz)-.15,pz,rot,s2]);if(COLR[ty])colliders.push({x:px,z:pz,r:COLR[ty]*s2,h:ty==='rock'?1.4*s2:30})}
+    const ty=wpick(V.t,tr),SR=SCALE[ty],s2=SR[0]+(sc-.75)/.6*(SR[1]-SR[0]);(bk[ty]||(bk[ty]=[])).push([px,groundH(px,pz)-.15,pz,rot,s2]);if(COLR[ty])colliders.push({x:px,z:pz,r:COLR[ty]*s2,h:ty==='rock'?1.4*s2:30,k:ty==='rock'?'rock':'tree'});else if(ty==='bush')nodes.push({x:px,z:pz,k:'bush'})}
   for(const ty in bk){const a=bk[ty],im=new THREE.InstancedMesh(GEO[ty],TREEMAT,a.length);im.receiveShadow=true;
     a.forEach((t,i)=>{dummy.position.set(t[0],t[1],t[2]);dummy.rotation.set(0,t[3],0);dummy.scale.setScalar(t[4]);dummy.updateMatrix();im.setMatrixAt(i,dummy.matrix);tmpC.setScalar(.82+hash2(t[0],t[2],3)*.36);im.setColorAt(i,tmpC)});
     im.castShadow=true;im.computeBoundingSphere();group.add(im)}
@@ -811,7 +831,7 @@ function buildChunk(cx,cz){
     const px=c0x+jx,pz=c0z+jz;if(nearFlat(px,pz,big?16:8))continue;if(big&&roadDist(px,pz)<7)continue;const h=H(px,pz);if(h<.6)continue;
     if(big&&Math.abs(H(px+5,pz)-H(px-5,pz))+Math.abs(H(px,pz+5)-H(px,pz-5))>6)continue;
     const rot=Math.floor(rq*4)*Math.PI/2+(u>.6?(rj-.5)*.12:(rj-.5)*.9),cs=Math.cos(rot),sn=Math.sin(rot),T=RUINS[key];
-    (rk[key]||(rk[key]=[])).push([px,groundH(px,pz)-.1,pz,rot]);for(const [lx,lz,lr] of T.c)colliders.push({x:px+lx*cs+lz*sn,z:pz-lx*sn+lz*cs,r:lr,h:T.h||5.5})}
+    (rk[key]||(rk[key]=[])).push([px,groundH(px,pz)-.1,pz,rot]);for(const [lx,lz,lr] of T.c)colliders.push({x:px+lx*cs+lz*sn,z:pz-lx*sn+lz*cs,r:lr,h:T.h||5.5,k:'ruin'})}
   for(const key in rk){const a=rk[key],im=new THREE.InstancedMesh(RUINS[key].g,VMAT,a.length);
     a.forEach((t,i)=>{dummy.position.set(t[0],t[1],t[2]);dummy.rotation.set(0,t[3],0);dummy.scale.setScalar(1);dummy.updateMatrix();im.setMatrixAt(i,dummy.matrix);tmpC.setScalar(.8+hash2(t[0],t[2],5)*.35);im.setColorAt(i,tmpC)});
     im.castShadow=true;im.receiveShadow=true;im.computeBoundingSphere();group.add(im)}
@@ -819,7 +839,7 @@ function buildChunk(cx,cz){
   const cu=urbanAt(x0+32,z0+32);
   if(r()<.32+cu*.35){const px=x0+8+r()*(CHUNK-16),pz=z0+8+r()*(CHUNK-16),rot=r()*TAU,h=H(px,pz);const id=cx+','+cz;
     if(h>.4&&!nearFlat(px,pz,6)&&!Wd.looted[id]){const m=makeChest();m.position.set(px,groundH(px,pz),pz);m.rotation.y=rot;group.add(m);chests.push({kind:'chest',id,x:px,z:pz,m})}}
-  scene.add(group);chunks.set(cx+','+cz,{cx,cz,group,colliders,chests});
+  scene.add(group);chunks.set(cx+','+cz,{cx,cz,group,colliders,chests,nodes});
 }
 function disposeChunk(c){scene.remove(c.group);c.group.traverse(o=>{if(o.isInstancedMesh)o.dispose();else if(o.isMesh&&o.geometry.attributes.color&&!o.isInstancedMesh&&o.material===VMAT)o.geometry.dispose()})}
 let focusX=0,focusZ=0;
@@ -910,8 +930,8 @@ const emptyEq=()=>Object.fromEntries(EQ_SLOTS.map(k=>[k,null]));
 const FIST={t:'w',w:'fist',r:0,dmg:4};
 function newPlayer(race,fate,name){const c=cities[0],eq=emptyEq();eq.main={t:'w',w:'dagger',r:0,dmg:7};eq.feet={t:'a',s:'feet',b:0,r:0,arm:3,aff:{}};
   const bag=Array(BASE_BAG).fill(null);bag[0]={t:'c',c:'potion',n:2};bag[1]={t:'c',c:'antidote',n:1};bag[2]={t:'c',c:'bread',n:3};bag[3]={t:'c',c:'water',n:3};bag[4]={t:'c',c:'bandage',n:1};bag[5]={t:'c',c:'rag',n:2};
-  return{name,race,fate,x:c.x,z:c.z+9,y:c.h,vy:0,my:Math.PI,hp:1,sta:999,inf:0,food:85,water:85,energy:90,mood:{stress:10,sad:8,bored:15,joy:25},body:emptyBody(),knox:false,sick:0,pk:0,down:0,attr:{str:0,dex:0,vit:0,end:0,agi:0,per:0},ap:0,lvl:1,xp:0,sp:0,gold:40,bag,eq,cls:null,skills:{},city:-1,quests:[],done:{},visited:{0:1},kills:0,born:Wd.time}}
-function migrate(p){if(p.food==null){p.food=85;p.water=85;p.energy=90}if(!p.body){p.body=emptyBody();p.knox=false;p.sick=0;p.pk=0}if(!p.mood)p.mood={stress:10,sad:8,bored:15,joy:25};p._mk=null;p.grab=null;p.down=0;if(!p.attr){p.attr={str:0,dex:0,vit:0,end:0,agi:0,per:0};p.ap=(p.lvl-1)*AP_PER_LVL}if(Array.isArray(p.bag)&&p.eq&&typeof p.eq==='object')return p;const old=p.inv||[],ei=typeof p.eq==='number'?p.eq:-1;p.eq=emptyEq();p.bag=[];
+  return{name,race,fate,x:c.x,z:c.z+9,y:c.h,vy:0,my:Math.PI,hp:1,sta:999,inf:0,food:85,water:85,energy:90,mood:{stress:10,sad:8,bored:15,joy:25},body:emptyBody(),knox:false,sick:0,pk:0,down:0,attr:{str:0,dex:0,vit:0,end:0,agi:0,per:0},ap:0,lvl:1,xp:0,sp:0,gold:40,bag,eq,cls:null,skills:{},city:-1,quests:[],done:{},visited:{0:1},kills:0,born:Wd.time,aliveT:0,atier:1}}
+function migrate(p){if(p.food==null){p.food=85;p.water=85;p.energy=90}if(!p.body){p.body=emptyBody();p.knox=false;p.sick=0;p.pk=0}if(!p.mood)p.mood={stress:10,sad:8,bored:15,joy:25};p._mk=null;p.grab=null;if(p.aliveT==null){p.aliveT=0;p.atier=1}p.down=0;if(!p.attr){p.attr={str:0,dex:0,vit:0,end:0,agi:0,per:0};p.ap=(p.lvl-1)*AP_PER_LVL}if(Array.isArray(p.bag)&&p.eq&&typeof p.eq==='object')return p;const old=p.inv||[],ei=typeof p.eq==='number'?p.eq:-1;p.eq=emptyEq();p.bag=[];
   old.forEach((it,i)=>{if(i===ei&&it.t==='w')p.eq.main=it;else p.bag.push(it)});if(p.potions)p.bag.push({t:'c',c:'potion',n:p.potions});if(p.antidotes)p.bag.push({t:'c',c:'antidote',n:p.antidotes});
   delete p.inv;delete p.potions;delete p.antidotes;return p}
 function offOk(it){const k=GEAR.off.bases[it.b][2],w=WEAPONS[curW().w];if(k==='shield')return w.kind==='melee'&&!TWOH.includes(w.m);if(k==='quiver')return w.kind==='bow';if(k==='tome')return w.kind==='magic';return true}
@@ -944,11 +964,11 @@ addEventListener('keydown',e=>{
   if(e.code==='Escape'){if(panelOpen){closePanel();return}if(state==='play'&&P&&!P.dead&&fallback)setPause(!paused);return}
   if(state!=='play'||P.dead||paused)return;
   const ka=Object.keys(CFG.binds).find(a=>CFG.binds[a]===e.code)||(e.code==='ShiftRight'&&CFG.binds.sprint==='ShiftLeft'?'sprint':null);if(!ka)return;
-  const PN={char:'char',stats:'stats',skills:'skills',map:'map',help:'help',quests:'quests',settings:'settings',health:'health'};
+  const PN={craft:'craft',char:'char',stats:'stats',skills:'skills',map:'map',help:'help',quests:'quests',settings:'settings',health:'health'};
   if(PN[ka]){togglePanel(PN[ka]);return}
   if(panelOpen)return;
   switch(ka){case'camera':firstPerson=!firstPerson;break;case'interact':interact();break;case'potion':usePotion();break;case'antidote':useAntidote();break;case'eat':quickEat();break;case'drink':quickDrink();break;case'rest':toggleRest();break;case'crouch':if(!mounted){crouch=!crouch;if(crouch&&resting)resting=false}break;case'bandage':quickTreat();break;
-    case'skill1':useSkill(0);break;case'skill2':useSkill(1);break;case'jump':e.preventDefault();if(P.grab){P.grab.str-=1;shake=Math.max(shake,.1);hurtT=.12;if(P.grab.str<=0)breakFree();break}if(sleeping){wake();break}if(onGround&&!mounted&&!act&&!(P.down>0)){if(resting)resting=false;crouch=false;if(P.energy>3&&P.sta>=8){P.sta-=8;lastSta=0;P.vy=8.4*(1+ST.jump)*(S2.spd<.7?.8:1);sfx('step','grass',.25)}else toast('เหนื่อยเกินกว่าจะกระโดด')}break}
+    case'dodge':doDash();break;case'aspect':useAspect();break;case'skill1':useSkill(0);break;case'skill2':useSkill(1);break;case'jump':e.preventDefault();if(P.grab){P.grab.str-=1;shake=Math.max(shake,.1);hurtT=.12;if(P.grab.str<=0)breakFree();break}if(sleeping){wake();break}if(onGround&&!mounted&&!act&&!(P.down>0)){if(ST.noJump){toast('รากหยั่งลึก: กระโดดไม่ได้','#ff8a70');break}if(resting)resting=false;crouch=false;if(P.energy>3&&P.sta>=8){P.sta-=8;lastSta=0;P.vy=8.4*(1+ST.jump)*(S2.spd<.7?.8:1);sfx('step','grass',.25)}else toast('เหนื่อยเกินกว่าจะกระโดด')}break}
 });
 addEventListener('keyup',e=>{keys[e.code]=false});
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
@@ -979,7 +999,7 @@ function itemTip(it,where){let h=`<b>${itemName(it)}</b><div class="m">`;
   if(it.t==='w'){const b=WEAPONS[it.w];h+=`${RAR[it.r].th} · ${b.kind==='melee'?'อาวุธประชิด':b.kind==='bow'?'อาวุธระยะไกล':'อาวุธเวทย์'}${TWOH.includes(b.m)?' · สองมือ':''}</div><div>ดาเมจ <b>${it.dmg}</b> · ความเร็ว ${b.rate}s</div>${b.cls?`<div class="${b.cls===P.cls?'m':'r'}">ต้องเป็น${CLASSES[b.cls].th} · ${b.sub}</div>`:'<div class="m">ใช้ได้ทุกคน</div>'}`}
   else if(it.t==='a'){const ob=it.s==='off'?GEAR.off.bases[it.b][2]:null;h+=`${RAR[it.r].th} · ${GEAR[it.s].th}${ob==='shield'?' (โล่ ใช้กับอาวุธประชิดมือเดียว)':ob==='quiver'?' (ใช้กับธนู/หน้าไม้)':ob==='tome'?' (ใช้กับอาวุธเวทย์)':''}</div>${it.arm?`<div>เกราะ <b>${it.arm}</b></div>`:''}${Object.entries(it.aff).map(([k,v])=>`<div class="g">${affText(k,v)}</div>`).join('')}${it.b===2&&ARMOR_SLOTS.includes(it.s)?'<div class="r">หนัก: -1.5% ความเร็ว</div>':''}${where==='e'&&it.s==='off'&&!offOk(it)?'<div class="r">ไม่ทำงานกับอาวุธที่ถืออยู่</div>':''}`}
   else if(it.t==='bag')h+=`${RAR[it.r].th} · กระเป๋า</div><div>เพิ่มช่องเก็บของ <b>+${it.slots}</b></div>`;
-  else if(it.t==='c')h+=`${CONS[it.c].food||CONS[it.c].water?'อาหาร/เครื่องดื่ม':it.c==='hide'?'วัตถุดิบ':'ของใช้'} · ซ้อนได้ ${STACK}</div><div>${CONS[it.c].d}</div>${it.c!=='hide'?'<div class="m">คลิกขวาเพื่อใช้</div>':''}`;
+  else if(it.t==='c')h+=`${CONS[it.c].food||CONS[it.c].water?'อาหาร/เครื่องดื่ม':CONS[it.c].mat?'วัตถุดิบ':'ของใช้'} · ซ้อนได้ ${STACK}</div><div>${CONS[it.c].d}</div>${it.c!=='hide'?'<div class="m">คลิกขวาเพื่อใช้</div>':''}`;
   else if(it.t==='b')h+=`Skill Book</div><div>อ่านเพื่อรับคลาส ${CLASSES[it.c].th} (${CLASSES[it.c].subs})</div>${P.cls?'<div class="r">คุณมีคลาสแล้ว</div>':''}`;
   return h+`<div class="m" style="margin-top:4px">ขายได้ ${sellPrice(it)} gold</div>`}
 const ICK={longsword:'sword',longbow:'bow',greataxe:'axe'};
@@ -1013,7 +1033,7 @@ function rollChest(bonus=0,boss=false,noGold=false){const L=ST.luck+bonus,out=[]
   if(!noGold)out.push({t:'gold',n:Math.round((6+rand()*22)*(1+L)*(boss?8:1))});
   if(rand()<.35||boss)out.push({t:'c',c:'potion',n:boss?3:1+(rand()<.3?1:0)});
   if(rand()<.22||boss)out.push({t:'c',c:'antidote',n:1});
-  if(rand()<.5)out.push({t:'c',c:pick(['bread','jerky','apple','bread']),n:1+ri(2)});if(rand()<.4)out.push({t:'c',c:'water',n:1+ri(2)});if(rand()<.08)out.push({t:'c',c:'kit',n:1});
+  if(rand()<.5)out.push({t:'c',c:pick(['bread','jerky','apple','bread']),n:1+ri(2)});if(rand()<.4)out.push({t:'c',c:'water',n:1+ri(2)});if(rand()<.08)out.push({t:'c',c:'kit',n:1});if(rand()<.35)out.push({t:'c',c:pick(['scrap','herb','fiber','scrap']),n:1+ri(3)});
   if(rand()<.38)out.push({t:'c',c:rand()<.45?'bandage':'rag',n:1+ri(2)});if(rand()<.12)out.push({t:'c',c:'disinfect',n:1});if(rand()<.07)out.push({t:'c',c:'suture',n:1});if(rand()<.08)out.push({t:'c',c:'splint',n:1});if(rand()<.15)out.push({t:'c',c:'painkill',n:1+ri(2)});if(rand()<.12)out.push({t:'c',c:'ale',n:1});if(rand()<.08)out.push({t:'c',c:'novel',n:1});
   const gn=boss?3:(rand()<.55+L*.3?1:0)+(rand()<.18?1:0);
   for(let i=0;i<gn;i++){const r=rollRarity(L,boss?3:0);out.push(rand()<.4?makeWeapon(r):makeGear(r,null,il))}
@@ -1041,12 +1061,13 @@ function interactables(){const out=[];for(const c of chunks.values())for(const c
 let nearest=null;
 function findNearest(){nearest=null;let bd=1e9;for(const o of interactables()){const d=Math.hypot(o.x-P.x,o.z-P.z),lim=o.r||3;if(d<lim&&d<bd){bd=d;nearest=o}}
   const pr=$('#prompt');if(P.grab){pr.innerHTML=`<b>กด ${keyName(CFG.binds.jump)} รัวๆ!</b> ดิ้นหลุด ${'■'.repeat(Math.max(0,Math.ceil(P.grab.str)))}`;pr.classList.remove('hidden');return}if(mounted){pr.innerHTML='<b>[E]</b> ลงจากม้า';pr.classList.remove('hidden');return}
+  if(!nearest){const g=gatherNode();if(g){pr.innerHTML=`<b>[${keyName(CFG.binds.interact)}]</b> ${GN[g.k].th} <small style="color:var(--mut)">(เหลือ ${gLeft(g)} ครั้ง)</small>`;pr.classList.remove('hidden');return}}
   if(!nearest&&nearWater()){pr.innerHTML=`<b>[${keyName(CFG.binds.drink)}]</b> ดื่มน้ำจากแหล่งน้ำ (เสี่ยงติดเชื้อ)`;pr.classList.remove('hidden');return}
   if(!nearest){pr.classList.add('hidden');return}
   const t={well:'บ่อน้ำสะอาด: ดื่มจนอิ่ม',inn:'โรงเตี๊ยม: พักผ่อน / กินอาหาร',fire:'กองไฟ: ย่างเนื้อ · นั่งพักข้างไฟ',chest:'เปิดหีบสมบัติ',shrine:P.city===nearest.ci?'ศิลาเมือง (ผูกพันแล้ว)':`ผูกพันกับเมือง ${cities[nearest.ci]?.name}: ${cities[nearest.ci]?.pd}`,board:'กระดานเควส',shop:'พ่อค้า',horse:'ขี่ม้า',loot:`ถุงของบนพื้น (${nearest.items?.length||0} ชิ้น)`}[nearest.kind];
   pr.innerHTML=`<b>[${keyName(CFG.binds.interact)}]</b> ${t}`;pr.classList.remove('hidden')}
 function interact(){
-  if(mounted){dismount();return}if(!nearest)return;const o=nearest;
+  if(mounted){dismount();return}if(!nearest){const g=gatherNode();if(g)gather(g);return}const o=nearest;
   if(o.kind==='well'){startAction('lake','ตักน้ำบ่อดื่ม',2.5,()=>{P.water=100;sfx('drink');toast('ดื่มน้ำสะอาดจนอิ่ม','#5aa0e0')});return}
   if(o.kind==='inn'){openPanel('inn',o.ci);return}
   if(o.kind==='fire'){startAction('cook','ย่างเนื้อข้างกองไฟ',3,()=>{cookAll();resting=true});return}
@@ -1059,12 +1080,12 @@ function interact(){
 }
 function openChest(o){{sfx('chest');moodAdd('joy',2);moodAdd('bored',-3);Wd.looted[o.id]=1;saveWorld();const lid=o.m.userData.lid;let t=0;const anim=()=>{t+=.08;lid.rotation.x=-Math.min(1.9,t*1.9);if(t<1)requestAnimationFrame(anim);else setTimeout(()=>{o.m.parent&&o.m.parent.remove(o.m)},1500)};anim();
     for(const c of chunks.values()){const i=c.chests.indexOf(o);if(i>=0)c.chests.splice(i,1)}
-    grant(rollChest(),'หีบสมบัติ');questEvent('chest');gainXp(10)}}
-function mount(h){mounted=h;h.rider=true;P.x=h.x;P.z=h.z;toast('ขี่ม้าแล้ว: เร็วขึ้นมาก กด E เพื่อลง')}
+    grant(seekLoot(rollChest()),'หีบสมบัติ');questEvent('chest');gainXp(10)}}
+function mount(h){if(ST.noMount){toast('ม้าตื่นกลัวกลิ่นนักล่า ไม่ยอมให้ขี่','#ff8a70');return}mounted=h;h.rider=true;P.x=h.x;P.z=h.z;toast('ขี่ม้าแล้ว: เร็วขึ้นมาก กด E เพื่อลง')}
 function dismount(){const h=mounted;mounted=null;h.rider=false;h.x=P.x;h.z=P.z;P.x+=Math.cos(h.yaw)*1.4;P.z-=Math.sin(h.yaw)*1.4;charModel.legL.rotation.z=charModel.legR.rotation.z=0}
 
 // ================= consumables & skills =================
-function usePotion(){if(!countC('potion')){toast('ยาฟื้นฟูหมดแล้ว','#c8402c');return}if(P.hp>=ST.maxHp)return;startAction('drink','ดื่มยาฟื้นฟู',1.2,potionDone,{mobile:1,mounted:1})}
+function usePotion(){if(ST.onlyAspectHeal){toast('ร่างที่แสงเลือก: ยารักษาคุณไม่ได้ ใช้ Aspect โคมรุ่งอรุณ','#ff8a70');return}if(!countC('potion')){toast('ยาฟื้นฟูหมดแล้ว','#c8402c');return}if(P.hp>=ST.maxHp)return;startAction('drink','ดื่มยาฟื้นฟู',1.2,potionDone,{mobile:1,mounted:1})}
 function potionDone(){if(!takeC('potion'))return;const h=Math.round(ST.maxHp*.45);P.hp=Math.min(ST.maxHp,P.hp+h);floatNum(P.x,P.y+2.2,P.z,'+'+h,'#7cff8a');renderHot();if(panelOpen==='char')renderPanel('char')}
 function useAntidote(){if(!countC('antidote')){toast('ยาแก้เชื้อหมดแล้ว','#c8402c');return}if(P.inf<=0&&!P.knox)return;startAction('drink','ดื่มยาแก้เชื้อ',1.5,()=>{if(!takeC('antidote'))return;P.inf=0;P.knox=false;sfx('drink');toast('เชื้อซอมบี้ถูกล้างออกจากร่างแล้ว','#8fc043');renderHot()},{mobile:1,mounted:1})}
 function antidoteOld(){P.inf=0;toast('เชื้อซอมบี้ถูกล้างออกจากร่างแล้ว','#8fc043');renderHot();if(panelOpen==='char')renderPanel('char')}
@@ -1074,7 +1095,7 @@ const emoLv=v=>lv4(v,[25,50,75,92]);
 function moodLvls(){const M=(P&&P.mood)||{};return{st:emoLv(M.stress||0),sd:emoLv(M.sad||0),bd:emoLv(M.bored||0),jy:emoLv(M.joy||0)}}
 function moodAdd(k,v){if(P&&P.mood)P.mood[k]=clamp(P.mood[k]+v,0,100)}
 function updateMood(dt,gdt,inC,ag){const M=P.mood,night=nightK>.5&&!inC,fire=nearFire(),mv=poseF.moving;
-  M.stress+=(ag*.5+S2.bleed*.6+(P.hp<ST.maxHp*.3?1.4:0)+(night?.12:0)+(P.knox?.35:0)+(P.grab?3:0))*dt-((inC?1.2:0)+(resting?(fire?1.1:.35):0)+(ag===0&&!night?.1:0))*dt-(sleeping?.05*gdt:0);
+  M.stress+=(1+(ST.stressMul||0))*(ag*.5+S2.bleed*.6+(P.hp<ST.maxHp*.3?1.4:0)+(night?.12:0)+(P.knox?.35:0)+(P.grab?3:0))*dt-((inC?1.2:0)+(resting?(fire?1.1:.35):0)+(ag===0&&!night?.1:0))*dt-(sleeping?.05*gdt:0);
   M.sad+=((P.knox?.12:0)+((S2.pain||0)>=2?.08:0)+(night&&!fire?.035:0)+(P.food<25?.07:0)+(M.stress>75?.05:0))*dt-((inC?.22:0)+(fire&&resting?.35:0)+(M.joy>50?.05:0))*dt-(sleeping?.02*gdt:0);
   M.bored+=((ag===0&&!mv?.22:ag===0?.05:0)*(inC?1.3:1))*dt-(ag>0?.9:0)*dt;
   M.joy-=(.1+(M.sad>50?.08:0))*dt;
@@ -1132,7 +1153,7 @@ function updateBody(dt,gdt){let bleed=0;
     if(w.winf)P.sick=Math.min(100,P.sick+gdt*.05);
     let hm=S2.heal*(resting?2:1)*(sleeping?2:1)*(w.band?1.25:1)*(w.dis?1.2:1);if(w.winf||(w.t==='deep'&&!w.st))hm=0;if(w.t==='frac'&&!w.sp)hm*=.4;
     w.h-=gdt*hm;if(w.h<=0){arr.splice(i,1);toast(`${partName(k)}: ${W.th}หายดีแล้ว`,'#8fc043')}}}
-  if(bleed){P.hp-=bleed*gdt;if(P.hp<=0)lastHit='เสียเลือดจนตาย';if(rand()<dt*bleed*2)spawnGore(P.x,P.y+.3,P.z,1,0x7a1810)}
+  if(bleed){P.hp-=bleed*gdt*(1+(ST.bleedMul||0));if(P.hp<=0)lastHit='เสียเลือดจนตาย';if(rand()<dt*bleed*2)spawnGore(P.x,P.y+.3,P.z,1,0x7a1810)}
   if(P.pk>0)P.pk-=gdt;
   if(P.knox){P.inf=Math.min(100,P.inf+gdt*.18*Math.max(.3,1-ST.infectRes*.6));P.sick=Math.min(100,P.sick+gdt*.06)}else if(P.inf>0)P.inf=Math.max(0,P.inf-gdt*.05);
   if(P.inf>0){P.hp-=(P.inf>=100?4:P.inf/100)*gdt;if(P.hp<=0)lastHit='เชื้อซอมบี้กัดกินร่าง'}
@@ -1175,11 +1196,11 @@ function useSkill(i){const s=activeSkills()[i];if(!s)return;if(!P.skills[s.id]){
   const fx=-Math.sin(yaw),fz=-Math.cos(yaw),w=curW(),base=calcDmg(w);P.my=yaw+Math.PI;
   const pose=(style,combo,dur)=>{atk={style,combo,t:0,dur,hit:true,b:{kind:'magic'}}};
   if(s.id==='whirl'){spinT=.45;for(const z of zNear(P.x,P.z,7))if(Math.hypot(z.x-P.x,z.z-P.z)<4.5+z.rad)hitZombie(z,base*2.2,{knock:5});ring(P.x,P.z,4.5,0xffd080);shake=.3;hitStop=.06}
-  if(s.id==='cry'){pose('cast',1,.6);buffDmg=10;P.hp=Math.min(ST.maxHp,P.hp+ST.maxHp*.15);ring(P.x,P.z,3,0xff5030);shake=.25;toast('War Cry! ดาเมจ +40%')}
+  if(s.id==='cry'){pose('cast',1,.6);buffDmg=10;if(!ST.onlyAspectHeal)P.hp=Math.min(ST.maxHp,P.hp+ST.maxHp*.15);ring(P.x,P.z,3,0xff5030);shake=.25;toast('War Cry! ดาเมจ +40%')}
   if(s.id==='volley'){pose('bow',0,.5);for(let k=-2;k<=2;k++)shoot(w,yaw+k*.09,base*.8)}
   if(s.id==='step'){invuln=1.5;for(let k=0;k<9;k++){const nx=P.x+fx*.9,nz=P.z+fz*.9;if(!blocked(nx,nz)){P.x=nx;P.z=nz}}ring(P.x,P.z,1.5,0x9ad0ff)}
   if(s.id==='nova'){pose('cast',1,.55);for(const z of zNear(P.x,P.z,9))if(Math.hypot(z.x-P.x,z.z-P.z)<6+z.rad)hitZombie(z,base*2.5,{knock:9,col:'#ff9a40'});ring(P.x,P.z,6,0xff7020);shake=.35;hitStop=.07}
-  if(s.id==='mend'){pose('cast',0,.6);P.hp=Math.min(ST.maxHp,P.hp+ST.maxHp*.4);P.inf=Math.max(0,P.inf-50);ring(P.x,P.z,2.5,0x7cff8a)}}
+  if(s.id==='mend'){pose('cast',0,.6);if(!ST.onlyAspectHeal)P.hp=Math.min(ST.maxHp,P.hp+ST.maxHp*.4);P.inf=Math.max(0,P.inf-50);ring(P.x,P.z,2.5,0x7cff8a)}}
 const rings=[];
 function ring(x,z,r,col,dur=.45){const m=new THREE.Mesh(new THREE.RingGeometry(.85,1,32).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.9,side:THREE.DoubleSide,depthWrite:false}));m.position.set(x,groundH(x,z)+.15,z);scene.add(m);rings.push({m,r,t:0,dur,grow:dur<.6})}
 
@@ -1211,6 +1232,10 @@ function curPose(){if(!atk)return null;const set=POSES[atk.style],kp=set[atk.com
 let pt=0;
 const kneel=(m,k)=>{m.body.position.y-=.42*k;m.legL.rotation.x=-1.45*k;m.legR.rotation.x=.85*k};
 const ACT_POSE={
+ chop:(m,t)=>{const k=(Math.sin(t*5.5)+1)/2;m.armR.rotation.set(-2.9+k*2.4,0,.15);m.armL.rotation.set(-2.7+k*2.3,0,-.15);m.body.rotation.x=.05+k*.4},
+ mine:(m,t)=>{const k=(Math.sin(t*5)+1)/2;m.armR.rotation.set(-3+k*2.6,0,.1);m.armL.rotation.set(-2.9+k*2.5,0,-.1);m.body.rotation.x=.1+k*.5;m.head.rotation.x=.3},
+ gather:(m,t)=>{kneel(m,1);m.body.rotation.x=.55;m.armR.rotation.set(-.8+Math.sin(t*7)*.4,0,.2);m.armL.rotation.set(-.8-Math.sin(t*7)*.4,0,-.2);m.head.rotation.x=.5},
+ craft:(m,t)=>{kneel(m,1);m.body.rotation.x=.3;m.armR.rotation.set(-1.1+Math.sin(t*8)*.3,0,.4);m.armL.rotation.set(-1.1+Math.sin(t*8+1)*.15,0,-.4);m.head.rotation.x=.45},
  eat:(m,t)=>{m.armR.rotation.set(-2.05+Math.sin(t*7)*.25,0,.42);m.armL.rotation.set(-.9,0,-.2);m.head.rotation.x=.12+Math.sin(t*7)*.08},
  drink:(m,t)=>{const r=Math.min(1,t*3);m.armR.rotation.set(-2.65*r,0,.25);m.head.rotation.x=-.5*r},
  pill:(m,t)=>{const r=Math.min(1,t*3);m.armR.rotation.set(-2.5*r,0,.3);m.head.rotation.x=t>.9?-.45:0},
@@ -1229,6 +1254,7 @@ function applyPose(dt){const m=charModel,p=curPose();pt+=dt;m.g.rotation.order='
   if(P.dead){const k=Math.min(1,(P.deadT||0)/.8);m.g.rotation.x=Math.PI/2*ease(k);m.body.rotation.set(0,0,0);m.armL.rotation.set(-2.8*k,0,-.3);m.armR.rotation.set(-2.8*k,0,.3);m.legL.rotation.set(0,0,0);m.legR.rotation.set(0,0,0);return}
   if(P.down>0){const k=P.down>.7?clamp((1.8-P.down)/.3,0,1):P.down/.7;m.g.rotation.x=-Math.PI/2*ease(k);m.body.rotation.set(0,0,0);m.armL.rotation.set(-.6*k,0,-.7*k);m.armR.rotation.set(-.6*k,0,.7*k);m.legL.rotation.set(.3*k,0,0);m.legR.rotation.set(-.25*k,0,0);return}
   if(sleeping){m.g.rotation.x=-Math.PI/2;m.g.position.y+=.2;m.body.rotation.set(0,0,0);m.body.position.y=Math.sin(pt*1.1)*.012;m.armL.rotation.set(0,0,-.12);m.armR.rotation.set(-.5,0,.6);m.legL.rotation.set(0,0,0);m.legR.rotation.set(.12,0,.05);m.head.rotation.y=.45;return}
+  if(dashT>0&&!mounted){const k=1-dashT/.34,th=ease(Math.min(1,k*1.15))*TAU,c=.78*((RACES[P.race].L.h)||1);m.g.rotation.x=th;m.g.position.y+=c*(1-Math.cos(th));m.g.position.x-=Math.sin(P.my)*c*Math.sin(th);m.g.position.z-=Math.cos(P.my)*c*Math.sin(th);m.body.rotation.set(.5,0,0);m.armL.rotation.set(-1.7,0,-.2);m.armR.rotation.set(-1.7,0,.2);m.legL.rotation.set(-1.4,0,0);m.legR.rotation.set(-1.4,0,0);m.head.rotation.x=.6;return}
   if(P.grab){const e=Math.sin(pt*16);m.body.rotation.set(.1,e*.35,0);m.armL.rotation.set(-1.4+e*.3,0,-.3);m.armR.rotation.set(-1.4-e*.3,0,.3);m.head.rotation.y=Math.sin(pt*9)*.4;m.legL.rotation.x=Math.sin(pt*11)*.3;m.legR.rotation.x=-Math.sin(pt*11)*.3;return}
   if(act&&ACT_POSE[act.id]&&!mounted){m.body.rotation.set(0,0,0);if(!(act.mobile&&poseF.moving)){m.legL.rotation.x=m.legR.rotation.x=0}ACT_POSE[act.id](m,act.t,act.t/act.dur)}
   else if(spinT>0){spinT-=dt;const k=1-spinT/.45;m.body.rotation.set(.05,k*TAU,0);m.armR.rotation.set(-1.5,0,1.3);m.armL.rotation.set(-1.4,0,-1.3)}
@@ -1262,9 +1288,9 @@ function updateGore(dt){for(let i=gore.length-1;i>=0;i--){const g=gore[i];g.life
 const corpses=[];
 function updateCorpses(dt){for(let i=corpses.length-1;i>=0;i--){const c=corpses[i];c.ct+=dt;const k=ease(Math.min(1,c.ct/.55));c.fall=c.fd?lerp(c.f0||0,c.fd*Math.PI/2,k):c.f0;c.yo=c.fd?lerp(c.yo||0,.05,k):c.yo;if(c.ct<.6){c.al=lerp(c.al,-.3,k);c.ar=lerp(c.ar,-2.6,k)}if(c.ct>24)c.y-=dt*.5;if(c.r)poseModel(c);if(c.ct>27){if(c.r)scene.remove(c.r.g);corpses.splice(i,1)}}}
 function playerAttack(){const w=curW(),b=WEAPONS[w.w],style=attackStyle(b),cost=b.kind==='melee'?(style==='heavy'?12:7):5;if(P.sta<cost)return;
-  if(resting)resting=false;if(act||sleeping||P.down>0)return;P.sta-=cost;lastSta=0;P.energy=Math.max(0,P.energy-.12);combo=comboT>0?(combo+1)%3:0;if(b.kind==='melee')sfx('swing',style==='heavy'||combo===2);
+  if(resting)resting=false;if(act||sleeping||P.down>0||dashT>0)return;P.sta-=(slowMo>0&&aspId()==='echo'&&aTier()>=3)?0:cost;lastSta=0;P.energy=Math.max(0,P.energy-.12);combo=comboT>0?(combo+1)%3:0;if(b.kind==='melee')sfx('swing',style==='heavy'||combo===2);
   const fin=combo===2&&b.kind==='melee',dur=b.rate*(fin?1.3:1),plunge=!onGround&&b.kind==='melee';
-  atk={style:plunge?'heavy':style,combo:plunge?0:combo,t:0,dur:dur*S2.atk,hit:false,w,b,dmg:calcDmg(w)*(fin?1.6:1)*(plunge?1.5:1)*S2.dmg,fin,plunge};atkCd=dur*S2.atk;P.my=yaw+Math.PI;if(plunge)P.vy=Math.min(P.vy,-5);
+  atk={style:plunge?'heavy':style,combo:plunge?0:combo,t:0,dur:dur*S2.atk,hit:false,w,b,dmg:calcDmg(w)*(fin?1.6:1)*(plunge?1.5:1)*S2.dmg,fin,plunge};atkCd=dur*S2.atk;P.my=yaw+Math.PI;if(plunge)P.vy=Math.min(P.vy,-5);if(P.shroud>0){atk.dmg*=2;if(aTier()<4){P.shroud=0;toast('ปรากฏตัว','#b090e0')}}
   if(b.kind==='melee')for(const z of zNear(P.x,P.z,4)){if(z.skills&&z.skills.includes('dodge')&&!z.sk&&(z.scd.dodge||0)<=0&&rand()<.45){const dx=z.x-P.x,dz=z.z-P.z,dd=Math.hypot(dx,dz)||1,side=rand()<.5?-1:1;z.sk={id:'dodge',ph:'go',t:0,dx:dz/dd*side,dz:-dx/dd*side,side};z.scd.dodge=3}}}
 function attackHitFrame(){const a=atk,b=a.b,fx=-Math.sin(yaw),fz=-Math.cos(yaw);
   if(b.kind!=='melee'){shoot(a.w,yaw,a.dmg);alertNoise(P.x,P.z,b.kind==='magic'?11:4);if(a.style==='xbow')shake=Math.max(shake,.12);return}
@@ -1276,29 +1302,29 @@ function attackHitFrame(){const a=atk,b=a.b,fx=-Math.sin(yaw),fz=-Math.cos(yaw);
   if(a.plunge){ring(P.x+fx*1.2,P.z+fz*1.2,2.4,0xe8d8b0);shake=Math.max(shake,.3);for(const z of zNear(P.x,P.z,4))if(!z.boss&&!z.down&&Math.hypot(z.x-P.x,z.z-P.z)<2.8&&rand()<.5)z.down=1.7}
   if(a.style==='heavy'||a.fin){ring(P.x+fx*1.6,P.z+fz*1.6,a.style==='heavy'?2.6:1.8,0xe8d8b0);shake=Math.max(shake,.22)}
   if(n){hitStop=a.style==='heavy'||a.fin?.09:.05;shake=Math.max(shake,a.style==='heavy'?.32:.14)}}
-function hitZombie(z,dmg,o={}){if(z.dead)return;if(z.sk&&z.sk.id==='ambush'){z.sk=null;z.aggro=true}z.hurtAcc=(z.hurtAcc||0)+dmg;let crit=rand()<.08+ST.crit;if(crit)dmg*=1.8;if(z.down>0)dmg*=1.5;if(!z.boss&&!(z.down>0)&&!ZT[z.type].crawl&&rand()<((o.kd||0)+(crit?.1:0))*(z.type==='brute'?.3:1))z.down=1.7;z.feed=null;dmg=Math.round(dmg);z.hp-=dmg;z.flash=.15;z.hitT=.22;
+function hitZombie(z,dmg,o={}){if(z.dead)return;if(z.sk&&z.sk.id==='ambush'){z.sk=null;z.aggro=true}z.hurtAcc=(z.hurtAcc||0)+dmg;let crit=rand()<.08+ST.crit||(slowMo>0&&aspId()==='echo'&&aTier()>=4);if(z.frz>0&&aspId()==='frost'&&aTier()>=3)dmg*=1.5;if(crit)dmg*=1.8;if(z.down>0)dmg*=1.5;if(!z.boss&&!(z.down>0)&&!ZT[z.type].crawl&&rand()<((o.kd||0)+(crit?.1:0))*(z.type==='brute'?.3:1))z.down=1.7;z.feed=null;dmg=Math.round(dmg);z.hp-=dmg;z.flash=.15;z.hitT=.22;
   if(!z.aggro)alertHorde(z);z.aggro=true;
   floatNum(z.x,z.y+2*z.sc,z.z,(crit?'✦':'')+dmg,o.col||(crit?'#ffd23f':'#fff'));sfx('hit',crit,z.x,z.z);spawnGore(z.x,z.y+1.2*z.sc,z.z,crit?9:4);
-  if(ST.lifesteal)P.hp=Math.min(ST.maxHp,P.hp+dmg*ST.lifesteal);
+  if(ST.lifesteal&&!ST.onlyAspectHeal)P.hp=Math.min(ST.maxHp,P.hp+dmg*ST.lifesteal);
   if(o.knock&&!z.boss){const dx=z.x-P.x,dz=z.z-P.z,d=Math.hypot(dx,dz)||1;z.kx=dx/d*o.knock*3;z.kz=dz/d*o.knock*3}
   if(z.down>0&&z.sk&&!['treeleap','leap'].includes(z.sk.id)){if(z.sk.rock)scene.remove(z.sk.rock);z.sk=null}
   if(z.hp>0&&!z.sk&&z.skills&&z.skills.includes('treeleap')&&(z.scd.treeleap||0)<=0&&z.hurtAcc>z.maxHp*.2&&!(z.down>0))startSkill(z,'treeleap');
   if(z.hp<=0)killZombie(z)}
-function killZombie(z){z.dead=true;if(P.grab&&P.grab.z===z)P.grab=null;if(z.sk&&z.sk.rock)scene.remove(z.sk.rock);z.sk=null;moodAdd('bored',-4);moodAdd('stress',.8);if(z.boss){moodAdd('joy',40);moodAdd('stress',-20)}const i=zombies.indexOf(z);if(i>=0)zombies.splice(i,1);z.ct=0;z.flash=0;z.down=0;z.fd=z.fall>.5?0:rand()<.5?-1:1;z.f0=z.fall||0;corpses.push(z);if(corpses.length>130){const c=corpses.shift();if(c.r)scene.remove(c.r.g)}
+function killZombie(z){z.dead=true;if(P.shroud>0&&aspId()==='shroud'&&aTier()>=3)P.shroud+=2;if(P.grab&&P.grab.z===z)P.grab=null;if(z.sk&&z.sk.rock)scene.remove(z.sk.rock);z.sk=null;moodAdd('bored',-4);moodAdd('stress',.8);if(z.boss){moodAdd('joy',40);moodAdd('stress',-20)}const i=zombies.indexOf(z);if(i>=0)zombies.splice(i,1);z.ct=0;z.flash=0;z.down=0;z.fd=z.fall>.5?0:rand()<.5?-1:1;z.f0=z.fall||0;corpses.push(z);if(corpses.length>130){const c=corpses.shift();if(c.r)scene.remove(c.r.g)}
   if(z.home){const pp=popMap()[z.home]||{k:0,t:Wd.time};pp.k++;pp.t=Wd.time;popMap()[z.home]=pp}
-  spawnGore(z.x,z.y+1*z.sc,z.z,z.boss?40:12);sfx('zdie',z.x,z.z);P.kills++;gainXp(z.xp);if(ST.killHeal)P.hp=Math.min(ST.maxHp,P.hp+ST.killHeal);
+  spawnGore(z.x,z.y+1*z.sc,z.z,z.boss?40:12);sfx('zdie',z.x,z.z);P.kills++;gainXp(z.xp);if(ST.killHeal&&!ST.onlyAspectHeal)P.hp=Math.min(ST.maxHp,P.hp+ST.killHeal);
   let fed=0;for(const o of zNear(z.x,z.z,14)){if(o===z||o.boss||o.aggro||ZT[o.type].ranged)continue;o.feed={x:z.x+(rand()-.5),z:z.z+(rand()-.5),lvl:z.lvl};o.feedT=0;if(++fed>=3)break}
   questEvent('kill',z.tribe);
   if(z.boss){boss=null;Wd.bossAt=Wd.time+600;saveWorld();shake=.6;grant(rollChest(.3,true,true),'The Rot King');questEvent('boss');toast('<b>The Rot King ถูกปราบแล้ว!</b> จะฟื้นคืนชีพในอีก 10 นาที','#b067e6');$('#boss').classList.add('hidden');return}
   if(z.elite&&rand()<.6){const r=rollRarity(ST.luck+.15,1);grant([rand()<.4?makeWeapon(r):makeGear(r,null,itemLevel())],`Elite ${TRIBES[z.tribe].n}`)}}
-function hurtPlayer(d,src,tribe,o={}){if(invuln>0||P.dead)return;moodAdd('stress',5);if(resting)resting=false;if(sleeping)wake('ตื่นเพราะถูกโจมตี!');cancelAction();sfx('hurt');d=Math.max(1,Math.round(d*(1-ST.dr)));P.hp-=d;lastHurt=0;lastHit=src;hurtT=.22;shake=Math.max(shake,.18);floatNum(P.x,P.y+2.3,P.z,'-'+d,'#ff5a4a');spawnGore(P.x,P.y+1.2,P.z,4,0x7a1810);
+function hurtPlayer(d,src,tribe,o={}){if(dashIF>0&&!P.dead&&(o.z||o.animal||o.acid||o.heavy)){perfectDodge();return}if(invuln>0||P.dead)return;moodAdd('stress',5);if(resting)resting=false;if(sleeping)wake('ตื่นเพราะถูกโจมตี!');cancelAction();sfx('hurt');d=Math.max(1,Math.round(d*(1-ST.dr)));P.hp-=d;lastHurt=0;lastHit=src;hurtT=.22;shake=Math.max(shake,.18);floatNum(P.x,P.y+2.3,P.z,'-'+d,'#ff5a4a');spawnGore(P.x,P.y+1.2,P.z,4,0x7a1810);
   $('#vig').style.boxShadow='inset 0 0 160px 40px rgba(170,0,0,.55)';setTimeout(()=>$('#vig').style.boxShadow='',180);
   if(tribe&&TRIBES[tribe].slow)slowT=2;
   if((o.z&&rand()<.75)||o.animal||o.slam||(o.heavy&&rand()<.6))woundRoll(Object.assign({tribe},o));
   if(o.acid&&rand()<.2*(TRIBES[tribe]?.inf||1)){P.knox=true;P.inf=Math.min(100,P.inf+6);toast('กรดซอมบี้กัดผิว: ติดเชื้อ!','#8fc043')}
   if(o.heavy&&!mounted&&!(P.down>0)&&rand()<.28){P.down=1.8;crouch=false;toast('ถูกกระแทกล้มลง!','#c8402c')}
   if(P.hp<=0)die()}
-function gainXp(x){x=Math.round(x*(1+ST.xpMul));P.xp+=x;let need=xpNeed(P.lvl);let up=false;while(P.xp>=need){moodAdd('joy',25);moodAdd('sad',-10);P.xp-=need;P.lvl++;P.sp++;P.ap+=AP_PER_LVL;up=true;refreshStats();P.hp=ST.maxHp;toast(`<b>เลเวลอัป! Lv.${P.lvl}</b> +${AP_PER_LVL} แต้มสเตท (${keyName(CFG.binds.stats)})${P.cls?' · +1 Skill Point':''}`,'#7fb0ff');ring(P.x,P.z,3,0x7fb0ff);need=xpNeed(P.lvl)}
+function gainXp(x){x=Math.round(x*(1+ST.xpMul));P.xp+=x;let need=xpNeed(P.lvl);let up=false;while(P.xp>=need){moodAdd('joy',25);moodAdd('sad',-10);P.xp-=need;P.lvl++;P.sp++;P.ap+=AP_PER_LVL;up=true;refreshStats();if(!ST.onlyAspectHeal)P.hp=ST.maxHp;toast(`<b>เลเวลอัป! Lv.${P.lvl}</b> +${AP_PER_LVL} แต้มสเตท (${keyName(CFG.binds.stats)})${P.cls?' · +1 Skill Point':''}`,'#7fb0ff');ring(P.x,P.z,3,0x7fb0ff);need=xpNeed(P.lvl)}
   if(up){sfx('level');const danger=zNear(P.x,P.z,25).some(z=>z.aggro)||animals.some(a=>a.hostile&&Math.hypot(a.x-P.x,a.z-P.z)<25);if(!danger&&!panelOpen&&P.hp>ST.maxHp*.5)setTimeout(()=>{if(state==='play'&&!panelOpen&&!P.dead)openPanel('stats')},700)}}
 const xpNeed=l=>Math.round(80*l**1.45);
 
@@ -1369,6 +1395,153 @@ function populate(dt){popT-=dt;if(popT>0)return;popT=.5;const cnt=new Map();
       for(let j=0;j<gs;j++){const x=gx+(rand()-.5)*8,z=gz+(rand()-.5)*8,h=groundH(x,z);if(h<-.6||cityAt(x,z,40)>=0||Math.hypot(x-P.x,z-P.z)<35)continue;
         const zz=makeZombie(x,z,pickZType(),BIOMES[biomeAt(x,z,h)].tribe,{elite:rand()<(bloodMoon()?.12:isNight()?.05:.01)});zz.home=k;total++}}}
   popInit=false}
+// ================= aspects =================
+const aspId=()=>P?FATES[P.fate].id:'';
+function aTier(){const t=(P&&P.aliveT)||0;let k=1;for(let i=1;i<4;i++)if(t>=TIER_T[i])k=i+1;return k}
+let aspCd=0,aspCh=1,slowMo=0,galeT=0,stormT=0,galeDash=0,galeHit=null;
+const orbs=[],allies=[],fields=[],beacons=[];
+const aspMaxCh=()=>{const id=aspId(),t=aTier();return (id==='shadow'&&t>=3)||(id==='titan'&&t>=4)?2:1};
+function aspectHTML(full){const F=FATES[P.fate],t=aTier(),nx=TIER_T[t]||0,rem=Math.max(0,nx-P.aliveT);
+  return `<div class="fc a" style="margin-bottom:8px"><b>✦ ${F.a[0]} · ขั้น ${ROMAN[t-1]}</b><span class="en">${F.a[1]}</span><p>${F.a[2]}</p>${t<4?`<p style="font-size:12px;color:var(--mut)">ขั้นถัดไปในอีก ${fmtT(rem)} (รอดชีวิตมาแล้ว ${fmtT(P.aliveT)})</p>`:'<p style="font-size:12px;color:#e8d080">ตื่นขึ้นเต็มที่แล้ว</p>'}</div>`+
+   (full?F.t.map((d,i)=>`<div class="tierl ${t>=i+2?'on':'off'}"><b>ขั้น ${ROMAN[i+1]}</b> <small>(${TIER_T[i+1]/60} นาที)</small> · ${d}</div>`).join('')+`<div class="fc f" style="margin:8px 0"><b>✖ ${F.f[0]}</b><span class="en">${F.f[1]}</span><p>${F.f[2]}</p></div>`:'')}
+const fmtT=s=>{s=Math.floor(s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h?`${h} ชม. ${m} นาที`:`${m}:${String(x).padStart(2,'0')}`};
+function aspEvolve(t){const F=FATES[P.fate];sfx('level');ring(P.x,P.z,5,0x9fd36e,.9);shake=Math.max(shake,.2);toast(`<b>✦ ${F.a[0]} ตื่นขึ้นสู่ขั้น ${ROMAN[t-1]}!</b><br>${F.t[t-2]}`,'#9fd36e');moodAdd('joy',20);renderChips()}
+function clearAspectFx(){for(const o of orbs)scene.remove(o.g);orbs.length=0;for(const a of allies)scene.remove(a.m.g);allies.length=0;for(const f of fields)for(const m of f.ms)scene.remove(m);fields.length=0;for(const b of beacons)scene.remove(b.m);beacons.length=0;slowMo=galeT=stormT=galeDash=0;aspCd=0;aspCh=1;dashT=dashIF=dashCd=0;const fx=$('#aspfx');if(fx)fx.className=''}
+const glowMat=(c,o=.85)=>new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:o,depthWrite:false,blending:THREE.AdditiveBlending});
+function spikes(x,z,r,col,n,h=1.2){const ms=[];for(let i=0;i<n;i++){const a=rand()*TAU,d=Math.sqrt(rand())*r,px=x+Math.sin(a)*d,pz=z+Math.cos(a)*d,m=new THREE.Mesh(new THREE.ConeGeometry(.12,h*(.6+rand()*.7),4),M(col));m.position.set(px,groundH(px,pz)+h*.35,pz);m.rotation.set((rand()-.5)*.6,0,(rand()-.5)*.6);scene.add(m);ms.push(m)}return ms}
+function useAspect(){if(!P||P.dead||sleeping||P.down>0||act||mounted)return;const F=FATES[P.fate],T=aTier(),id=F.id;
+  if(aspCh<=0){toast(`${F.a[0]} ยังไม่พร้อม (${Math.ceil(aspCd)} วิ)`);return}
+  const fx=-Math.sin(yaw),fz=-Math.cos(yaw),base=calcDmg(curW());let ok=true;P.my=yaw+Math.PI;
+  if(id==='lantern'){const g=new THREE.Group(),c=new THREE.Mesh(new THREE.SphereGeometry(.35,16,12),glowMat(0xfff4c0,1)),h=new THREE.Mesh(new THREE.SphereGeometry(.9,16,12),glowMat(0xffd070,.25));g.add(c,h);const ox=P.x+fx*1.5,oz=P.z+fz*1.5;g.position.set(ox,groundH(ox,oz)+2.2,oz);scene.add(g);
+    orbs.push({g,h,x:ox,z:oz,t:T>=2?18:12,r:T>=2?8:6,heal:T>=2?4.5:3,burn:T>=3,follow:T>=4,tk:0});ring(ox,oz,T>=2?8:6,0xfff0a0,.8);sfx('magic')}
+  else if(id==='grave'){const n=T>=4?3:T>=2?2:1,cs=corpses.filter(c=>Math.hypot(c.x-P.x,c.z-P.z)<14).sort((a,b)=>Math.hypot(a.x-P.x,a.z-P.z)-Math.hypot(b.x-P.x,b.z-P.z)).slice(0,n);
+    if(!cs.length){toast('ไม่มีซากศพใกล้ๆ ให้ปลุก','#ff8a70');return}
+    for(const c of cs){if(c.r)scene.remove(c.r.g);corpses.splice(corpses.indexOf(c),1);const m=buildHumanoid({skin:0x7a8a6a,hair:0x222222,cloth:0x3a3a2a,pants:0x2a2a22,eyes:0x9aff6a});scene.add(m.g);
+      allies.push({kind:'ghoul',m,x:c.x,z:c.z,y:groundH(c.x,c.z),yaw:0,t:T>=2?35:25,spd:5.5,dmg:(base*.7+6)*(T>=4?1.5:1),rate:1,cd:.5,ph:0,boom:T>=3,slot:rand()*TAU,rise:1});ring(c.x,c.z,2.5,0x9aff6a,.6);spawnGore(c.x,c.y||0,c.z,8,0x3a5a2a)}
+    sfx('groan',P.x,P.z,1,true);toast(`ปลุกศพ ${cs.length} ตัวให้ลุกขึ้นสู้!`,'#9aff6a')}
+  else if(id==='shadow'){const ox=P.x,oz=P.z,R=T>=2?12:8;for(let k=0;k<R*2;k++){const nx=P.x+fx*.5,nz=P.z+fz*.5;if(blocked(nx,nz)||groundH(nx,nz)<-.8)break;P.x=nx;P.z=nz}P.y=Math.max(P.y,groundH(P.x,P.z));
+    const burst=(x,z)=>{ring(x,z,3.5,0x8050c0,.6);spawnGore(x,groundH(x,z)+1,z,14,0x2a1040);for(const zb of zNear(x,z,5))if(!zb.boss&&Math.hypot(zb.x-x,zb.z-z)<3.5+zb.rad){zb.down=Math.max(zb.down||0,1.6);zb.aggro=true}};
+    spawnGore(ox,groundH(ox,oz)+1,oz,10,0x2a1040);if(T>=2)burst(ox,oz);if(T>=4){burst(P.x,P.z);invuln=Math.max(invuln,1)}sfx('magic');shake=Math.max(shake,.12)}
+  else if(id==='frost'){const R=T>=4?10:7;for(let i=0;i<40;i++){const a=yaw+Math.PI+(T>=4?rand()*TAU:(rand()-.5)*1.1),sp=8+rand()*8;spawnGoreV(P.x+fx*.6,P.y+1.4,P.z+fz*.6,Math.sin(a)*-sp*(T>=4?1:1),rand()*1.5,Math.cos(a)*-sp,0xcfeeff)}
+    let n=0;for(const z of zNear(P.x,P.z,R+2)){const dx=z.x-P.x,dz=z.z-P.z,d=Math.hypot(dx,dz);if(d>R+z.rad)continue;if(T<4&&(dx*fx+dz*fz)/(d||1)<.5)continue;z.frz=4;z.aggro=true;n++;if(T>=2&&!z.boss)z.root=Math.max(z.root||0,2);hitZombie(z,base*.4,{col:'#bfe8ff'})}
+    ring(P.x+(T>=4?0:fx*3),P.z+(T>=4?0:fz*3),T>=4?R:4,0xbfe8ff,.6);sfx('magic')}
+  else if(id==='root'){const R=T>=3?8:5,dur=T>=3?5:3;let n=0;for(const z of zNear(P.x,P.z,R+2))if(Math.hypot(z.x-P.x,z.z-P.z)<R+z.rad){z.root=Math.max(z.root||0,z.boss?dur*.5:dur);z.aggro=true;n++}
+    fields.push({kind:'root',x:P.x,z:P.z,r:R,t:dur,tk:0,dmg:T>=2?base*.25+4:0,ms:spikes(P.x,P.z,R,0x4a6a2a,18+R*3)});if(T>=4&&n){P.sta=Math.min(ST.maxSta,P.sta+n*8);floatNum(P.x,P.y+2.2,P.z,'+'+n*8+' STA','#9fd36e')}
+    ring(P.x,P.z,R,0x6a9a3a,.6);shake=Math.max(shake,.25);sfx('slam',P.x,P.z);hurtT=.1}
+  else if(id==='seek'){let n=0;const pil=(x,z,c)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(.35,.35,60,8,1,true),glowMat(c,.45));m.position.set(x,groundH(x,z)+30,z);scene.add(m);beacons.push({m,t:25});n++};
+    for(const c of chunks.values())for(const ch of c.chests)if(Math.hypot(ch.x-P.x,ch.z-P.z)<140&&!Wd.looted[ch.id])pil(ch.x,ch.z,0xffd76a);for(const l of lootBags)if(Math.hypot(l.x-P.x,l.z-P.z)<140)pil(l.x,l.z,0x9ad0ff);
+    if(T>=2)for(const z of zombies)if((z.elite||z.boss)&&Math.hypot(z.x-P.x,z.z-P.z)<140)pil(z.x,z.z,0xff4040);if(T>=3)P.seekBonus=1;if(T>=4)P.seekT=25;
+    ring(P.x,P.z,12,0xffd76a,1.2);sfx('coin');toast(n?`สัมผัสได้ถึงสิ่งของ ${n} จุด (ลำแสง)`:'ไม่พบสมบัติในระยะ','#ffd76a')}
+  else if(id==='shroud'){P.shroud=T>=2?9:6;for(const z of zNear(P.x,P.z,45)){z.aggro=false;z.feed=null}ring(P.x,P.z,3,0x6a3aa0,.6);spawnGore(P.x,P.y+1,P.z,14,0x1a0a2a);sfx('magic');toast('หายตัวเข้าสู่ม่านรัตติกาล','#b090e0')}
+  else if(id==='echo'){slowMo=T>=2?6:4;moodAdd('stress',12);sfx('heart');toast('เวลาเดินช้าลง…','#9ad0ff')}
+  else if(id==='titan'){if(!onGround&&!P.slam){ok=false}else{P.vy=10.5;P.slam=1;onGround=false;sfx('swing',true)}}
+  else if(id==='gale'){P.kx=fx*30;P.kz=fz*30;galeDash=.45;galeHit=new Set();invuln=Math.max(invuln,.35);if(T>=2)galeT=4;if(T>=4)stormT=3;spawnGore(P.x,P.y+.3,P.z,10,0xd8e8f0);sfx('swing',true);P.my=Math.atan2(fx,fz)}
+  else if(id==='blood'){const cost=(T>=4&&P.hp<ST.maxHp*.3)?0:Math.round(ST.maxHp*.12);if(cost&&P.hp<=cost+1){toast('HP ไม่พอสำหรับพิธีโลหิต','#ff8a70');return}P.hp-=cost;if(cost)floatNum(P.x,P.y+2.2,P.z,'-'+cost,'#ff4060');
+    const R=T>=4?8:5,zs=[];for(const z of zNear(P.x,P.z,R+2))if(Math.hypot(z.x-P.x,z.z-P.z)<R+z.rad){hitZombie(z,base*2.2*(T>=2?1.5:1)+8,{col:'#ff3040',knock:4});if(!z.dead)zs.push(z)}
+    if(T>=3&&cost&&zs.length){P.hp=Math.min(ST.maxHp,P.hp+cost);floatNum(P.x,P.y+2.6,P.z,'+'+cost,'#ff8090')}
+    fields.push({kind:'bleed',x:P.x,z:P.z,r:0,t:5,tk:.5,dmg:base*.18+2,zs,ms:spikes(P.x,P.z,R,0x9a1020,22+R*3,1.6)});fields[fields.length-1].kill=.7;ring(P.x,P.z,R,0xff2040,.6);shake=Math.max(shake,.3);sfx('rip')}
+  else if(id==='beast'){const n=T>=2?2:1;for(let i=0;i<n;i++){const m=buildAnimal('wolf'),gm=glowMat(0x9ad8ff,.7);m.g.traverse(o=>{if(o.isMesh){o.material=gm;o.castShadow=false}});m.g.scale.setScalar(1.15);scene.add(m.g);const a=rand()*TAU;
+      allies.push({kind:'wolf',m,x:P.x+Math.sin(a)*2,z:P.z+Math.cos(a)*2,y:P.y,yaw:0,t:T>=4?90:30,spd:9,dmg:(base*.6+5)*(T>=4?2:1),rate:.8,cd:.3,ph:0,slot:a})}
+    sfx('howl');if(T>=3){for(const z of zNear(P.x,P.z,12))if(!z.boss&&Math.hypot(z.x-P.x,z.z-P.z)<10){z.down=Math.max(z.down||0,1.5)}ring(P.x,P.z,10,0x9ad8ff,.9)}toast(`เรียกหมาป่าวิญญาณ ${n} ตัว`,'#9ad8ff')}
+  if(!ok)return;aspCh--;if(aspCd<=0)aspCd=F.cd;if(ST.stressMul&&id!=='echo')moodAdd('stress',12)}
+function titanImpact(){const T=aTier(),R=T>=2?7:5,dmg=calcDmg(curW())*1.5*(T>=2?1.5:1)+6;for(const z of zNear(P.x,P.z,R+2)){const d=Math.hypot(z.x-P.x,z.z-P.z);if(d<R+z.rad){hitZombie(z,dmg*(1-d/(R*2)),{knock:9,kd:1});if(!z.boss&&!z.dead)z.down=Math.max(z.down||0,1.8)}}
+  ring(P.x,P.z,R,0xd8b070,.7);shake=Math.max(shake,.5);hitStop=.08;sfx('slam',P.x,P.z);spawnGore(P.x,P.y+.2,P.z,24,0x6a5a40);alertNoise(P.x,P.z,25);
+  if(T>=3)fields.push({kind:'slow',x:P.x,z:P.z,r:R,t:6,tk:0,dmg:0,ms:spikes(P.x,P.z,R,0x3a3028,14,.6)})}
+function seekLoot(items){if(P.seekBonus){P.seekBonus=0;items.push(rand()<.5?makeGear(rollRarity(ST.luck,1),null,itemLevel()):makeWeapon(rollRarity(ST.luck,1)));toast('สัมผัสสมบัติ: ได้ของเพิ่ม 1 ชิ้น','#ffd76a')}return items}
+function updateAspect(dt){
+  if(aspCh<aspMaxCh()){aspCd-=dt;if(aspCd<=0){aspCh++;aspCd=aspCh<aspMaxCh()?FATES[P.fate].cd:0}}
+  if(slowMo>0)slowMo-=dt;if(galeT>0)galeT-=dt;if(stormT>0)stormT-=dt;if(P.shroud>0)P.shroud-=dt;if(P.seekT>0)P.seekT-=dt;
+  if(dashT>0)dashT-=dt;if(dashIF>0)dashIF-=dt;if(dashCd>0)dashCd-=dt;
+  if(galeDash>0){galeDash-=dt;const T=aTier();for(const z of zNear(P.x,P.z,3))if(!galeHit.has(z)&&Math.hypot(z.x-P.x,z.z-P.z)<z.rad+1.6){galeHit.add(z);const sd=((z.x-P.x)*P.kz-(z.z-P.z)*P.kx)>0?1:-1,l=Math.hypot(P.kx,P.kz)||1;z.kx=P.kz/l*sd*12;z.kz=-P.kx/l*sd*12;hitZombie(z,calcDmg(curW())*.7+4,{});if(T>=3&&!z.boss)z.down=Math.max(z.down||0,1.5)}}
+  const fx=$('#aspfx'),cl=slowMo>0?'echo':P.shroud>0?'shroud':'';if(fx.className!==cl)fx.className=cl;
+  for(let i=orbs.length-1;i>=0;i--){const o=orbs[i];o.t-=dt;if(o.follow){o.x=lerp(o.x,P.x+1,dt*3);o.z=lerp(o.z,P.z+1,dt*3)}o.g.position.set(o.x,groundH(o.x,o.z)+2.2+Math.sin(performance.now()/400)*.2,o.z);o.h.scale.setScalar(1+Math.sin(performance.now()/250)*.12);
+    if(Math.hypot(P.x-o.x,P.z-o.z)<o.r&&!P.dead){P.hp=Math.min(ST.maxHp,P.hp+o.heal*dt);if(o.follow){P.inf=Math.max(0,P.inf-.4*dt)}}
+    o.tk-=dt;if(o.tk<=0){o.tk=.5;if(Math.hypot(P.x-o.x,P.z-o.z)<o.r&&P.hp<ST.maxHp)floatNum(P.x,P.y+2.2,P.z,'+'+Math.round(o.heal*.5),'#fff0a0');if(o.burn)for(const z of zNear(o.x,o.z,o.r+1))if(Math.hypot(z.x-o.x,z.z-o.z)<o.r)hitZombie(z,6+P.lvl,{col:'#ffe080'})}
+    if(o.t<=0){scene.remove(o.g);orbs.splice(i,1)}}
+  for(let i=fields.length-1;i>=0;i--){const f=fields[i];f.t-=dt;f.tk-=dt;
+    if(f.kind==='slow')for(const z of zNear(f.x,f.z,f.r+1))if(Math.hypot(z.x-f.x,z.z-f.z)<f.r)z.frz=Math.max(z.frz||0,.5);
+    if(f.tk<=0){f.tk=.5;if(f.kind==='root'&&f.dmg)for(const z of zNear(f.x,f.z,f.r+1))if(z.root>0&&Math.hypot(z.x-f.x,z.z-f.z)<f.r+z.rad)hitZombie(z,f.dmg,{col:'#8ac060'});if(f.kind==='bleed')for(const z of f.zs)if(!z.dead)hitZombie(z,f.dmg,{col:'#ff3040'})}
+    if(f.kill!=null){f.kill-=dt;if(f.kill<=0){for(const m of f.ms)scene.remove(m);f.ms=[];f.kill=null}}
+    else if(f.t<1)for(const m of f.ms)m.position.y-=dt*.8;
+    if(f.t<=0){for(const m of f.ms)scene.remove(m);fields.splice(i,1)}}
+  for(let i=beacons.length-1;i>=0;i--){const b=beacons[i];b.t-=dt;b.m.material.opacity=.45*Math.min(1,b.t/3);if(b.t<=0){scene.remove(b.m);beacons.splice(i,1)}}
+  updateAllies(dt)}
+function updateAllies(dt){for(let i=allies.length-1;i>=0;i--){const a=allies[i];a.t-=dt;
+  if(a.t<=0||P.dead){if(a.boom&&!P.dead){ring(a.x,a.z,4,0x9aff6a,.6);spawnGore(a.x,a.y+1,a.z,20,0x4a6a2a);sfx('slam',a.x,a.z);for(const z of zNear(a.x,a.z,5))if(Math.hypot(z.x-a.x,z.z-a.z)<4+z.rad)hitZombie(z,30+P.lvl*3,{knock:6,kd:.4})}else spawnGore(a.x,a.y+.8,a.z,8,a.kind==='wolf'?0x9ad8ff:0x3a5a2a);scene.remove(a.m.g);allies.splice(i,1);continue}
+  if(a.rise>0){a.rise-=dt*1.5;a.m.g.position.set(a.x,a.y-a.rise*1.6,a.z);continue}
+  if(!a.tg||a.tg.dead||Math.hypot(a.tg.x-a.x,a.tg.z-a.z)>25||(a.tg.sk&&a.tg.sk.id==='ambush')){a.tg=null;let bd=18;for(const z of zNear(a.x,a.z,18)){if(z.sk&&z.sk.id==='ambush')continue;const d=Math.hypot(z.x-a.x,z.z-a.z);if(d<bd){bd=d;a.tg=z}}}
+  let tx,tz;if(a.tg){tx=a.tg.x;tz=a.tg.z}else{tx=P.x+Math.sin(a.slot)*2.6;tz=P.z+Math.cos(a.slot)*2.6}
+  const dx=tx-a.x,dz=tz-a.z,d=Math.hypot(dx,dz),reach=a.tg?a.tg.rad+1.2:.5;let spd=0;
+  if(d>reach){spd=Math.min(a.spd,d*3);a.x+=dx/d*spd*dt;a.z+=dz/d*spd*dt;a.yaw=Math.atan2(dx,dz)}else if(a.tg)a.yaw=Math.atan2(dx,dz);
+  if(Math.hypot(P.x-a.x,P.z-a.z)>45){a.x=P.x+1;a.z=P.z+1}
+  a.cd-=dt;a.lunge=Math.max(0,(a.lunge||0)-dt);if(a.tg&&d<a.tg.rad+1.7&&a.cd<=0){a.cd=a.rate;a.lunge=.25;hitZombie(a.tg,a.dmg,{knock:3,kd:.15,col:a.kind==='wolf'?'#9ad8ff':'#9aff6a'});sfx(a.kind==='wolf'?'snarlW':'grunt',a.x,a.z)}
+  a.y=groundH(a.x,a.z);a.ph+=dt*Math.max(spd,.5)*1.6;const g=a.m.g;g.position.set(a.x,a.y,a.z);g.rotation.y=a.yaw;
+  if(a.kind==='wolf'){const sw=Math.sin(a.ph*1.4)*.7*Math.min(1,spd/3);a.m.legs.forEach((l,k)=>l.rotation.x=(k===0||k===3?sw:-sw));a.m.neck.rotation.x=a.lunge>0?.4:0}
+  else{animHumanoid(a.m,a.ph,Math.min(1,spd/3),true);if(a.lunge>0){a.m.armL.rotation.x=a.m.armR.rotation.x=-2.2}}}}
+// ================= dodge dash =================
+let dashT=0,dashIF=0,dashCd=0;
+function doDash(){if(!P||P.dead||mounted||sleeping||P.down>0||act||dashCd>0||P.grab)return;if(P.sta<16){toast('สแตมินาไม่พอจะหลบ');return}
+  let ix=(down('right')?1:0)-(down('left')?1:0),iz=(down('forward')?1:0)-(down('back')?1:0);if(!ix&&!iz)iz=-1;
+  const fx=-Math.sin(yaw),fz=-Math.cos(yaw),rx=Math.cos(yaw),rz=-Math.sin(yaw);let dx=fx*iz+rx*ix,dz=fz*iz+rz*ix;const l=Math.hypot(dx,dz)||1;dx/=l;dz/=l;
+  P.sta-=16;lastSta=0;P.kx=dx*17;P.kz=dz*17;dashT=.34;dashIF=.3;dashCd=.6;P.my=Math.atan2(dx,dz);atk=null;resting=false;crouch=false;sfx('swing',false);spawnGore(P.x,P.y+.1,P.z,5,0x8a7a60)}
+function perfectDodge(){dashIF=0;invuln=Math.max(invuln,.25);slowMo=Math.max(slowMo,.45);P.sta=Math.min(ST.maxSta,P.sta+12);floatNum(P.x,P.y+2.3,P.z,'หลบ!','#9ad0ff');sfx('swing',true);moodAdd('joy',2)}
+// ================= gathering & crafting =================
+const GN={tree:{th:'ตัดไม้',max:3,t:3,act:'chop'},rock:{th:'ทุบหิน',max:3,t:3,act:'mine'},ruin:{th:'ค้นเศษซากปรักหักพัง',max:2,t:3.5,act:'loot'},bush:{th:'เก็บพุ่มไม้ (เส้นใย/สมุนไพร)',max:2,t:1.6,act:'gather'}};
+const gKey=o=>Math.round(o.x*2)+','+Math.round(o.z*2);
+function gLeft(o){Wd.gath=Wd.gath||{};const k=gKey(o),g=Wd.gath[k];if(!g)return GN[o.k].max;if(Wd.time-g.t>DAY){delete Wd.gath[k];return GN[o.k].max}return GN[o.k].max-g.n}
+function gatherNode(){if(!P||mounted||P.dead)return null;let best=null,bd=1e9;
+  for(const o of nearColliders(P.x,P.z)){if(!o.k)continue;const d=Math.hypot(o.x-P.x,o.z-P.z)-o.r;if(d<1.3&&d<bd&&gLeft(o)>0){bd=d;best=o}}
+  const cx=Math.floor(P.x/CHUNK),cz=Math.floor(P.z/CHUNK);for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const c=chunks.get((cx+a)+','+(cz+b));if(c&&c.nodes)for(const o of c.nodes){const d=Math.hypot(o.x-P.x,o.z-P.z)-.9;if(d<1.1&&d<bd&&gLeft(o)>0){bd=d;best=o}}}
+  return best}
+function gather(o){const G=GN[o.k],m=WEAPONS[curW().w].m,tool=(o.k==='tree'&&['axe','greataxe','halberd'].includes(m))||(o.k==='rock'&&['mace','club','axe','greataxe'].includes(m));
+  startAction(G.act,G.th+(tool?' (มีเครื่องมือ)':''),G.t*(tool?.6:1),()=>{if(gLeft(o)<=0)return;const k=gKey(o);const g=Wd.gath[k]||(Wd.gath[k]={n:0,t:Wd.time});g.n++;g.t=Wd.time;
+    const dbl=P.seekT>0&&aspId()==='seek'?2:1,out=[];
+    if(o.k==='tree'){out.push({t:'c',c:'wood',n:(2+(tool?1:0))*dbl});if(rand()<.2)out.push({t:'c',c:'fiber',n:1})}
+    if(o.k==='rock'){out.push({t:'c',c:'stone',n:(2+(tool?1:0))*dbl});if(rand()<.2)out.push({t:'c',c:'scrap',n:1})}
+    if(o.k==='ruin'){out.push({t:'c',c:'scrap',n:(1+ri(2))*dbl});if(rand()<.4)out.push({t:'c',c:'rag',n:1});if(rand()<.35)out.push({t:'c',c:'wood',n:1});if(rand()<.06)out.push({t:'c',c:'novel',n:1})}
+    if(o.k==='bush'){out.push({t:'c',c:'fiber',n:2*dbl});if(rand()<.5)out.push({t:'c',c:'herb',n:dbl});if(rand()<.15)out.push({t:'c',c:'apple',n:1})}
+    const got=[];for(const it of out){got.push(`${CONS[it.c].th} ×${it.n}`);const c={...it};if(!addItem(c))dropToGround([c])}
+    if(o.k==='bush')sfx('step','grass',.6);else{sfx('hit',false,o.x,o.z);sfx(o.k==='tree'?'crack':'slam',o.x,o.z)}
+    toast('ได้ '+got.join(' · '),'#d8c090');alertNoise(P.x,P.z,o.k==='bush'?3:12);P.energy=Math.max(0,P.energy-(o.k==='bush'?.2:.7));moodAdd('bored',-3);saveWorld();renderHot();if(panelOpen==='char')renderPanel('char')})}
+const MATS=['wood','stone','fiber','scrap','herb','hide'];
+function mkGearB(slot,bi,r=0){const base=GEAR[slot].bases[bi];const it={t:'a',s:slot,b:bi,r,arm:Math.round(base[1]*RAR[r].m),aff:{}};if(base[2]==='quiver')it.aff.rangedMul=.08;return it}
+const RECIPES=[
+ ['ของใช้','rag','ผ้าขี้ริ้ว',{fiber:3},null,()=>({t:'c',c:'rag',n:1}),1.5,'พันแผลชั่วคราว'],
+ ['ของใช้','kit','ชุดก่อไฟ',{wood:3,fiber:1,stone:1},null,()=>({t:'c',c:'kit',n:1}),2,'วางกองไฟไว้ย่างเนื้อและพัก'],
+ ['ของใช้','jerky','เนื้อตากแห้ง ×2',{meat_raw:2},'fire',()=>({t:'c',c:'jerky',n:2}),3,'อาหารพกพา ไม่เสี่ยงติดเชื้อ'],
+ ['การแพทย์','bandage','ผ้าพันแผล',{rag:2,herb:1},null,()=>({t:'c',c:'bandage',n:1}),2,'ผ้าพันแผลสะอาด'],
+ ['การแพทย์','splint','เฝือกไม้',{wood:2,fiber:2},null,()=>({t:'c',c:'splint',n:1}),2,'ดามกระดูกหัก'],
+ ['การแพทย์','suture','เข็มเย็บแผล',{scrap:1,fiber:1},null,()=>({t:'c',c:'suture',n:1}),2,'เย็บแผลลึก'],
+ ['การแพทย์','disinfect','แอลกอฮอล์ฆ่าเชื้อ',{herb:3,water:1},'fire',()=>({t:'c',c:'disinfect',n:1}),3,'ต้มสมุนไพรเป็นยาฆ่าเชื้อ'],
+ ['การแพทย์','potion','ยาฟื้นฟู',{herb:4,water:1},'fire',()=>({t:'c',c:'potion',n:1}),3.5,'ฟื้น 45% HP'],
+ ['การแพทย์','antidote','ยาแก้เชื้อ',{herb:6,disinfect:1},'city',()=>({t:'c',c:'antidote',n:1}),4,'ต้องใช้อุปกรณ์ในเมือง'],
+ ['อาวุธ','club','กระบองไม้',{wood:4},null,()=>makeWeapon(0,'club'),2.5,'อาวุธประชิดพื้นฐาน'],
+ ['อาวุธ','stoneaxe','ขวานหิน',{wood:2,stone:3,fiber:2},null,()=>makeWeapon(0,'stoneaxe'),3,'ตัดไม้ไวขึ้น'],
+ ['อาวุธ','spear','หอกหยาบ',{wood:3,stone:1,fiber:2},null,()=>makeWeapon(0,'spear'),3,'ระยะตีไกล'],
+ ['อาวุธ','shortbow','ธนูสั้น',{wood:4,fiber:4},null,()=>makeWeapon(0,'shortbow'),3.5,'อาวุธระยะไกล'],
+ ['อาวุธ','arming','ดาบเหล็ก',{scrap:8,wood:2,hide:1},'city',()=>makeWeapon(1,'arming'),5,'ตีที่โรงตีเหล็กในเมือง'],
+ ['อาวุธ','mace','กระบองเหล็ก',{scrap:10,wood:2},'city',()=>makeWeapon(1,'mace'),5,'ตีที่โรงตีเหล็กในเมือง'],
+ ['เกราะ','wraps','ผ้าพันมือ',{fiber:3},null,()=>mkGearB('hands',0),2,'ถุงมือ'],
+ ['เกราะ','cap','หมวกหนัง',{hide:2,fiber:1},null,()=>mkGearB('head',0),3,'หมวก'],
+ ['เกราะ','vest','เสื้อบุนวม',{hide:3,fiber:3},null,()=>mkGearB('chest',0),3.5,'เกราะอก'],
+ ['เกราะ','leggings','กางเกงหนัง',{hide:2,fiber:2},null,()=>mkGearB('legs',0),3,'กางเกง'],
+ ['เกราะ','boots','รองเท้าบูท',{hide:2},null,()=>mkGearB('feet',0),2.5,'รองเท้า'],
+ ['เกราะ','gloves','ถุงมือหนัง',{hide:1,fiber:1},null,()=>mkGearB('hands',1),2.5,'ถุงมือ'],
+ ['เกราะ','shield','โล่ไม้',{wood:6,hide:1},null,()=>mkGearB('off',0),3,'มือรอง'],
+ ['เกราะ','coif','หมวกโซ่',{scrap:8,hide:1},'city',()=>mkGearB('head',1),5,'ตีที่โรงตีเหล็กในเมือง'],
+ ['เกราะ','chain','เสื้อเกราะโซ่',{scrap:14,hide:2},'city',()=>mkGearB('chest',1),6,'ตีที่โรงตีเหล็กในเมือง'],
+ ['กระเป๋า','pouch','ถุงผ้า (4 ช่อง)',{fiber:6},null,()=>makeBag(0),2.5,'กระเป๋าเสริม'],
+ ['กระเป๋า','satchel','กระเป๋าหนัง (6 ช่อง)',{hide:4,fiber:4},null,()=>makeBag(1),3.5,'กระเป๋าเสริม'],
+].map(([cat,id,th,req,st,mk,t,d])=>({cat,id,th,req,st,mk,t,d}));
+function stOk(st){return !st||(st==='fire'?nearFire():cityAt(P.x,P.z,2)>=0)}
+const canCraft=r=>stOk(r.st)&&Object.entries(r.req).every(([k,n])=>countC(k)>=n);
+function renderCraft(T,B){T.textContent='สร้างสิ่งของ';const inC=cityAt(P.x,P.z,2)>=0,fire=nearFire();
+  B.innerHTML=`<div class="matbar">${MATS.map(k=>`<span>${CONS[k].th} <b>${countC(k)}</b></span>`).join('')}</div><p style="font-size:13px;color:var(--mut);margin:0 0 6px">ตอนนี้: ${fire?'🔥 อยู่ใกล้กองไฟ':'ไม่มีกองไฟ'} · ${inC?'◆ อยู่ในเมือง (ใช้โรงตีเหล็กได้)':'อยู่นอกเมือง'} · เก็บวัตถุดิบ: เดินไปที่ต้นไม้ ก้อนหิน พุ่มไม้ หรือซากปรักหักพังแล้วกด ${keyName(CFG.binds.interact)}</p>`+
+   [...new Set(RECIPES.map(r=>r.cat))].map(cat=>`<h3>${cat}</h3>`+RECIPES.filter(r=>r.cat===cat).map(r=>`<div class="qrow rcp"><div><b>${r.th}</b> <small style="color:var(--mut)">${r.d}</small><br><small>${Object.entries(r.req).map(([k,n])=>`<span style="color:${countC(k)>=n?'#9fd36e':'#ff8a70'}">${CONS[k].th} ${countC(k)}/${n}</span>`).join(' · ')}${r.st?` · <span style="color:${stOk(r.st)?'#9fd36e':'#ff8a70'}">${r.st==='fire'?'ต้องอยู่ใกล้กองไฟ':'ต้องอยู่ในเมือง'}</span>`:''}</small></div><button data-rc="${r.id}" ${canCraft(r)?'':'disabled'}>สร้าง</button></div>`).join('')).join('');
+  B.querySelectorAll('[data-rc]').forEach(b=>b.onclick=()=>craft(b.dataset.rc))}
+function craft(id){const r=RECIPES.find(x=>x.id===id);if(!r||!canCraft(r))return;closePanel();
+  startAction('craft','สร้าง '+r.th,r.t,()=>{if(!canCraft(r)){toast('วัตถุดิบไม่พอแล้ว','#ff8a70');return}for(const [k,n] of Object.entries(r.req))for(let i=0;i<n;i++)takeC(k);
+    const it=r.mk();if(!addItem(it))dropToGround([it]);sfx('chest');toast(`สร้าง <b>${r.th}</b> สำเร็จ`,'#d8b070');moodAdd('bored',-6);moodAdd('joy',2);renderHot()})}
 // ================= zombie skills & attack patterns =================
 const ZSK={grab:{th:'จับรัด',cd:9},lunge:{th:'พุ่งกัด',cd:7},vomit:{th:'อ้วกพิษ',cd:12},pounce:{th:'กระโจน',cd:8},flurry:{th:'ข่วนรัว',cd:6},dodge:{th:'หลบหลีก',cd:3},treeleap:{th:'ปีนต้นไม้ทุบ',cd:12},charge:{th:'พุ่งชน',cd:10},pound:{th:'กระทืบพื้น',cd:9},throw:{th:'ขว้างหิน',cd:9},volley:{th:'พ่นกรดรัว',cd:8},pool:{th:'บ่อกรด',cd:10},hop:{th:'กระโดดถอย',cd:6},ankle:{th:'คว้าข้อเท้า',cd:8},ambush:{th:'แกล้งตาย',cd:99},roar:{th:'คำราม',cd:16},leap:{th:'กระโดดทุบ',cd:11}};
 const ZSKP={walker:['grab','lunge','vomit'],runner:['pounce','flurry','dodge'],brute:['charge','pound','throw'],spitter:['volley','pool','hop'],crawler:['ankle','ambush']};
@@ -1457,13 +1630,13 @@ function updateZombies(dt){zFrame++;buildZGrid();const pc=cityAt(P.x,P.z,2)>=0,n
     let zdt=dt;const far=d>95&&!z.boss;if(far){if((z.id+zFrame)%4)continue;zdt=dt*4}
     const agR=z.ag*(night?1.5:1)*Math.max(.2,1+ST.aggroMul)*(mounted?1.3:1)*P.noise,keep=Math.max(agR*2.5,28);
     if(z.down>0){z.down-=zdt;z.atk=Math.max(z.atk,.4)}
-    let chase=!pc&&!P.dead&&!(z.down>0)&&(d<agR||(z.aggro&&d<keep));if(z.aggro&&!pc&&d>keep)z.aggro=false;if(chase)z.feed=null;
+    let chase=!pc&&!P.dead&&!(P.shroud>0)&&!(z.down>0)&&(d<agR||(z.aggro&&d<keep));if(z.aggro&&!pc&&d>keep)z.aggro=false;if(chase)z.feed=null;
     if(z.skills)for(const k in z.scd)z.scd[k]-=zdt;
     if(z.sk){skillUpdate(z,zdt,d);z.flash-=zdt;if(z.r)poseModel(z);continue}
     z.skT=(z.skT||0)-zdt;if(chase&&!far&&!(z.wind>0)&&!(z.down>0)&&z.skT<=0){z.skT=.6;if(trySkill(z,d)){z.flash-=zdt;if(z.r)poseModel(z);continue}}
     if(chase&&!z.aggro){z.aggro=true;alertHorde(z)}
     if(z.boss&&Math.hypot(z.x-lair.x,z.z-lair.z)>75){chase=false;z.aggro=false;z.hp=Math.min(z.maxHp,z.hp+z.maxHp*.2*zdt)}
-    let mx=0,mz=0,spd=z.spd*(night?1.2:1)*(bm>1?1.1:1);
+    let mx=0,mz=0,spd=z.spd*(night?1.2:1)*(bm>1?1.1:1);if(z.frz>0){z.frz-=zdt;spd*=.3}if(z.root>0){z.root-=zdt;spd=0}if(stormT>0&&!z.boss){const sx=z.x-P.x,sz=z.z-P.z,sd=Math.hypot(sx,sz);if(sd<4.5&&sd>.1){z.kx=sx/sd*9;z.kz=sz/sd*9}}
     if(chase){const want=ZT[z.type].ranged&&!z.boss?9:0;if(z.wind>0)spd*=.25;if(d>want+z.rad+.9){mx=dx/d;mz=dz/d}else if(want&&d<want-2){mx=-dx/d;mz=-dz/d;spd*=.6}
       z.atk-=zdt;
       if(ZT[z.type].ranged&&!z.boss){if(d<22&&z.atk<=0){z.atk=2.4;z.lunge=.25;const p=new THREE.Vector3(z.x,z.y+1.5*z.sc,z.z),t=new THREE.Vector3(P.x,P.y+1,P.z),v=t.sub(p).normalize().multiplyScalar(18);v.y+=2.5;const m=new THREE.Mesh(acidGeo,MB(0x9aff3a));scene.add(m);projs.push({m,p,v,dmg:z.dmg*bm,from:'z',life:2.5,g:6,tribe:z.tribe,src:`Lv${z.lvl} ${TRIBES[z.tribe].n} Spitter`,z})}}
@@ -1547,7 +1720,7 @@ function updateAnimals(dt){const night=isNight();
     if(d>190){scene.remove(an.m.g);animals.splice(i,1);continue}
     let mx=0,mz=0,spd=0;an.t-=dt;
     const pc=cityAt(P.x,P.z,2)>=0;
-    if(A.flee&&d<A.flee*(resting?.6:1)*(down('sprint')?1.4:1))an.st='flee';
+    if(A.flee&&d<A.flee*(ST.noMount?1.6:1)*(resting?.6:1)*(down('sprint')?1.4:1))an.st='flee';
     if(an.hostile&&!pc&&d<(A.aggro||40)*(night?1.4:1))an.st='hunt';
     if(an.st==='flee'){mx=-dx/(d||1);mz=-dz/(d||1);spd=A.run;if(d>A.flee*2.6)an.st='graze'}
     else if(an.st==='hunt'){if(pc||d>60){an.st='graze';an.hostile=!!A.aggro}else{if(d>an.rad+1.3){mx=dx/d;mz=dz/d;spd=A.run*(an.wind>0?.2:1)}an.atk-=dt;
@@ -1602,12 +1775,12 @@ function updatePlayer(dt){
   let mx=fx*iz+rx*ix,mz=fz*iz+rz*ix;const ml=Math.hypot(mx,mz);if(ml>0){mx/=ml;mz/=ml}
   const gh=groundH(P.x,P.z),wet=gh<-.4,swim=gh<-1.15;if(swim)crouch=false;
   let canSprint=down('sprint')&&ml>0&&P.sta>2&&!swim&&S2.sprint&&!act;if(canSprint)crouch=false;
-  let spd=(mounted?12:5.2)*ST.spd*(canSprint?(mounted?1.6:1.65):1)*(wet?.6:1)*(slowT>0?.6:1)*(atk?(atk.b.kind==='melee'?.45:.7):1)*(mounted?1:S2.spd*(crouch?.5:1))*(act?.5:1);
+  let spd=(mounted?12:5.2)*ST.spd*(canSprint?(mounted?1.6:1.65):1)*(wet?.6:1)*(slowT>0?.6:1)*(atk?(atk.b.kind==='melee'?.45:.7):1)*(mounted?1:S2.spd*(crouch?.5:1))*(act?.5:1)*(galeT>0?1.3:1);
   if(canSprint&&!mounted){P.sta-=17*dt*S2.staDrain;lastSta=0}else if(ml>0&&!mounted&&S2.staDrain>1.4){P.sta-=4*dt;lastSta=0}
   P.noise=sleeping?.5:crouch?.5:canSprint?1.6:resting?.7:1;
-  P.x+=(mx*spd+(P.kx||0))*dt;P.z+=(mz*spd+(P.kz||0))*dt;if(P.kx){P.kx*=Math.pow(.02,dt);P.kz*=Math.pow(.02,dt);if(Math.abs(P.kx)<.1)P.kx=P.kz=0}collide();
+  P.x+=(mx*spd+(P.kx||0))*dt;P.z+=(mz*spd+(P.kz||0))*dt;if(P.kx||P.kz){const kd=Math.pow(.02,dt);P.kx=(P.kx||0)*kd;P.kz=(P.kz||0)*kd;if(Math.hypot(P.kx,P.kz)<.15)P.kx=P.kz=0}collide();
   P.vy-=24*dt;P.y+=P.vy*dt;const floor=swim?-1.15:gh,wasAir=!onGround;
-  if(P.y<=floor){if(wasAir&&!swim){P.landT=.18;if(P.vy<-13.5){const fd=(-P.vy-13.5)*5;hurtPlayer(fd,'ตกจากที่สูง',null,{});if(P.vy<-17)woundRoll({heavy:1,slam:1,low:1})}else sfx('step','grass',.3)}P.y=floor;P.vy=0;onGround=true}else onGround=P.y-floor<.08;
+  if(P.y<=floor){if(wasAir&&P.slam){P.slam=0;titanImpact()}if(wasAir&&!swim){P.landT=.18;if(P.vy<-13.5){const fd=(-P.vy-13.5)*5;hurtPlayer(fd,'ตกจากที่สูง',null,{});if(P.vy<-17)woundRoll({heavy:1,slam:1,low:1})}else sfx('step','grass',.3)}P.y=floor;P.vy=0;onGround=true}else onGround=P.y-floor<.08;
   if(ml>0&&!(mouseL&&!panelOpen)){const ty=Math.atan2(mx,mz);let df=((ty-P.my+Math.PI*3)%TAU)-Math.PI;P.my+=df*Math.min(1,dt*12)}
   if(firstPerson||atk||mouseL)P.my=yaw+Math.PI;
   const gdt=dt*(sleeping?SLEEP_SCALE:1),inC=cityAt(P.x,P.z)>=0;P.inCity=inC;
@@ -1617,7 +1790,7 @@ function updatePlayer(dt){
     if(bi==='ash'&&nightK<.5)hot=1+(canSprint?1:0)+(P.eq.chest&&P.eq.chest.b===2?1:0);tempKind=cold>0?'cold':hot>0?'hot':'';tempLv=clamp(Math.max(cold,hot),0,4);
   // survival needs
     const exert=(canSprint?2.3:ml>0?1.15:1)+(atk?.5:0),eF=1-ST.endu,sl=sleeping?.4:1;
-    P.water=Math.max(0,P.water-gdt*.065*exert*(bi==='ash'?1.5:1)*eF*sl*(1+(tempKind==='hot'?tempLv*.3:0)));P.food=Math.max(0,P.food-gdt*.04*(.4+exert*.6)*(bi==='snow'?1.3:1)*eF*sl*(1+(tempKind==='cold'?tempLv*.2:0)));
+    P.water=Math.max(0,P.water-gdt*.065*exert*(bi==='ash'?1.5:1)*eF*sl*(1+(tempKind==='hot'?tempLv*.3:0)));P.food=Math.max(0,P.food-gdt*.04*(1+(ST.hungerMul||0))*(.4+exert*.6)*(bi==='snow'?1.3:1)*eF*sl*(1+(tempKind==='cold'?tempLv*.2:0)));
     if(sleeping)P.energy=Math.min(100,P.energy+gdt*.25*(inC?1.3:1));else if(resting)P.energy=Math.min(100,P.energy+dt*(inC?3:nearFire()?1.6:.65));else P.energy=Math.max(0,P.energy-dt*.034*(mounted?.6:exert)*eF);
     if(P.water<=0){P.hp-=gdt;lastHit='ขาดน้ำ'}if(P.food<=0){P.hp-=gdt*.6;lastHit='อดอาหาร'}
     for(const [k,lab] of [['food','หิว'],['water','กระหาย'],['energy','เหนื่อยล้า']]){const lv=P[k]<10?2:P[k]<25?1:0;if(lv>(P['w_'+k]||0))toast(lv===2?`<b>${lab}มาก!</b> ${k==='energy'?'นั่งพัก/นอน ('+keyName(CFG.binds.rest)+') หรือโรงเตี๊ยม':k==='food'?'กินอาหาร ('+keyName(CFG.binds.eat)+')':'ดื่มน้ำ ('+keyName(CFG.binds.drink)+')'}`:`เริ่ม${lab}`,'#c8402c');P['w_'+k]=lv}}
@@ -1625,11 +1798,11 @@ function updatePlayer(dt){
   if(P.hp<=0){die();return}
   // panic & emotions
   {let c=0,ag=0;for(const z of zNear(P.x,P.z,20))if(z.aggro){ag++;if(Math.hypot(z.x-P.x,z.z-P.z)<15)c++}const tgt=Math.min(4,c/2.5+(P.hp<ST.maxHp*.3?1:0)+(P.grab?1.5:0));panic+=(tgt-panic)*Math.min(1,dt*(tgt>panic?2:.25));updateMood(dt,gdt,inC,ag)}
-  if(P.drunk>0)P.drunk-=dt;updatePools(dt);
-  lastSta+=dt;if(lastSta>.8)P.sta=Math.min(ST.maxSta*(P.food<25?.7:1),P.sta+22*(1+ST.staRegen)*S2.sta*(resting||sleeping?1.5:1)*dt);
+  if(P.drunk>0)P.drunk-=dt;updatePools(dt);P.aliveT+=dt;{const t=aTier();if(t>P.atier){P.atier=t;aspEvolve(t)}}
+  lastSta+=dt;if(lastSta>.8)P.sta=Math.min(ST.maxSta*(P.food<25?.7:1),P.sta+22*(1+ST.staRegen)*S2.sta*(ST.dayStaHalf&&!isNight()?.5:1)*(resting||sleeping?1.5:1)*dt);
   P.stepAcc=(P.stepAcc||0)+(onGround&&ml>0?spd*dt:0);const stride=mounted?2.6:canSprint?2.1:crouch?1.1:1.55;if(P.stepAcc>stride){P.stepAcc=0;if(mounted)sfx('gallop');else{const bi=biomeAt(P.x,P.z,P.y),sf=gh<-.3?'water':inC||roadDist(P.x,P.z)<3.4||(urbanAt(P.x,P.z)>.5&&isStreet(P.x,P.z))?'stone':bi==='snow'?'snow':'grass';sfx('step',sf,canSprint?.32:crouch?.08:.2)}}
   lastHurt+=dt;
-  let reg=ST.regen;if(!ST.noRegen&&!S2.noRegen&&lastHurt>5)reg+=.8*(1+ST.regenMul)*(resting?2:1)*(sleeping?4:1);if(inC&&!ST.noRegen&&!S2.bleed)reg+=3;P.hp=Math.min(ST.maxHp,P.hp+reg*dt);
+  let reg=ST.regen;if(!ST.noRegen&&!S2.noRegen&&lastHurt>5)reg+=.8*(1+ST.regenMul)*(resting?2:1)*(sleeping?4:1);if(inC&&!ST.noRegen&&!S2.bleed)reg+=3;if(ST.onlyAspectHeal)reg=0;P.hp=Math.min(ST.maxHp,P.hp+reg*dt);
   if(act){act.t+=dt;if(act.t>=act.dur){const d=act.done;act=null;$('#actbar').classList.add('hidden');d()}else updActBar()}
   if(P.down>0){P.down-=dt;if(P.down<=0)P.down=0}
   if(sleeping){if(P.energy>=99)wake('ตื่นนอน: สดชื่นเต็มที่');else if(zNear(P.x,P.z,12).some(z=>z.aggro))wake('ตื่นเพราะได้ยินเสียงซอมบี้!')}
@@ -1701,7 +1874,7 @@ function questEvent(type,arg){for(const q of P.quests){if(q.have>=q.n||q.type!==
 
 // ================= panels =================
 function openPanel(kind,arg){panelOpen=kind;mouseL=false;if(locked)document.exitPointerLock();$('#panel').classList.remove('hidden');renderPanel(kind,arg)}
-function closePanel(){panelOpen=null;rebinding=null;hideTip();$('#panel').classList.add('hidden');$('#panel').classList.remove('wide');if(state==='play'&&P&&!fallback&&!P.dead){setPause(true);if(lockOk)requestLock()}if(P&&state==='play')renderHot()}
+function closePanel(){panelOpen=null;rebinding=null;hideTip();$('#panel').classList.add('hidden');$('#panel').classList.remove('wide');if(state==='menu')$('#menu').classList.remove('hidden');if(state==='play'&&P&&!fallback&&!P.dead){setPause(true);if(lockOk)requestLock()}if(P&&state==='play')renderHot()}
 function togglePanel(k){if(panelOpen===k)closePanel();else openPanel(k)}
 $('#pclose').onclick=closePanel;
 const tipEl=$('#tip');
@@ -1724,7 +1897,7 @@ function moveItem(src,dst){const get=x=>x.k==='b'?P.bag[x.i]:P.eq[x.s],set=(x,v)
   if(src.s==='bag'||dst.s==='bag'){const cap=bagCap(),used=P.bag.filter(Boolean).length;if(used>cap){set(dst,b||null);set(src,a);toast('ของในกระเป๋าเยอะเกินความจุใหม่ ทิ้งหรือขายของก่อน','#c8402c');return}}
   afterInv()}
 function quickUse(i){const it=P.bag[i];if(!it)return;
-  if(it.t==='c'){const C=CONS[it.c];if(it.c==='ale'){startAction('drink','ดื่มเบียร์',2,()=>{if(!takeC('ale'))return;moodAdd('stress',-25);moodAdd('sad',-15);moodAdd('bored',-10);moodAdd('joy',5);P.water=Math.min(100,P.water+10);P.drunk=40;sfx('drink');toast('สบายใจขึ้น… แต่มึนนิดหน่อย','#d8a040');renderHot()},{mobile:1});return}if(it.c==='novel'){startAction('read','อ่านนิยาย',6,()=>{if(!takeC('novel'))return;moodAdd('bored',-35);moodAdd('sad',-15);moodAdd('stress',-10);moodAdd('joy',4);toast('อ่านจบแล้ว รู้สึกดีขึ้น','#c8a0d0');renderHot()});return}if(it.c==='potion')usePotion();else if(it.c==='antidote')useAntidote();else if(it.c==='kit')startAction('fire','ก่อกองไฟ',3,()=>{if(takeC('kit')){placeFire();toast('ก่อกองไฟแล้ว: กด E ที่กองไฟเพื่อย่างเนื้อและนั่งพัก','#ff8a3a');afterInv()}});else if(it.c==='hide')toast('หนังสัตว์เอาไว้ขายให้พ่อค้า');else if(it.c==='painkill')usePainkill();else if(C.med)quickTreat();else if(C.water&&!C.food)quickDrink();else quickEat(it.c);return}
+  if(it.t==='c'){const C=CONS[it.c];if(C.mat){toast(`วัตถุดิบ: ใช้สร้างของที่หน้าสร้างสิ่งของ (${keyName(CFG.binds.craft)})`);return}if(it.c==='ale'){startAction('drink','ดื่มเบียร์',2,()=>{if(!takeC('ale'))return;moodAdd('stress',-25);moodAdd('sad',-15);moodAdd('bored',-10);moodAdd('joy',5);P.water=Math.min(100,P.water+10);P.drunk=40;sfx('drink');toast('สบายใจขึ้น… แต่มึนนิดหน่อย','#d8a040');renderHot()},{mobile:1});return}if(it.c==='novel'){startAction('read','อ่านนิยาย',6,()=>{if(!takeC('novel'))return;moodAdd('bored',-35);moodAdd('sad',-15);moodAdd('stress',-10);moodAdd('joy',4);toast('อ่านจบแล้ว รู้สึกดีขึ้น','#c8a0d0');renderHot()});return}if(it.c==='potion')usePotion();else if(it.c==='antidote')useAntidote();else if(it.c==='kit')startAction('fire','ก่อกองไฟ',3,()=>{if(takeC('kit')){placeFire();toast('ก่อกองไฟแล้ว: กด E ที่กองไฟเพื่อย่างเนื้อและนั่งพัก','#ff8a3a');afterInv()}});else if(it.c==='hide')toast('หนังสัตว์เอาไว้ขายให้พ่อค้า');else if(it.c==='painkill')usePainkill();else if(C.med)quickTreat();else if(C.water&&!C.food)quickDrink();else quickEat(it.c);return}
   if(it.t==='b'){if(P.cls){toast('คุณมีคลาสแล้ว');return}startAction('read','อ่าน '+CLASSES[it.c].book,3,()=>{if(P.bag[i]!==it||P.cls)return;P.cls=it.c;P.bag[i]=null;toast(`คุณได้เป็น <b>${CLASSES[P.cls].th} (${CLASSES[P.cls].n})</b> แล้ว! กด K เพื่อเปิดสกิลทรี`,CLASSES[P.cls].col);afterInv()});return}
   let s=slotFor(it);if(s==='ring')s=!P.eq.ring1?'ring1':!P.eq.ring2?'ring2':'ring1';moveItem({k:'b',i},{k:'e',s})}
 function unequip(s){if(!P.eq[s])return;const i=P.bag.indexOf(null);if(i<0){toast('กระเป๋าเต็ม','#c8402c');return}moveItem({k:'e',s},{k:'b',i})}
@@ -1764,7 +1937,8 @@ function renderChar(){const T=$('#ptitle'),B=$('#pbody');$('#panel').classList.a
 let panelArg=null;
 function renderPanel(kind,arg){panelArg=arg;const T=$('#ptitle'),B=$('#pbody');if(kind!=='char')$('#panel').classList.remove('wide');
   if(kind==='char'){renderChar();return}
-  if(kind==='stats'){T.textContent='อัพสเตท';const pend=panelArg&&panelArg.pend?panelArg.pend:{str:0,dex:0,vit:0,end:0,agi:0,per:0};panelArg={pend};const used=Object.values(pend).reduce((a,b)=>a+b,0),left=P.ap-used,base=RACES[P.race].s;
+  if(kind==='craft'){renderCraft(T,B);return}
+  if(kind==='stats'){T.textContent='อัพสเตท';setTimeout(()=>{const b=$('#pbody')||B;if(b&&!b.querySelector('.aspbox')){const d=document.createElement('div');d.className='aspbox';d.innerHTML=aspectHTML(true);b.prepend(d)}},0);const pend=panelArg&&panelArg.pend?panelArg.pend:{str:0,dex:0,vit:0,end:0,agi:0,per:0};panelArg={pend};const used=Object.values(pend).reduce((a,b)=>a+b,0),left=P.ap-used,base=RACES[P.race].s;
     const cur={str:ST.str,dex:ST.dex,vit:P.attr.vit,end:P.attr.end,agi:P.attr.agi,per:P.attr.per};
     B.innerHTML=`<div class="res"><span>Lv ${P.lvl}</span><span style="color:#7fffb0">แต้มคงเหลือ <b>${left}</b></span><span style="color:var(--mut)">ได้ ${AP_PER_LVL} แต้มทุกเลเวล · เก็บไว้อัพทีหลังได้</span>${ST.moodPen.str||ST.moodPen.dex?`<span style="color:#ff8a70">อารมณ์: STR −${ST.moodPen.str} DEX −${ST.moodPen.dex}</span>`:''}</div>`+ATTRS.map(([k,ab,th,d])=>`<div class="attr"><b>${ab}</b><div>${th}<small>${d}</small></div><div class="v">${cur[k]}${pend[k]?`<em> +${pend[k]}</em>`:''}</div><button class="sm ghost" data-m="${k}" ${pend[k]?'':'disabled'}>−</button><button class="sm" data-p="${k}" ${left>0?'':'disabled'}>+</button></div>`).join('')+
       `<div class="cbtn"><button id="apOk" ${used?'':'disabled'}>ยืนยัน</button><button class="ghost" id="apLater">เก็บไว้อัพทีหลัง</button></div>`;
@@ -1800,7 +1974,7 @@ function renderPanel(kind,arg){panelArg=arg;const T=$('#ptitle'),B=$('#pbody');i
     B.innerHTML=`<div class="res"><span style="color:#f2c94c">● ${P.gold} gold</span><span>แรง ${Math.round(P.energy)}%</span><span>อาหาร ${Math.round(P.food)}%</span><span>น้ำ ${Math.round(P.water)}%</span></div>
       <div class="qrow"><div>นอนพัก 4 ชั่วโมง<br><small>แรงเต็ม · HP เต็ม · เวลาผ่านไป 4 ชั่วโมงในเกม (หิวและกระหายขึ้นเล็กน้อย)</small></div><button class="sm" id="innSleep" ${P.gold<pr?'disabled':''}>${pr} gold</button></div>
       <div class="qrow"><div>อาหารร้อนกับเบียร์<br><small>อาหาร +55 · น้ำ +45 · ความเศร้า −12 · ความสุข +8</small></div><button class="sm" id="innEat" ${P.gold<mp?'disabled':''}>${mp} gold</button></div>`;
-    $('#innSleep').onclick=()=>{if(P.gold<pr)return;P.gold-=pr;moodAdd('stress',-30);moodAdd('sad',-20);moodAdd('joy',10);P.energy=100;P.hp=ST.maxHp;Wd.time+=DAY/6;P.food=Math.max(0,P.food-12);P.water=Math.max(0,P.water-15);for(const k in P.body)for(const w of P.body[k])w.h-=200;popInit=true;for(const z of zombies)if(z.r)scene.remove(z.r.g);zombies.length=0;boss=null;sfx('level');toast('นอนหลับพักผ่อนเต็มที่ เวลาผ่านไป 4 ชั่วโมง','#b0a0ff');renderPanel('inn',arg)};
+    $('#innSleep').onclick=()=>{if(P.gold<pr)return;P.gold-=pr;moodAdd('stress',-30);moodAdd('sad',-20);moodAdd('joy',10);P.energy=100;if(!ST.onlyAspectHeal)P.hp=ST.maxHp;Wd.time+=DAY/6;P.food=Math.max(0,P.food-12);P.water=Math.max(0,P.water-15);for(const k in P.body)for(const w of P.body[k])w.h-=200;popInit=true;for(const z of zombies)if(z.r)scene.remove(z.r.g);zombies.length=0;boss=null;sfx('level');toast('นอนหลับพักผ่อนเต็มที่ เวลาผ่านไป 4 ชั่วโมง','#b0a0ff');renderPanel('inn',arg)};
     $('#innEat').onclick=()=>{if(P.gold<mp)return;P.gold-=mp;moodAdd('sad',-12);moodAdd('joy',8);moodAdd('bored',-6);P.food=Math.min(100,P.food+55);P.water=Math.min(100,P.water+45);sfx('eat');renderPanel('inn',arg)};return}
   if(kind==='skills'){T.textContent='สกิลทรี';
     if(!P.cls){B.innerHTML=`<p>คุณยังไม่มีคลาส ต้องหา <b>Skill Book</b> จากหีบสมบัติหรือบอสก่อน แล้วคลิกขวาที่หนังสือในกระเป๋า (I)</p><div class="sk">${Object.values(CLASSES).map(c=>`<div class="sn"><b style="color:${c.col}">${c.th} · ${c.n}</b><div class="ty">${c.book}</div><p style="margin:6px 0 0">Sub-class: ${c.subs}</p></div>`).join('')}</div><p style="color:var(--mut)">Skill point ที่เก็บไว้: ${P.sp}</p>`;return}
@@ -1837,7 +2011,7 @@ function helpHTML(){return `<table class="k"><tbody>
 <tr><td>Esc</td><td>ปลดล็อกเมาส์ / หยุดพัก</td></tr></tbody></table>
 <p style="color:var(--mut);font-size:13px">ปุ่มด้านบนเป็นค่าเริ่มต้น เปลี่ยนได้ทั้งหมดในตั้งค่า (O)</p>
 <h3>กฎของโลกนี้</h3>
-<p>• <b>ซอมบี้มีสกิลเฉพาะตัว</b> (ดูใต้ชื่อ): Walker จับรัด/พุ่งกัด/อ้วกพิษ · Runner กระโจน/ข่วนรัว/หลบหลีก · Brute <b>ปีนต้นไม้แล้วดีดตัวลงมาทุบ</b> (เมื่อโดนตีหนัก) พุ่งชน กระทืบพื้น ขว้างหิน · Spitter พ่นรัว/บ่อกรด/กระโดดถอย · Crawler คว้าข้อเท้า/<b>แกล้งตาย</b> · ท่าตีปกติสุ่มทุกครั้ง: ปัดขวา ปัดซ้าย ทุบสองมือ งับ ทุบเหนือหัว · วงสีแดงบนพื้น = จุดที่กำลังจะโดนทุบ<br>• <b>ถูกจับ</b>: กด Space รัวๆ หรือโจมตีเพื่อดิ้นหลุด ไม่งั้นจะโดนกัด<br>• <b>กระโดด</b> (Space ใช้สแตมินา 8) ข้ามหิน ลังไม้ แนวกั้นเตี้ยๆ ได้ · กดโจมตีกลางอากาศ = ดิ่งทุบ แรงขึ้น 50% และทำให้ซอมบี้ล้ม<br>• <b>อารมณ์</b>: เครียด เศร้า เบื่อ มีความสุข มีผลต่อ STR/DEX ความเร็วการกระทำ XP และดาเมจ (ดูที่ H)<br>• <b>บาดแผลแบบ Project Zomboid</b>: โดนซอมบี้ตีอาจเกิดแผลที่อวัยวะต่างๆ (ถลอก ฉีกขาด ถูกกัด แผลลึก กระดูกหัก) แผลทำให้เลือดออก ต้องพันแผล แผลลึกต้องเย็บ กระดูกหักต้องดามเฝือก แผลที่ไม่ได้ฆ่าเชื้อหรือผ้าพันแผลสกปรกจะติดเชื้อ · <b>ถูกกัด</b>มีโอกาสสูงมากที่จะติดเชื้อซอมบี้ เชื้อจะลุกลามจนตายถ้าไม่มียาแก้เชื้อ · เกราะในช่องนั้นช่วยกันแผล<br>• <b>อาการ (Moodles)</b> ขวามือ: หิว กระหาย ง่วง หอบ เจ็บปวด เลือดออก ป่วย ตื่นตระหนก ของหนัก หนาว/ร้อน แต่ละอาการมี 4 ระดับ ทำให้ช้าลง ตีช้า ตีเบา หรือฟื้นสแตมินาช้า<br>• <b>นอนหลับ</b>ได้ทุกที่ (เวลาเร็วขึ้น 20 เท่า) แต่ซอมบี้อาจมาปลุก ถ้าแรงหมดจะหมดสติเอง · ทุกการกระทำใช้เวลา และขยับตัวจะยกเลิก<br>• ซอมบี้กระจายอยู่ทั่วโลก ซากเมืองและถนนมีเยอะที่สุด ฆ่าแล้วพื้นที่จะโล่งไปพักหนึ่ง ซอมบี้รับรู้ได้ใกล้ลง แต่การวิ่งและการต่อสู้มีเสียงดึงดูดพวกมัน<br>• <b>เอาชีวิตรอด</b>: ต้องกิน ดื่ม และพักผ่อน หิวทำให้สแตมินาลดและ HP ไม่ฟื้น กระหายทำให้ฟื้นสแตมินาช้า เหนื่อยทำให้เดินช้า ถ้าอาหารหรือน้ำหมดจะเสีย HP เรื่อยๆ · วิ่ง ต่อสู้ ทะเลทรายร้อน และหิมะหนาว ทำให้หมดเร็วขึ้น<br>• <b>สัตว์ป่า</b>: ล่ากวาง กระต่าย หมูป่า หมาป่า เพื่อเอาเนื้อและหนัง เนื้อดิบควรย่างก่อนกิน (กองไฟ หรือให้พ่อค้าย่าง) หมาป่าล่าเป็นฝูงโดยเฉพาะกลางคืน<br>• <b>เลเวลอัป</b> ได้ 3 แต้มสเตท อัพทันทีหรือเก็บไว้ก่อนก็ได้<br>• <b>Hardcore</b>: HP หมดคือจบ ตัวละครถูกลบ ของหายหมด<br>• <b>ซอมบี้ให้แค่ XP</b> ไม่ดรอปเงิน เงินได้จากหีบ เควส และการขายของ<br>• <b>ซอมบี้มีเลเวล</b> และเก็บเลเวลได้เอง: อยู่นานขึ้น กัดคุณ หรือกินศพพวกเดียวกันจะเลเวลอัป ตัวใหญ่และแรงขึ้น ตาส้มคือ Lv10+ ตาแดงคือ Lv20+<br>• ยิ่งไกลจาก Emberhold และยิ่งผ่านไปหลายวัน ซอมบี้ยิ่งเลเวลสูง<br>• <b>เชื้อซอมบี้</b>: โดนกัดแล้วเชื้อสะสม ดูด HP จนกว่าจะดื่มยาแก้เชื้อ<br>• <b>เกราะ</b> ลดดาเมจที่ได้รับ เกราะเหล็กหนักทำให้ช้าลงเล็กน้อย<br>• <b>กลางวัน/กลางคืน</b> สลับทุก 10 นาที กลางคืนมองเห็นสั้นลง ซอมบี้ดุและเยอะขึ้น · <b>Blood Moon</b> ทุกคืนที่ 3<br>• <b>ซากนคร</b> (▣ บนแผนที่) มีหีบเยอะ แต่ซอมบี้ก็หนาแน่นกว่าที่อื่น<br>• ซอมบี้ยกแขนง้างก่อนตี ถอยออกทันจะไม่โดน · ตีต่อเนื่อง 3 ครั้งเป็นคอมโบ<br>• <b>เมือง</b>เป็นเขตปลอดภัย ผูกพันศิลาเมืองได้ทีละ 1 เมืองเพื่อรับ perk</p>
+<p>• <b>Aspect</b> (ปุ่ม T): พลังพิเศษที่กดใช้ มีคูลดาวน์ และพัฒนาขึ้นเมื่อรอดชีวิตครบ 20 / 60 / 120 นาที ดูรายละเอียดที่หน้าอัพสเตท (U)<br>• <b>หลบ (Q)</b>: กลิ้งหลบไปทางที่กดเดิน ใช้สแตมินา 16 อมตะช่วงสั้นๆ ถ้าหลบตอนกำลังจะโดนตีพอดี เวลาจะช้าลงแวบหนึ่งและได้สแตมินาคืน<br>• <b>เก็บทรัพยากร</b>: เดินไปที่ต้นไม้ (ไม้) ก้อนหิน (หิน) พุ่มไม้ (เส้นใย สมุนไพร) ซากปรักหักพัง (เศษเหล็ก) แล้วกด E · ถือขวานตัดไม้ไวขึ้น · แต่ละจุดเก็บได้จำกัดและฟื้นในวันถัดไป<br>• <b>สร้างสิ่งของ (N)</b>: ยา ผ้าพันแผล อาวุธ เกราะ กระเป๋า · บางสูตรต้องอยู่ใกล้กองไฟหรือในเมือง<br>• <b>ซอมบี้มีสกิลเฉพาะตัว</b> (ดูใต้ชื่อ): Walker จับรัด/พุ่งกัด/อ้วกพิษ · Runner กระโจน/ข่วนรัว/หลบหลีก · Brute <b>ปีนต้นไม้แล้วดีดตัวลงมาทุบ</b> (เมื่อโดนตีหนัก) พุ่งชน กระทืบพื้น ขว้างหิน · Spitter พ่นรัว/บ่อกรด/กระโดดถอย · Crawler คว้าข้อเท้า/<b>แกล้งตาย</b> · ท่าตีปกติสุ่มทุกครั้ง: ปัดขวา ปัดซ้าย ทุบสองมือ งับ ทุบเหนือหัว · วงสีแดงบนพื้น = จุดที่กำลังจะโดนทุบ<br>• <b>ถูกจับ</b>: กด Space รัวๆ หรือโจมตีเพื่อดิ้นหลุด ไม่งั้นจะโดนกัด<br>• <b>กระโดด</b> (Space ใช้สแตมินา 8) ข้ามหิน ลังไม้ แนวกั้นเตี้ยๆ ได้ · กดโจมตีกลางอากาศ = ดิ่งทุบ แรงขึ้น 50% และทำให้ซอมบี้ล้ม<br>• <b>อารมณ์</b>: เครียด เศร้า เบื่อ มีความสุข มีผลต่อ STR/DEX ความเร็วการกระทำ XP และดาเมจ (ดูที่ H)<br>• <b>บาดแผลแบบ Project Zomboid</b>: โดนซอมบี้ตีอาจเกิดแผลที่อวัยวะต่างๆ (ถลอก ฉีกขาด ถูกกัด แผลลึก กระดูกหัก) แผลทำให้เลือดออก ต้องพันแผล แผลลึกต้องเย็บ กระดูกหักต้องดามเฝือก แผลที่ไม่ได้ฆ่าเชื้อหรือผ้าพันแผลสกปรกจะติดเชื้อ · <b>ถูกกัด</b>มีโอกาสสูงมากที่จะติดเชื้อซอมบี้ เชื้อจะลุกลามจนตายถ้าไม่มียาแก้เชื้อ · เกราะในช่องนั้นช่วยกันแผล<br>• <b>อาการ (Moodles)</b> ขวามือ: หิว กระหาย ง่วง หอบ เจ็บปวด เลือดออก ป่วย ตื่นตระหนก ของหนัก หนาว/ร้อน แต่ละอาการมี 4 ระดับ ทำให้ช้าลง ตีช้า ตีเบา หรือฟื้นสแตมินาช้า<br>• <b>นอนหลับ</b>ได้ทุกที่ (เวลาเร็วขึ้น 20 เท่า) แต่ซอมบี้อาจมาปลุก ถ้าแรงหมดจะหมดสติเอง · ทุกการกระทำใช้เวลา และขยับตัวจะยกเลิก<br>• ซอมบี้กระจายอยู่ทั่วโลก ซากเมืองและถนนมีเยอะที่สุด ฆ่าแล้วพื้นที่จะโล่งไปพักหนึ่ง ซอมบี้รับรู้ได้ใกล้ลง แต่การวิ่งและการต่อสู้มีเสียงดึงดูดพวกมัน<br>• <b>เอาชีวิตรอด</b>: ต้องกิน ดื่ม และพักผ่อน หิวทำให้สแตมินาลดและ HP ไม่ฟื้น กระหายทำให้ฟื้นสแตมินาช้า เหนื่อยทำให้เดินช้า ถ้าอาหารหรือน้ำหมดจะเสีย HP เรื่อยๆ · วิ่ง ต่อสู้ ทะเลทรายร้อน และหิมะหนาว ทำให้หมดเร็วขึ้น<br>• <b>สัตว์ป่า</b>: ล่ากวาง กระต่าย หมูป่า หมาป่า เพื่อเอาเนื้อและหนัง เนื้อดิบควรย่างก่อนกิน (กองไฟ หรือให้พ่อค้าย่าง) หมาป่าล่าเป็นฝูงโดยเฉพาะกลางคืน<br>• <b>เลเวลอัป</b> ได้ 3 แต้มสเตท อัพทันทีหรือเก็บไว้ก่อนก็ได้<br>• <b>Hardcore</b>: HP หมดคือจบ ตัวละครถูกลบ ของหายหมด<br>• <b>ซอมบี้ให้แค่ XP</b> ไม่ดรอปเงิน เงินได้จากหีบ เควส และการขายของ<br>• <b>ซอมบี้มีเลเวล</b> และเก็บเลเวลได้เอง: อยู่นานขึ้น กัดคุณ หรือกินศพพวกเดียวกันจะเลเวลอัป ตัวใหญ่และแรงขึ้น ตาส้มคือ Lv10+ ตาแดงคือ Lv20+<br>• ยิ่งไกลจาก Emberhold และยิ่งผ่านไปหลายวัน ซอมบี้ยิ่งเลเวลสูง<br>• <b>เชื้อซอมบี้</b>: โดนกัดแล้วเชื้อสะสม ดูด HP จนกว่าจะดื่มยาแก้เชื้อ<br>• <b>เกราะ</b> ลดดาเมจที่ได้รับ เกราะเหล็กหนักทำให้ช้าลงเล็กน้อย<br>• <b>กลางวัน/กลางคืน</b> สลับทุก 10 นาที กลางคืนมองเห็นสั้นลง ซอมบี้ดุและเยอะขึ้น · <b>Blood Moon</b> ทุกคืนที่ 3<br>• <b>ซากนคร</b> (▣ บนแผนที่) มีหีบเยอะ แต่ซอมบี้ก็หนาแน่นกว่าที่อื่น<br>• ซอมบี้ยกแขนง้างก่อนตี ถอยออกทันจะไม่โดน · ตีต่อเนื่อง 3 ครั้งเป็นคอมโบ<br>• <b>เมือง</b>เป็นเขตปลอดภัย ผูกพันศิลาเมืองได้ทีละ 1 เมืองเพื่อรับ perk</p>
 <p style="color:var(--mut);font-size:13px">Prototype Act I (เล่นคนเดียว) · ระบบออนไลน์, สิ่งก่อสร้างของผู้เล่น และ Act ถัดไปยังไม่อยู่ในเวอร์ชันนี้</p>`}
 function drawBigMap(){const cv=$('#bigmap');if(!cv)return;const g=cv.getContext('2d'),S=560,tp=(x,z)=>[(x/WORLD_R*.5+.5)*S,(z/WORLD_R*.5+.5)*S];
   g.imageSmoothingEnabled=true;g.drawImage(worldMap,0,0,S,S);g.font='600 13px Sarabun,sans-serif';g.textAlign='center';g.strokeStyle='#000';g.lineWidth=3;
@@ -1870,9 +2044,10 @@ function renderHot(){if(!P)return;const w=curW(),acts=activeSkills();
   $('#hot').innerHTML=`<div class="slot w"><kbd>LMB</kbd><span class="mini-ic">${icon(w)}</span><div>${itemName(w)} · ${w.dmg}</div></div><div class="slot"><kbd>${kn('potion')}</kbd>ยาฟื้นฟู<span class="n">${countC('potion')}</span></div><div class="slot"><kbd>${kn('antidote')}</kbd>ยาแก้เชื้อ<span class="n">${countC('antidote')}</span></div><div class="slot"><kbd>${kn('eat')}</kbd>อาหาร<span class="n">${FOOD_ORDER.reduce((s,k)=>s+countC(k),0)}</span></div><div class="slot"><kbd>${kn('drink')}</kbd>น้ำ<span class="n">${countC('water')}</span></div><div class="slot"><kbd>${kn('bandage')}</kbd>รักษาแผล<span class="n">${countC('bandage')+countC('rag')}</span></div>`+[0,1].map(i=>{const s=acts[i];if(!s)return `<div class="slot lock"><kbd>${kn('skill'+(i+1))}</kbd>—</div>`;return `<div class="slot ${P.skills[s.id]?'':'lock'}" data-sk="${s.id}"><kbd>${kn('skill'+(i+1))}</kbd>${s.n}<div class="cd" style="height:0"></div></div>`}).join('')}
 function renderQuests(){$('#quests').innerHTML=P.quests.map(q=>`<div class="q">${q.txt}<br><span style="color:var(--mut)">${q.have}/${q.n}</span></div>`).join('')}
 function renderChips(){const R=RACES[P.race],F=FATES[P.fate];$('#who').innerHTML=`${esc(P.name)}<small>${R.th} · ${P.cls?CLASSES[P.cls].th:'ไม่มีคลาส'}</small>`;
-  $('#chips').innerHTML=`<span class="chip a">✦ ${F.a[0]}</span><span class="chip f">✖ ${F.f[0]}</span>${P.city>=0?`<span class="chip c">◆ ${cities[P.city].name}</span>`:''}<span class="chip">เกราะ ${Math.round(ST.armor)}</span>`}
+  $('#chips').innerHTML=`<span class="chip a">✦ ${F.a[0]} ${ROMAN[aTier()-1]}</span><span class="chip f">✖ ${F.f[0]}</span>${P.city>=0?`<span class="chip c">◆ ${cities[P.city].name}</span>`:''}<span class="chip">เกราะ ${Math.round(ST.armor)}</span>`}
 let hudT=0,bmPrev=false,moodKey='';
 function updateHUD(dt){hudT-=dt;if(hudT>0)return;hudT=.1;
+  {const F=FATES[P.fate],mx=aspMaxCh(),rdy=aspCh>0,pc=rdy&&aspCh>=mx?100:Math.round((1-Math.max(0,aspCd)/F.cd)*100),el=$('#asp');el.className=rdy?'ready':'';el.innerHTML=`<b>✦ ${F.a[0]}</b><span class="tr">${ROMAN[aTier()-1]}</span> <span class="k">[${keyName(CFG.binds.aspect)}]</span>${mx>1?` <span class="k">×${aspCh}</span>`:''}${!rdy?` <small>${Math.ceil(aspCd)} วิ</small>`:''}${P.shroud>0?' <small style="color:#b090e0">หายตัว</small>':''}<div class="cdb"><i style="width:${pc}%"></i></div>`}
   const hp=Math.max(0,P.hp);$('.bar.hp i').style.width=(hp/ST.maxHp*100)+'%';$('.bar.hp span').textContent=`${Math.ceil(hp)} / ${ST.maxHp}`;
   $('.bar.st i').style.width=(P.sta/ST.maxSta*100)+'%';
   for(const [k,c] of [['food','f'],['water','w'],['energy','e']]){const el=$('.need.'+c);el.querySelector('i').style.width=P[k]+'%';el.classList.toggle('low',P[k]<20)}
@@ -1893,7 +2068,7 @@ function showBanner(sub,reset){const b=$('#banner');if(reset){b.querySelector('.
 function savePlayer(){if(!P||P.dead||state!=='play')return;const o={...P};store.set(SKEY,o);saveWorld()}
 function clearFx(){for(const c of corpses)if(c.r)scene.remove(c.r.g);corpses.length=0;for(const g of gore)scene.remove(g.m);gore.length=0;atk=null;spinT=0;tS.length=0;trail.visible=false;for(const l of [...lootBags])removeLoot(l)}
 function clearZombies(){clearAnimals();for(const z of zombies)if(z.r)scene.remove(z.r.g);zombies.length=0;boss=null;for(const p of projs)scene.remove(p.m);projs.length=0;clearFx();if(eyeIM)renderZombies(0,0,0)}
-function startPlay(p,fresh){for(const q of pools)scene.remove(q.m);pools.length=0;P=migrate(p);P.dead=false;P.deadT=0;state='play';resting=false;sleeping=false;crouch=false;act=null;panic=0;grassKey='';popInit=true;$('#sleepov').classList.add('hidden');$('#actbar').classList.add('hidden');fitBag();refreshStats();if(fresh){P.hp=ST.maxHp;P.sta=ST.maxSta}rebuildChar();
+function startPlay(p,fresh){for(const q of pools)scene.remove(q.m);pools.length=0;clearAspectFx();P=migrate(p);P.dead=false;P.deadT=0;state='play';resting=false;sleeping=false;crouch=false;act=null;panic=0;grassKey='';popInit=true;$('#sleepov').classList.add('hidden');$('#actbar').classList.add('hidden');fitBag();refreshStats();if(fresh){P.hp=ST.maxHp;P.sta=ST.maxSta}rebuildChar();
   clearZombies();
   yaw=P.my-Math.PI;pitch=-.15;inCityIdx=cityAt(P.x,P.z);
   ['#menu','#create','#dead'].forEach(s=>$(s).classList.add('hidden'));$('#hud').classList.remove('hidden');
@@ -1916,23 +2091,33 @@ $('#bQuit').onclick=()=>{savePlayer();toMenu()};
 $('#bResume').onclick=()=>{if(!fallback)requestLock();else setPause(false)};
 $('#bHelp1').onclick=()=>{setPause(false);openPanel('help')};
 $('#bSet1').onclick=()=>{setPause(false);openPanel('settings')};
-$('#bSet0').onclick=()=>openPanel('settings');
+$('#bSet0').onclick=()=>{$('#menu').classList.add('hidden');openPanel('settings')};
 document.addEventListener('click',e=>{if(e.target.closest('button'))sfx('ui')});
 $('#bHelp0').onclick=()=>{const m=$('#menu .mbox');if(m.querySelector('.helpbox')){m.querySelector('.helpbox').remove();return}const d=document.createElement('div');d.className='helpbox';d.style.cssText='text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;margin-top:14px;max-height:40vh;overflow:auto';d.innerHTML=helpHTML();m.appendChild(d)};
-$('#bResetW').onclick=()=>{Wd={start:Date.now(),looted:{},time:DAY*.04,bossAt:0};saveWorld();for(const c of chunks.values())disposeChunk(c);chunks.clear();toMenu()};
+$('#bResetW').onclick=()=>{Wd={start:Date.now(),gath:{},looted:{},time:DAY*.04,bossAt:0};saveWorld();for(const c of chunks.values())disposeChunk(c);chunks.clear();toMenu()};
 $('#bCont').onclick=()=>{const p=store.get(SKEY);if(!p)return;startPlay(p,false)};
 
 // character creation
 let cRace=0,cFate=-1,preview=null;
-$('#bNew').onclick=()=>{state='create';cFate=-1;$('#menu').classList.add('hidden');$('#create').classList.remove('hidden');$('#fate').innerHTML='<button id="bRoll">สุ่ม Aspect และ Flaw</button>';$('#bRoll').onclick=rollFate;$('#bStart').disabled=true;renderRaces();selRace(ri(RACES.length))};
+$('#bNew').onclick=()=>{state='create';cFate=-1;$('#menu').classList.add('hidden');$('#create').classList.remove('hidden');renderRaces();selRace(ri(RACES.length));createStep(1)};
 $('#bBack').onclick=()=>{if(preview){scene.remove(preview.g);preview=null}toMenu()};
+$('#bNext').onclick=()=>createStep(2);
+$('#bBack2').onclick=()=>{if(cFate<0)createStep(1)};
+function createStep(n){const one=n===1;$('#step1').classList.toggle('hidden',!one);$('#step2').classList.toggle('hidden',one);$('#raceGrid').classList.toggle('hidden',!one);$('#fateInfo').classList.toggle('hidden',one);
+  $('#cTitle').textContent=one?'เลือกเผ่าพันธุ์':'ชะตาลิขิต';$('#cStep').textContent=`ขั้นที่ ${n} / 2`;
+  if(!one){const r=RACES[cRace];$('#sRace').textContent=`${($('#pname').value.trim()||'Wanderer').slice(0,16)} · ${r.th} (${r.n})`;
+    $('#fateInfo').innerHTML=`<p style="font-size:13px;line-height:1.6">• <b style="color:#9fd36e">Aspect</b> คือพลังพิเศษที่กดใช้เอง (ปุ่ม ${keyName(CFG.binds.aspect)}) ไม่ใช่บัฟสเตท<br>• Aspect <b>พัฒนาขึ้นเอง</b>เมื่อตัวละครมีชีวิตรอดถึงเวลาที่กำหนด:<br>&nbsp;&nbsp;ขั้น II = 20 นาที · ขั้น III = 60 นาที · ขั้น IV = 120 นาที (เวลาเล่นจริง)<br>• <b style="color:#ff8a70">Flaw</b> คือข้อเสียถาวรที่ผูกกับ Aspect นั้น<br>• ตายแล้วทุกอย่างรวมถึงขั้นของ Aspect กลับเป็นศูนย์</p><h3>Aspect ทั้งหมด</h3><div>${FATES.map(F=>`<span class="aspn">✦ ${F.a[0]}</span>`).join('')}</div>`;
+    if(cFate<0){$('#fate').innerHTML='<button id="bRoll">สุ่ม Aspect และ Flaw</button>';$('#bRoll').onclick=rollFate;$('#tiers').innerHTML='';$('#bStart').disabled=true;$('#bBack2').classList.remove('hidden')}}}
 function renderRaces(){$('#raceGrid').innerHTML=RACES.map((r,i)=>`<button class="rc" data-r="${i}"><b>${r.n}</b><small>${r.th}</small></button>`).join('');$('#raceGrid').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>selRace(+b.dataset.r))}
 function selRace(i){cRace=i;const r=RACES[i];document.querySelectorAll('.rc').forEach(b=>b.classList.toggle('on',+b.dataset.r===i));
   $('#rName').textContent=`${r.n} · ${r.th}`;$('#rDesc').textContent=r.d;$('#rPerk').textContent='พรสวรรค์เผ่า: '+r.pd;
   $('#rStats').innerHTML=r.s.map((v,k)=>`<div class="stat"><span>${STATN[k]}</span><span class="t"><i style="width:${v/STATMAX[k]*100}%"></i></span><span>${k>=4?v.toFixed(2):v}</span></div>`).join('');
   if(preview)scene.remove(preview.g);preview=buildHumanoid(r.L);const c=cities[0];preview.g.position.set(c.x,c.h,c.z+9);scene.add(preview.g)}
-function rollFate(){cFate=ri(FATES.length);const F=FATES[cFate];
-  $('#fate').innerHTML=`<div class="fc a reveal"><b>✦ Aspect: ${F.a[0]}</b><span class="en">${F.a[1]}</span><p>${F.a[2]}</p></div><div class="fc f reveal" style="animation-delay:.35s"><b>✖ Flaw: ${F.f[0]}</b><span class="en">${F.f[1]}</span><p>${F.f[2]}</p></div>`;$('#bStart').disabled=false}
+function rollFate(){if(cFate>=0)return;$('#bBack2').classList.add('hidden');const fin=ri(FATES.length);cFate=fin;let n=0;$('#fate').innerHTML='<div class="fc a" id="spin" style="text-align:center;font-size:18px"></div>';
+  const iv=setInterval(()=>{n++;$('#spin').innerHTML=`<b>✦ ${FATES[(fin+n)%FATES.length].a[0]}</b>`;sfx('ui');if(n>=18){clearInterval(iv);showFate()}},70)}
+function showFate(){const F=FATES[cFate];sfx('level');
+  $('#fate').innerHTML=`<div class="fc a reveal"><b>✦ Aspect: ${F.a[0]}</b><span class="en">${F.a[1]}</span><p>${F.a[2]}</p><p style="color:var(--mut);font-size:12px">คูลดาวน์ ${F.cd} วิ · กด ${keyName(CFG.binds.aspect)}</p></div><div class="fc f reveal" style="animation-delay:.35s"><b>✖ Flaw: ${F.f[0]}</b><span class="en">${F.f[1]}</span><p>${F.f[2]}</p></div>`;
+  $('#tiers').innerHTML=`<h3>การพัฒนาของ Aspect</h3>`+F.t.map((t,i)=>`<div class="tierl off"><b>ขั้น ${ROMAN[i+1]}</b> <small>(รอด ${TIER_T[i+1]/60} นาที)</small> · ${t}</div>`).join('');$('#bStart').disabled=false}
 $('#bStart').onclick=()=>{if(cFate<0)return;const name=($('#pname').value.trim()||'Wanderer').slice(0,16);if(preview){scene.remove(preview.g);preview=null}
   startPlay(newPlayer(cRace,cFate,name),true);savePlayer()};
 
@@ -1942,7 +2127,7 @@ function frame(now){requestAnimationFrame(frame);const rdt=Math.min(.05,(now-las
   const c0=cities[0];
   if(state==='play'&&P&&!P.dead&&!paused){
     Wd.time+=dt*(sleeping?SLEEP_SCALE:down('timeskip')?60:1);
-    updatePlayer(dt);if(!P.dead){updateZombies(dt);populate(dt);updateAnimals(dt);spawnAnimals(dt);updateBirds(dt);updateFires(dt);updateProjs(dt);findNearest();updateHUD(rdt);updateGrass();if(sleeping)P.noise=.5;updateAudio(rdt)}updateGore(dt);updateCorpses(dt);
+    updatePlayer(dt);updateAspect(dt);const wdt=dt*(slowMo>0?.35:1);if(!P.dead){updateZombies(wdt);populate(dt);updateAnimals(wdt);spawnAnimals(dt);updateBirds(dt);updateFires(dt);updateProjs(wdt);findNearest();updateHUD(rdt);updateGrass();if(sleeping)P.noise=.5;updateAudio(rdt)}updateGore(dt);updateCorpses(dt);
     focusX=P.x;focusZ=P.z;updateCamera();saveT+=dt;if(saveT>8){saveT=0;savePlayer()}}
   else if(state==='play'&&P){if(P.dead&&charModel){P.deadT=(P.deadT||0)+rdt;applyPose(rdt)}updateCamera()}
   else if(state==='menu'&&c0){menuA+=dt*.05;focusX=c0.x;focusZ=c0.z;camera.position.set(c0.x+Math.cos(menuA)*85,c0.h+38,c0.z+Math.sin(menuA)*85);camera.lookAt(c0.x,c0.h+4,c0.z)}
@@ -1961,7 +2146,7 @@ setTimeout(()=>{
   {const c=document.createElement('canvas');c.width=c.height=160;const g=c.getContext('2d'),d=g.createImageData(160,160);for(let i=0;i<d.data.length;i+=4){const v=Math.random()*255;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=255}g.putImageData(d,0,0);$('#grain').style.backgroundImage=`url(${c.toDataURL()})`}
   focusX=cities[0].x;focusZ=cities[0].z;updateChunks(400);
   state='menu';$('#loading').classList.add('hidden');toMenu();
-  window.__realm={get animals(){return animals},get CFG(){return CFG},get P(){return P},get Wd(){return Wd},cities,lair,zombies,ruinCenters,get fog(){return scene.fog},get state(){return state},setTime:t=>{Wd.time=t},biomeAt,baseH,urbanAt,dbg:{tp:(x,z)=>{P.x=x;P.z=z;P.y=groundH(x,z)},attack:()=>playerAttack(),interact:()=>interact(),near:()=>nearest&&nearest.kind,openPanel,grant:l=>grant(l,'debug'),ST:()=>ST,hurt:d=>hurtPlayer(d,'debug','hollowed'),hurt2:d=>hurtPlayer(d,'Lv1 Hollowed Walker','hollowed',{z:1,heavy:true}),setYaw:(y,p)=>{yaw=y;pitch=p},moveItem,quickUse,makeGear,makeBag,makeWeapon,gainXp:x=>gainXp(x),mz:(type,dx=5,dz=0)=>makeZombie(P.x+dx,P.z+dz,type,'mossbound'),sk:(z,id)=>startSkill(z,id),zstep:(z,n=20,dt=.05)=>{const log=[];for(let i=0;i<n&&z.sk;i++){skillUpdate(z,dt,Math.hypot(P.x-z.x,P.z-z.z));log.push(z.sk?z.sk.id+':'+z.sk.ph+':'+(z.yo||0).toFixed(1):'end')}return log},get paused(){return paused}}};
+  window.__realm={get animals(){return animals},get CFG(){return CFG},get P(){return P},get Wd(){return Wd},cities,lair,zombies,ruinCenters,get fog(){return scene.fog},get state(){return state},setTime:t=>{Wd.time=t},biomeAt,baseH,urbanAt,dbg:{tp:(x,z)=>{P.x=x;P.z=z;P.y=groundH(x,z)},attack:()=>playerAttack(),interact:()=>interact(),near:()=>nearest&&nearest.kind,openPanel,grant:l=>grant(l,'debug'),ST:()=>ST,hurt:d=>hurtPlayer(d,'debug','hollowed'),hurt2:d=>hurtPlayer(d,'Lv1 Hollowed Walker','hollowed',{z:1,heavy:true}),setYaw:(y,p)=>{yaw=y;pitch=p},moveItem,quickUse,makeGear,makeBag,makeWeapon,gainXp:x=>gainXp(x),mz:(type,dx=5,dz=0)=>makeZombie(P.x+dx,P.z+dz,type,'mossbound'),sk:(z,id)=>startSkill(z,id),asp:()=>useAspect(),finishAct:()=>{if(act)act.t=act.dur+1;return !!act},countC:c=>countC(c),addC:(c,n)=>addItem({t:'c',c,n}),dash:()=>doDash(),gnode:()=>gatherNode(),gather:o=>gather(o),craft:id=>craft(id),setFate:f=>{P.fate=f;aspCh=1;aspCd=0;refreshStats();renderChips()},aspState:()=>({aspCh,aspCd,slowMo,allies:allies.length,orbs:orbs.length,fields:fields.length,beacons:beacons.length,shroud:P.shroud,dashT}),zstep:(z,n=20,dt=.05)=>{const log=[];for(let i=0;i<n&&z.sk;i++){skillUpdate(z,dt,Math.hypot(P.x-z.x,P.z-z.z));log.push(z.sk?z.sk.id+':'+z.sk.ph+':'+(z.yo||0).toFixed(1):'end')}return log},get paused(){return paused}}};
   requestAnimationFrame(frame)},30);
 }
 </script>
