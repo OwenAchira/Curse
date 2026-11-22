@@ -184,6 +184,8 @@ table.k{border-collapse:collapse;width:100%;font-size:14px}table.k td{padding:5p
 #aspfx{position:absolute;inset:0;pointer-events:none;transition:background .3s,box-shadow .3s}#aspfx.echo{background:rgba(70,120,200,.16);box-shadow:inset 0 0 160px rgba(120,180,255,.5)}#aspfx.shroud{box-shadow:inset 0 0 220px rgba(40,10,70,.9);background:rgba(30,10,50,.18)}
 .sbgrid{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:6px 0}.sbgrid select,.sbgrid input{background:#1c140d;color:var(--txt);border:1px solid var(--line2);border-radius:5px;padding:3px 6px}.sbbtns{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}.sbbtns button{min-width:0}button.danger{background:#5a1a12;border-color:#a03a2a}
 #blindfx{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .5s;background:radial-gradient(circle at 50% 55%,rgba(0,0,0,.55) 0%,rgba(0,0,0,.97) 32%,#000 60%)}#blindfx.on{opacity:1}
+#netBadge{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(30,90,60,.85);color:#fff;font:600 12px Sarabun,sans-serif;padding:3px 12px;border-radius:12px;pointer-events:none}
+#rplates{position:fixed;inset:0;pointer-events:none;z-index:5}.rpl{position:absolute;transform:translate(-50%,-100%);font:700 12px Sarabun,sans-serif;color:#9ad0ff;text-shadow:0 1px 2px #000,0 0 4px #000;white-space:nowrap;text-align:center}.rpl span{color:#d8e8f0;font-weight:400}.rpl i{display:block;width:50px;height:3px;background:#0a2a3a;margin:2px auto 0}.rpl i u{display:block;height:100%;background:#4ac0ff}
 #sbBadge{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(40,90,140,.8);color:#fff;font:700 12px Sarabun,sans-serif;padding:3px 12px;border-radius:12px;pointer-events:none;letter-spacing:1px}
 .matbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}.matbar span{background:#1c140d;border:1px solid var(--line2);border-radius:6px;padding:3px 8px;font-size:13px}.matbar b{color:var(--gold)}
 .rcp button{min-width:76px}.tierl{font-size:13px;margin:4px 0;padding:6px 8px;border-radius:6px;background:#140f0a;border:1px solid var(--line2)}.tierl.on{border-color:#4f7a3a;color:#d8ecc0}.tierl.off{color:#8a8070}
@@ -218,11 +220,13 @@ table.k{border-collapse:collapse;width:100%;font-size:14px}table.k td{padding:5p
     <div class="col">
       <button id="bCont" class="hidden">เล่นต่อ</button>
       <button id="bNew">สร้างตัวละครใหม่</button>
+      <button id="bOnline">เล่นออนไลน์ (Co-op)</button>
       <button class="ghost" id="bSand">โหมดแซนด์บ็อกซ์ (ทดสอบ)</button>
       <button class="ghost" id="bHelp0">วิธีเล่น</button>
       <button class="ghost" id="bSet0">ตั้งค่า</button>
     </div>
-    <p class="note">Hardcore: ตายครั้งเดียว ทุกอย่างกลับเป็นศูนย์ · Prototype เล่นคนเดียว</p>
+    <p class="note">Hardcore: ตายครั้งเดียว ทุกอย่างกลับเป็นศูนย์ · เล่นคนเดียว หรือ Co-op ได้สูงสุด 4 คน</p>
+    <p class="note"><button class="ghost sm" id="bExport">สำรองเซฟ (ดาวน์โหลด)</button> <button class="ghost sm" id="bImport">นำเข้าเซฟ</button></p>
     <p class="note" id="worldInfo"></p>
     <p class="note"><button class="ghost sm" id="bResetW">รีเซ็ตโลก (dev)</button></p>
   </div>
@@ -262,6 +266,7 @@ table.k{border-collapse:collapse;width:100%;font-size:14px}table.k td{padding:5p
   <div id="aspfx"></div>
   <div id="blindfx"></div>
   <div id="sbBadge" class="hidden">SANDBOX · กด F2</div>
+  <div id="netBadge" class="hidden"></div>
   <div id="cross"></div>
   <div id="asp"></div>
   <div id="actbar" class="hidden"><span></span><div class="bar"><i></i></div></div>
@@ -727,10 +732,10 @@ const MONTH=30*86400000;
 let Wd=store.get(WKEY)||{start:Date.now(),looted:{},time:DAY*.04,bossAt:0};
 if(Date.now()-Wd.start>MONTH){Wd.looted={};Wd.start=Date.now()}
 if(!Wd.w2){Wd.looted={};Wd.pop={};Wd.gath={};Wd.w2=1}
-const saveWorld=()=>{if(!SANDBOX)store.set(WKEY,Wd)};
+const saveWorld=()=>{if(!SANDBOX&&!window.__netGuest)store.set(WKEY,Wd)};
 
 // ================= settings & key bindings =================
-const ACTIONS=[['forward','เดินหน้า','KeyW'],['back','ถอยหลัง','KeyS'],['left','เดินซ้าย','KeyA'],['right','เดินขวา','KeyD'],['sprint','วิ่ง','ShiftLeft'],['jump','กระโดด','Space'],['interact','ใช้ / เก็บ / คุย','KeyE'],['potion','ยาฟื้นฟู','KeyR'],['antidote','ยาแก้เชื้อ','KeyF'],['eat','กินอาหาร','KeyG'],['drink','ดื่มน้ำ','KeyB'],['rest','นั่งพัก','KeyZ'],['skill1','สกิล 1','Digit1'],['skill2','สกิล 2','Digit2'],['char','ตัวละคร & กระเป๋า','KeyI'],['stats','อัพสเตท','KeyU'],['skills','สกิลทรี','KeyK'],['map','แผนที่','KeyM'],['quests','เควส','KeyJ'],['crouch','ย่อง (ลดเสียง)','KeyC'],['bandage','รักษาแผลด่วน','KeyX'],['health','สุขภาพ & บาดแผล','KeyH'],['camera','สลับมุมกล้อง','KeyV'],['dodge','หลบ (Dash)','KeyQ'],['aspect','ใช้ Aspect','KeyT'],['craft','สร้างสิ่งของ','KeyN'],['sandbox','เมนูแซนด์บ็อกซ์','F2'],['help','วิธีเล่น','F1'],['settings','ตั้งค่า','KeyO'],['timeskip','เร่งเวลา (dev)','KeyP']];
+const ACTIONS=[['forward','เดินหน้า','KeyW'],['back','ถอยหลัง','KeyS'],['left','เดินซ้าย','KeyA'],['right','เดินขวา','KeyD'],['sprint','วิ่ง','ShiftLeft'],['jump','กระโดด','Space'],['interact','ใช้ / เก็บ / คุย','KeyE'],['potion','ยาฟื้นฟู','KeyR'],['antidote','ยาแก้เชื้อ','KeyF'],['eat','กินอาหาร','KeyG'],['drink','ดื่มน้ำ','KeyB'],['rest','นั่งพัก','KeyZ'],['skill1','สกิล 1','Digit1'],['skill2','สกิล 2','Digit2'],['char','ตัวละคร & กระเป๋า','KeyI'],['stats','อัพสเตท','KeyU'],['skills','สกิลทรี','KeyK'],['map','แผนที่','KeyM'],['quests','เควส','KeyJ'],['crouch','ย่อง (ลดเสียง)','KeyC'],['bandage','รักษาแผลด่วน','KeyX'],['health','สุขภาพ & บาดแผล','KeyH'],['camera','สลับมุมกล้อง','KeyV'],['dodge','หลบ (Dash)','KeyQ'],['aspect','ใช้ Aspect','KeyT'],['craft','สร้างสิ่งของ','KeyN'],['sandbox','เมนูแซนด์บ็อกซ์','F2'],['online','เล่นออนไลน์','F3'],['help','วิธีเล่น','F1'],['settings','ตั้งค่า','KeyO'],['timeskip','เร่งเวลา (dev)','KeyP']];
 const SETKEY='realmofash.settings';
 const CFG_DEF={vol:{master:.8,sfx:.9,amb:.7,music:.35},sens:1,invertY:false,shadows:true,grass:1,zMul:1,binds:{}};
 let CFG=Object.assign({},CFG_DEF,store.get(SETKEY)||{});CFG.vol=Object.assign({},CFG_DEF.vol,CFG.vol);CFG.binds=Object.assign({},CFG.binds);
@@ -791,7 +796,7 @@ const SFX={
  vomit:()=>{tn({type:'sawtooth',f0:140,f1:80,dur:.6,vol:.2,filt:500,q:3,vib:14});nz({dur:.5,f0:700,f1:200,type:'lowpass',vol:.35,brown:true,at:.15})},
  gallop:()=>{nz({dur:.06,f0:500,f1:250,type:'lowpass',vol:.35,brown:true});nz({dur:.06,f0:500,f1:250,type:'lowpass',vol:.3,brown:true,at:.09})},
 };
-const sfx=(n,...a)=>{if(AU.ctx&&SFX[n])try{SFX[n](...a)}catch(e){}};
+let sfx=(n,...a)=>{if(AU.ctx&&SFX[n])try{SFX[n](...a)}catch(e){}};
 function musicStart(){const ch=[[110,130.8,164.8],[98,123.5,146.8],[87.3,110,130.8],[82.4,103.8,123.5]];let i=0;
   const play=()=>{const C=AU.ctx;if(!C||C.state!=='running')return;const t=C.currentTime,c=ch[i++%ch.length],nt=nightK>.5;
     for(const f0 of c)for(const det of [-5,5]){const o=C.createOscillator();o.type='sawtooth';o.frequency.value=f0*(nt?.5:1);o.detune.value=det;const f=C.createBiquadFilter();f.type='lowpass';f.frequency.value=nt?360:600;const g=C.createGain();g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.02,t+3);g.gain.linearRampToValueAtTime(.0001,t+9);o.connect(f);f.connect(g);g.connect(AU.music);o.start(t);o.stop(t+9.3)}
@@ -856,10 +861,11 @@ function buildChunk(cx,cz){
 }
 function disposeChunk(c){scene.remove(c.group);c.group.traverse(o=>{if(o.isInstancedMesh)o.dispose();else if(o.isMesh&&o.geometry.attributes.color&&!o.isInstancedMesh&&o.material===VMAT)o.geometry.dispose()})}
 let focusX=0,focusZ=0;
-function updateChunks(max=2){const pcx=Math.floor(focusX/CHUNK),pcz=Math.floor(focusZ/CHUNK),need=[];
-  for(let dz=-VIEW;dz<=VIEW;dz++)for(let dx=-VIEW;dx<=VIEW;dx++){const d=dx*dx+dz*dz;if(d>VIEW*VIEW+1)continue;if(!chunks.has((pcx+dx)+','+(pcz+dz)))need.push([d,pcx+dx,pcz+dz])}
-  need.sort((a,b)=>a[0]-b[0]);for(let i=0;i<Math.min(max,need.length);i++)buildChunk(need[i][1],need[i][2]);
-  for(const [k,c] of chunks)if((c.cx-pcx)**2+(c.cz-pcz)**2>(VIEW+2)**2){disposeChunk(c);chunks.delete(k)}}
+function updateChunks(max=2){const cs=[[Math.floor(focusX/CHUNK),Math.floor(focusZ/CHUNK),VIEW]];
+  if(typeof NET!=='undefined'&&NET.host&&state==='play')for(const r of NET.remotes.values())if(r.px&&!r.px.dead)cs.push([Math.floor(r.px.x/CHUNK),Math.floor(r.px.z/CHUNK),3]);
+  const need=[],seen=new Set();for(const [pcx,pcz,V] of cs)for(let dz=-V;dz<=V;dz++)for(let dx=-V;dx<=V;dx++){const d=dx*dx+dz*dz;if(d>V*V+1)continue;const k=(pcx+dx)+','+(pcz+dz);if(seen.has(k))continue;seen.add(k);if(!chunks.has(k))need.push([d+(V<VIEW?2:0),pcx+dx,pcz+dz])}
+  need.sort((a,b)=>a[0]-b[0]);for(let i=0;i<Math.min(max+(cs.length>1?1:0),need.length);i++)buildChunk(need[i][1],need[i][2]);
+  for(const [k,c] of chunks){let keep=false;for(const [pcx,pcz,V] of cs)if((c.cx-pcx)**2+(c.cz-pcz)**2<=(V+2)**2){keep=true;break}if(!keep){disposeChunk(c);chunks.delete(k)}}}
 function nearColliders(x,z){const out=[],cx=Math.floor(x/CHUNK),cz=Math.floor(z/CHUNK);
   for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const c=chunks.get((cx+a)+','+(cz+b));if(c)for(const o of c.colliders)out.push(o)}
   for(const c of cities)if((x-c.x)**2+(z-c.z)**2<(c.r+12)**2)for(const o of c.cols)out.push(o);
@@ -980,7 +986,7 @@ addEventListener('keydown',e=>{
   if(e.code==='Escape'){if(panelOpen){closePanel();return}if(state==='play'&&P&&!P.dead&&fallback)setPause(!paused);return}
   if(state!=='play'||P.dead||paused)return;
   const ka=Object.keys(CFG.binds).find(a=>CFG.binds[a]===e.code)||(e.code==='ShiftRight'&&CFG.binds.sprint==='ShiftLeft'?'sprint':null);if(!ka)return;
-  const PN={sandbox:'sandbox',craft:'craft',char:'char',stats:'stats',skills:'skills',map:'map',help:'help',quests:'quests',settings:'settings',health:'health'};
+  const PN={online:'online',sandbox:'sandbox',craft:'craft',char:'char',stats:'stats',skills:'skills',map:'map',help:'help',quests:'quests',settings:'settings',health:'health'};
   if(PN[ka]){togglePanel(PN[ka]);return}
   if(panelOpen)return;
   switch(ka){case'camera':firstPerson=!firstPerson;break;case'interact':interact();break;case'potion':usePotion();break;case'antidote':useAntidote();break;case'eat':quickEat();break;case'drink':quickDrink();break;case'rest':toggleRest();break;case'crouch':if(!mounted){crouch=!crouch;if(crouch&&resting)resting=false}break;case'bandage':quickTreat();break;
@@ -1319,7 +1325,7 @@ function attackHitFrame(){const a=atk,b=a.b,fx=-Math.sin(yaw),fz=-Math.cos(yaw);
   if(a.plunge){ring(P.x+fx*1.2,P.z+fz*1.2,2.4,0xe8d8b0);shake=Math.max(shake,.3);for(const z of zNear(P.x,P.z,4))if(!z.boss&&!z.down&&Math.hypot(z.x-P.x,z.z-P.z)<2.8&&rand()<.5)z.down=1.7}
   if(a.style==='heavy'||a.fin){ring(P.x+fx*1.6,P.z+fz*1.6,a.style==='heavy'?2.6:1.8,0xe8d8b0);shake=Math.max(shake,.22)}
   if(n){hitStop=a.style==='heavy'||a.fin?.09:.05;shake=Math.max(shake,a.style==='heavy'?.32:.14)}}
-function hitZombie(z,dmg,o={}){if(z.dead)return;if(z.uniq&&z.inv>0){floatNum(z.x,z.y+2*z.sc,z.z,'IMMUNE','#ffb040');return}if(z.sk&&z.sk.id==='ambush'){z.sk=null;z.aggro=true}z.hurtAcc=(z.hurtAcc||0)+dmg;let crit=rand()<.08+ST.crit||(slowMo>0&&aspId()==='echo'&&aTier()>=4);if(z.frz>0&&aspId()==='frost'&&aTier()>=3)dmg*=1.5;if(crit)dmg*=1.8;if(z.down>0)dmg*=1.5;if(!z.boss&&!z.uniq&&!(z.down>0)&&!ZT[z.type].crawl&&rand()<((o.kd||0)+(crit?.1:0))*(z.type==='brute'?.3:1))z.down=1.7;z.feed=null;if(z.uniq==='mino'){minoReflect(z,dmg);dmg*=1-MINO_DR}dmg=Math.round(dmg);z.hp-=dmg;z.flash=.15;z.hitT=.22;
+function hitZombie(z,dmg,o={}){if(z.dead)return;if(z.uniq&&z.inv>0){floatNum(z.x,z.y+2*z.sc,z.z,'IMMUNE','#ffb040');return}if(z.sk&&z.sk.id==='ambush'){z.sk=null;z.aggro=true}z.hurtAcc=(z.hurtAcc||0)+dmg;let crit=!o.nocrit&&(rand()<.08+ST.crit||(slowMo>0&&aspId()==='echo'&&aTier()>=4));if(z.frz>0&&aspId()==='frost'&&aTier()>=3)dmg*=1.5;if(crit)dmg*=1.8;if(z.down>0)dmg*=1.5;if(!z.boss&&!z.uniq&&!(z.down>0)&&!ZT[z.type].crawl&&rand()<((o.kd||0)+(crit?.1:0))*(z.type==='brute'?.3:1))z.down=1.7;z.feed=null;if(NET.guest){const raw=Math.round(dmg),shown=Math.round(raw*(z.uniq==='mino'?1-MINO_DR:1));floatNum(z.x,z.y+2*z.sc,z.z,(crit?'✦':'')+shown,o.col||(crit?'#ffd23f':'#fff'));sfx('hit',crit,z.x,z.z);spawnGore(z.x,z.y+1.2*z.sc,z.z,crit?9:4);z.flash=.15;if(z.hid!=null)netSend({t:'hit',id:z.hid,dmg:raw,o:{knock:o.knock,kd:o.kd,col:o.col}});return}if(z.uniq==='mino'){minoReflect(z,dmg);dmg*=1-MINO_DR}dmg=Math.round(dmg);z.hp-=dmg;z.flash=.15;z.hitT=.22;
   if(!z.aggro)alertHorde(z);z.aggro=true;
   floatNum(z.x,z.y+2*z.sc,z.z,(crit?'✦':'')+dmg,o.col||(crit?'#ffd23f':'#fff'));sfx('hit',crit,z.x,z.z);spawnGore(z.x,z.y+1.2*z.sc,z.z,crit?9:4);
   if(ST.lifesteal&&!ST.onlyAspectHeal)P.hp=Math.min(ST.maxHp,P.hp+dmg*ST.lifesteal);
@@ -1327,17 +1333,17 @@ function hitZombie(z,dmg,o={}){if(z.dead)return;if(z.uniq&&z.inv>0){floatNum(z.x
   if(z.down>0&&z.sk&&!['treeleap','leap'].includes(z.sk.id)){if(z.sk.rock)scene.remove(z.sk.rock);z.sk=null}
   if(z.hp>0&&!z.sk&&z.skills&&z.skills.includes('treeleap')&&(z.scd.treeleap||0)<=0&&z.hurtAcc>z.maxHp*.2&&!(z.down>0))startSkill(z,'treeleap');
   if(z.hp<=0)killZombie(z)}
-function killZombie(z){z.dead=true;if(P.shroud>0&&aspId()==='shroud'&&aTier()>=3)P.shroud+=2;if(P.grab&&P.grab.z===z)P.grab=null;if(z.sk&&z.sk.rock)scene.remove(z.sk.rock);z.sk=null;moodAdd('bored',-4);moodAdd('stress',.8);if(z.boss){moodAdd('joy',40);moodAdd('stress',-20)}const i=zombies.indexOf(z);if(i>=0)zombies.splice(i,1);z.ct=0;z.flash=0;z.down=0;z.fd=z.fall>.5?0:rand()<.5?-1:1;z.f0=z.fall||0;corpses.push(z);if(corpses.length>130){const c=corpses.shift();if(c.r)scene.remove(c.r.g)}
+function killZombie(z){z.dead=true;if(NET.host){netEv({k:'zdie',id:z.id});if(z.boss||z.uniq)netEv({k:'bosskill',n:z.boss?'The Rot King':z.uniq==='mino'?'Asterion the Minotaur':'Nocturne the Moonwhale',x:r2(z.x),z:r2(z.z)})}if(P.shroud>0&&aspId()==='shroud'&&aTier()>=3)P.shroud+=2;if(P.grab&&P.grab.z===z)P.grab=null;if(z.sk&&z.sk.rock)scene.remove(z.sk.rock);z.sk=null;moodAdd('bored',-4);moodAdd('stress',.8);if(z.boss){moodAdd('joy',40);moodAdd('stress',-20)}const i=zombies.indexOf(z);if(i>=0)zombies.splice(i,1);z.ct=0;z.flash=0;z.down=0;z.fd=z.fall>.5?0:rand()<.5?-1:1;z.f0=z.fall||0;corpses.push(z);if(corpses.length>130){const c=corpses.shift();if(c.r)scene.remove(c.r.g)}
   if(z.home){const pp=popMap()[z.home]||{k:0,t:Wd.time};pp.k++;pp.t=Wd.time;popMap()[z.home]=pp}
-  spawnGore(z.x,z.y+1*z.sc,z.z,z.boss?40:12);sfx('zdie',z.x,z.z);P.kills++;gainXp(z.xp);if(ST.killHeal&&!ST.onlyAspectHeal)P.hp=Math.min(ST.maxHp,P.hp+ST.killHeal);
+  spawnGore(z.x,z.y+1*z.sc,z.z,z.boss?40:12);sfx('zdie',z.x,z.z);if(NET.attacker)netSendTo(NET.attacker,{t:'xp',x:z.xp,el:z.elite?1:0});else{P.kills++;gainXp(z.xp)}if(ST.killHeal&&!ST.onlyAspectHeal)P.hp=Math.min(ST.maxHp,P.hp+ST.killHeal);
   let fed=0;for(const o of zNear(z.x,z.z,14)){if(o===z||o.boss||o.aggro||ZT[o.type].ranged)continue;o.feed={x:z.x+(rand()-.5),z:z.z+(rand()-.5),lvl:z.lvl};o.feedT=0;if(++fed>=3)break}
   questEvent('kill',z.tribe);if(z.uniq==='mino')minoDie(z);else if(z.uniq==='whale')whaleDie(z);
   if(z.boss){boss=null;Wd.bossAt=Wd.time+600;saveWorld();shake=.6;grant(rollChest(.3,true,true),'The Rot King');questEvent('boss');toast('<b>The Rot King ถูกปราบแล้ว!</b> จะฟื้นคืนชีพในอีก 10 นาที','#b067e6');$('#boss').classList.add('hidden');return}
-  if(z.elite&&rand()<.6){const r=rollRarity(ST.luck+.15,1);grant([rand()<.4?makeWeapon(r):makeGear(r,null,itemLevel())],`Elite ${TRIBES[z.tribe].n}`)}}
-function hurtPlayer(d,src,tribe,o={}){if(SANDBOX&&SB.god&&!P.dead){floatNum(P.x,P.y+2.3,P.z,'('+Math.round(d)+')','#9ad0ff');return}if(dashIF>0&&!P.dead&&(o.z||o.animal||o.acid||o.heavy)){perfectDodge();return}if(invuln>0||P.dead)return;moodAdd('stress',5);if(resting)resting=false;if(sleeping)wake('ตื่นเพราะถูกโจมตี!');cancelAction();sfx('hurt');d=Math.max(1,Math.round(d*(1-ST.dr)));P.hp-=d;lastHurt=0;lastHit=src;hurtT=.22;shake=Math.max(shake,.18);floatNum(P.x,P.y+2.3,P.z,'-'+d,'#ff5a4a');spawnGore(P.x,P.y+1.2,P.z,4,0x7a1810);
+  if(z.elite&&!NET.attacker&&rand()<.6){const r=rollRarity(ST.luck+.15,1);grant([rand()<.4?makeWeapon(r):makeGear(r,null,itemLevel())],`Elite ${TRIBES[z.tribe].n}`)}}
+function hurtPlayer(d,src,tribe,o={}){if(P.remote){netSendTo(P.peer,{t:'hurt',d,src,tr:tribe,o});return}if(SANDBOX&&SB.god&&!P.dead){floatNum(P.x,P.y+2.3,P.z,'('+Math.round(d)+')','#9ad0ff');return}if(dashIF>0&&!P.dead&&(o.z||o.animal||o.acid||o.heavy)){perfectDodge();return}if(invuln>0||P.dead)return;moodAdd('stress',5);if(resting)resting=false;if(sleeping)wake('ตื่นเพราะถูกโจมตี!');cancelAction();sfx('hurt');d=Math.max(1,Math.round(d*(1-ST.dr)));P.hp-=d;lastHurt=0;lastHit=src;hurtT=.22;shake=Math.max(shake,.18);floatNum(P.x,P.y+2.3,P.z,'-'+d,'#ff5a4a');spawnGore(P.x,P.y+1.2,P.z,4,0x7a1810);
   $('#vig').style.boxShadow='inset 0 0 160px 40px rgba(170,0,0,.55)';setTimeout(()=>$('#vig').style.boxShadow='',180);
   if(tribe&&TRIBES[tribe].slow)slowT=2;
-  if((o.z&&rand()<.75)||o.animal||o.slam||(o.heavy&&rand()<.6))woundRoll(Object.assign({tribe},o));
+  if((o.z&&rand()<.75)||o.animal||o.slam||(o.heavy&&rand()<.6))woundRoll(Object.assign({tribe},o));else if(o.wound)woundRoll({});
   if(o.acid&&rand()<.2*(TRIBES[tribe]?.inf||1)){P.knox=true;P.inf=Math.min(100,P.inf+6);toast('กรดซอมบี้กัดผิว: ติดเชื้อ!','#8fc043')}
   if(o.heavy&&!mounted&&!(P.down>0)&&rand()<.28){P.down=1.8;crouch=false;toast('ถูกกระแทกล้มลง!','#c8402c')}
   if(P.hp<=0)die()}
@@ -1401,15 +1407,16 @@ function chunkTarget(cx,cz){const x=cx*CHUNK+32,z=cz*CHUNK+32;if(Math.hypot(x,z)
   const k=cx+','+cz,pp=popMap()[k];if(pp){const kl=pp.k-Math.floor((Wd.time-pp.t)/90);if(kl<=0)delete popMap()[k];else v-=kl}return Math.max(0,Math.round(v))}
 const pickZType=()=>wpick([['walker',.52],['runner',isNight()?.22:.12],['brute',.1],['spitter',.12],['crawler',.12]]);
 let popT=0,popInit=true;
+function nearPD(x,z){let m=1e9;for(const p of (typeof NET!=='undefined'&&NET.host?netAllPlayers():[P]))m=Math.min(m,Math.hypot(p.x-x,p.z-z));return m}
 function populate(dt){popT-=dt;if(popT>0)return;popT=.5;if(SANDBOX&&!SB.pop)return;const cnt=new Map();
   for(let i=zombies.length-1;i>=0;i--){const z=zombies[i];if(z.boss||!z.home)continue;if(!chunks.has(z.home)&&!z.aggro){zombies.splice(i,1);continue}cnt.set(z.home,(cnt.get(z.home)||0)+1)}
   const cap=Math.round((isNight()?DIFF.capNight:DIFF.capDay)*CFG.zMul);let budget=popInit?3000:45,total=zombies.length;
   const ks=[...chunks.keys()].sort(()=>rand()-.5);
-  for(const k of ks){if(budget<=0)break;const c=chunks.get(k),want=chunkTarget(c.cx,c.cz),have=cnt.get(k)||0,near=Math.hypot(c.cx*CHUNK+32-P.x,c.cz*CHUNK+32-P.z);
-    if(have>want+2){let ex=have-want;for(let i=zombies.length-1;i>=0&&ex>0;i--){const z=zombies[i];if(z.home===k&&!z.aggro&&Math.hypot(z.x-P.x,z.z-P.z)>110){zombies.splice(i,1);ex--;total--}}continue}
+  for(const k of ks){if(budget<=0)break;const c=chunks.get(k),want=chunkTarget(c.cx,c.cz),have=cnt.get(k)||0,near=nearPD(c.cx*CHUNK+32,c.cz*CHUNK+32);
+    if(have>want+2){let ex=have-want;for(let i=zombies.length-1;i>=0&&ex>0;i--){const z=zombies[i];if(z.home===k&&!z.aggro&&nearPD(z.x,z.z)>110){zombies.splice(i,1);ex--;total--}}continue}
     if(have>=want||total>=cap||(!popInit&&near<115))continue;
     let n=Math.min(want-have,budget,cap-total);while(n>0){const gx=c.cx*CHUNK+4+rand()*56,gz=c.cz*CHUNK+4+rand()*56,gs=Math.min(n,1+ri(4));n-=gs;budget-=gs;
-      for(let j=0;j<gs;j++){const x=gx+(rand()-.5)*8,z=gz+(rand()-.5)*8,h=groundH(x,z);if(h<-.6||cityAt(x,z,40)>=0||Math.hypot(x-P.x,z-P.z)<35)continue;
+      for(let j=0;j<gs;j++){const x=gx+(rand()-.5)*8,z=gz+(rand()-.5)*8,h=groundH(x,z);if(h<-.6||cityAt(x,z,40)>=0||nearPD(x,z)<35)continue;
         const zz=makeZombie(x,z,pickZType(),BIOMES[biomeAt(x,z,h)].tribe,{elite:rand()<(bloodMoon()?.12:isNight()?.05:.01)});zz.home=k;total++}}}
   popInit=false}
 // ================= ground scars: craters & cracks =================
@@ -1464,8 +1471,8 @@ function updateBat(an,A,dt,d){const night=isNight(),pc=cityAt(P.x,P.z,2)>=0,gh=g
 
 // ================= Minotaur (unique monster) =================
 const MINO_LV0=20,MINO_DR=.6,MINO_REFLECT=1,MINO_REFLECT_R=16;let mino=null,arena=null;
-function minoReflect(z,raw){const ps=[P].filter(p=>p&&!p.dead&&Math.hypot(p.x-z.x,p.z-z.z)<MINO_REFLECT_R);if(!ps.length||raw<=0)return;const share=raw*MINO_REFLECT/ps.length;
-  for(const p of ps){hurtPlayer(share,'Minotaur: สะท้อนความเสียหาย',null,{reflect:1})}if(!z._rfx||performance.now()-z._rfx>250){z._rfx=performance.now();spawnGoreV(z.x,z.y+2.5,z.z,(P.x-z.x)*.6,3,(P.z-z.z)*.6,0xffb040)}}
+function minoReflect(z,raw){const ps=netAllPlayers().filter(p=>p&&!p.dead&&Math.hypot(p.x-z.x,p.z-z.z)<MINO_REFLECT_R);if(!ps.length||raw<=0)return;const share=raw*MINO_REFLECT/ps.length;
+  for(const p of ps){hurtAny(p,share,'Minotaur: สะท้อนความเสียหาย',{reflect:1})}if(!z._rfx||performance.now()-z._rfx>250){z._rfx=performance.now();spawnGoreV(z.x,z.y+2.5,z.z,(P.x-z.x)*.6,3,(P.z-z.z)*.6,0xffb040)}}
 const minoMat={hide:M(0x7a4a2c),hide2:M(0x4e2418),hide3:M(0x6a3e22),dark:M(0x2e1e12),horn:M(0xe8dcc0),eye:MB(0xff3a1a),gold:M(0xc8a040,{emissive:0x3a2a08}),glow:MB(0xff7a2a),metal:M(0x8a8a92),cloth:M(0x5a3418),stone:M(0x7a7062)};
 function mbx(w,h,d,m,x,y,z,p){const o=new THREE.Mesh(BG(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;p.add(o);return o}
 function hornMesh(len,r,sx){const g=new THREE.Group(),a=new THREE.Mesh(new THREE.CylinderGeometry(r*.75,r,len*.5,6),minoMat.horn);a.position.y=len*.25;a.castShadow=true;g.add(a);
@@ -1517,7 +1524,7 @@ const tmpHV=new THREE.Vector3();
 function hornOrbitPos(z,i,out){const a=(z.hang||0)+i/6*TAU,r=z.hr||2.8;return out.set(z.x+Math.sin(a)*r,z.y+(z.yo||0)+(z.phase===3?5.4:3.7)+Math.sin(z.hang*2+i)*.3,z.z+Math.cos(a)*r)}
 function updateHorns(z,dt){if(!z.hornS)return;z.hang=(z.hang||0)+dt*1.8*(z.hspin||1);
   for(let i=0;i<6;i++){const s=z.hornS[i];
-    if(s.mode==='fly'){s.t+=dt;s.p.addScaledVector(s.v,dt);if(Math.hypot(P.x-s.p.x,P.z-s.p.z)<1.05&&Math.abs(P.y+1-s.p.y)<1.4){zHit(z,.7,{},'เขาพลังจิต');s.mode='return';s.t=0}
+    if(s.mode==='fly'){s.t+=dt;s.p.addScaledVector(s.v,dt);if(!NET.guest&&Math.hypot(P.x-s.p.x,P.z-s.p.z)<1.05&&Math.abs(P.y+1-s.p.y)<1.4){zHit(z,.7,{},'เขาพลังจิต');s.mode='return';s.t=0}
       else if(s.p.y<groundH(s.p.x,s.p.z)+.3){s.mode='stuck';s.t=0;spawnGore(s.p.x,s.p.y,s.p.z,5,0x5a5040);addScar(crackLine(s.p.x,s.p.z,Math.atan2(s.v.x,s.v.z),2.4,.14),15)}else if(s.t>1.7){s.mode='return';s.t=0}}
     else if(s.mode==='stuck'){s.t+=dt;if(s.t>.6){s.mode='return';s.t=0}}
     else if(s.mode==='return'){hornOrbitPos(z,i,tmpHV);s.p.lerp(tmpHV,Math.min(1,dt*6));if(s.p.distanceTo(tmpHV)<.5)s.mode='orbit'}
@@ -1595,6 +1602,11 @@ function poseMino(z){const r=z.r;if(!r)return;const g=r.g;g.position.set(z.x,z.y
     if(A==='roar'){r.head.rotation.x=-.6;r.armL.rotation.set(-.5,0,-1.3);r.armR.rotation.set(-.5,0,1.3);r.torso.rotation.x=-.25}
     if(A==='charge'){r.torso.rotation.x=.6;r.head.rotation.x=.4;r.armL.rotation.x=r.armR.rotation.x=.5}}}
 function makeArena(z){const R=19;let cx=(z.x+P.x)/2,cz=(z.z+P.z)/2;if(Math.hypot(P.x-z.x,P.z-z.z)>R*1.3){cx=z.x;cz=z.z}
+  makeArenaAt(cx,cz,R);arena.tgt=P.remote?P.peer:'host';if(NET.host)netEv({k:'arena',x:r2(cx),z:r2(cz),R,tgt:arena.tgt});sfx('roar',z.x,z.z);
+  for(const o of zombies)if(o!==z&&!o.dead){const ax=o.x-cx,az=o.z-cz,ad=Math.hypot(ax,az)||1;if(ad<R+2){o.x=cx+ax/ad*(R+2.5);o.z=cz+az/ad*(R+2.5);o.aggro=false}}
+  for(const a of allies){const ax=a.x-cx,az=a.z-cz,ad=Math.hypot(ax,az)||1;if(ad<R+2){a.x=cx+ax/ad*(R+2.5);a.z=cz+az/ad*(R+2.5)}}
+  if(!P.remote)toast('<b>โคลอสเซียมผุดขึ้นจากพื้นดิน!</b> คุณถูกขังไว้สู้ตัวต่อตัวกับ Minotaur','#ffb040')}
+function makeArenaAt(cx,cz,R){
   const h0=groundH(cx,cz),g=new THREE.Group();g.position.set(cx,h0-11,cz);scene.add(g);const n=16,stone=minoMat.stone,dk=M(0x5a5248);
   for(let i=0;i<n;i++){const a=i/n*TAU,px=Math.sin(a)*R,pz=Math.cos(a)*R;const pl=new THREE.Mesh(new THREE.CylinderGeometry(.9,1.15,13,8),stone);pl.position.set(px,3.5,pz);pl.castShadow=true;g.add(pl);
     const cap=new THREE.Mesh(BG(2.4,.6,2.4),dk);cap.position.set(px,10.2,pz);cap.rotation.y=a;g.add(cap);
@@ -1602,10 +1614,8 @@ function makeArena(z){const R=19;let cx=(z.x+P.x)/2,cz=(z.z+P.z)/2;if(Math.hypot
     const b=a+Math.PI/n,ch=2*R*Math.sin(Math.PI/n);const wl=new THREE.Mesh(BG(ch-1.7,5.5,1),stone);wl.position.set(Math.sin(b)*R*Math.cos(Math.PI/n),.5,Math.cos(b)*R*Math.cos(Math.PI/n));wl.rotation.y=b;wl.castShadow=true;g.add(wl);
     const ar=new THREE.Mesh(BG(ch,.9,1.2),dk);ar.position.set(wl.position.x,9.4,wl.position.z);ar.rotation.y=b;g.add(ar)}
   const fg=conform(new THREE.CircleGeometry(R,40).rotateX(-Math.PI/2),cx,cz,.06),floor=new THREE.Mesh(fg,new THREE.MeshBasicMaterial({color:0xb8a070,transparent:true,opacity:0,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2}));floor.position.set(cx,0,cz);scene.add(floor);
-  arena={x:cx,z:cz,R,g,floor,h0,t:0,life:50,up:false,sink:0};sfx('slam',cx,cz);sfx('roar',z.x,z.z);shake=Math.max(shake,.5);
-  for(const o of zombies)if(o!==z&&!o.dead){const ax=o.x-cx,az=o.z-cz,ad=Math.hypot(ax,az)||1;if(ad<R+2){o.x=cx+ax/ad*(R+2.5);o.z=cz+az/ad*(R+2.5);o.aggro=false}}
-  for(const a of allies){const ax=a.x-cx,az=a.z-cz,ad=Math.hypot(ax,az)||1;if(ad<R+2){a.x=cx+ax/ad*(R+2.5);a.z=cz+az/ad*(R+2.5)}}
-  toast('<b>โคลอสเซียมผุดขึ้นจากพื้นดิน!</b> คุณถูกขังไว้สู้ตัวต่อตัวกับ Minotaur','#ffb040')}
+  arena={x:cx,z:cz,R,g,floor,h0,t:0,life:50,up:false,sink:0,tgt:'host'};sfx('slam',cx,cz);shake=Math.max(shake,.5);
+  if(NET.guest&&arena)setTimeout(()=>{if(arena&&arena.tgt===NET.myId)toast('<b>โคลอสเซียมผุดขึ้น!</b> คุณถูกขังสู้ตัวต่อตัวกับ Minotaur','#ffb040')},50)}
 function endArena(now){if(!arena)return;if(now){scene.remove(arena.g);scene.remove(arena.floor);arena.floor.geometry.dispose();arena=null;return}if(!arena.sink)arena.sink=.001}
 function updateArena(dt){if(!arena)return;const a=arena;a.t+=dt;
   if(a.sink){a.sink+=dt;a.g.position.y=a.h0-11*ease(Math.min(1,a.sink/1.6));a.floor.material.opacity=.55*(1-Math.min(1,a.sink/1.6));a.up=false;if(a.sink>1.7)endArena(true);return}
@@ -1657,18 +1667,19 @@ function whaleDie(z){if(z.aura){scene.remove(z.aura);z.aura=null}whale=null;sfx(
 const whaleEmp=z=>isNight()||moonT>0||z.phase===3;
 function waterMesh(){const m=new THREE.Mesh(acidGeo,MB(0xa8e4ff));m.add(new THREE.Mesh(acidHalo,new THREE.MeshBasicMaterial({color:0x6ac8ff,transparent:true,opacity:.35,depthWrite:false,blending:THREE.AdditiveBlending})));return m}
 function whaleMouth(z){const s=z.wsc,c=Math.cos(z.pitch);return v3.set(z.x+Math.sin(z.yaw)*13*s*c,z.y+z.sc-1.5*s+Math.sin(-z.pitch)*13*s,z.z+Math.cos(z.yaw)*13*s*c).clone()}
-function whaleShoot(z,emp){const players=[P].filter(p=>p&&!p.dead&&Math.hypot(p.x-z.x,p.z-z.z)<60*WR);for(const p of players){const o=whaleMouth(z),t=new THREE.Vector3(p.x+(P.kx||0)*.08+(rand()-.5)*2.5,p.y+1,p.z+(rand()-.5)*2.5),v=t.sub(o).normalize().multiplyScalar(50);
+function whaleShoot(z,emp){const players=netAllPlayers().filter(p=>p&&!p.dead&&Math.hypot(p.x-z.x,p.z-z.z)<60*WR);for(const p of players){const o=whaleMouth(z),t=new THREE.Vector3(p.x+(P.kx||0)*.08+(rand()-.5)*2.5,p.y+1,p.z+(rand()-.5)*2.5),v=t.sub(o).normalize().multiplyScalar(50);
   const m=waterMesh();m.position.copy(o);scene.add(m);projs.push({m,p:o,v,dmg:z.dmg*.28*(emp?2:1),from:'z',life:4,g:2,src:'Moonwhale: กระสุนน้ำ',o:{water:1},col:0x8ad8ff,z})}}
 function spawnMeteor(x,z,dmg){const ring_=telegraphRing(x,z,10.8*WR);const m=new THREE.Mesh(new THREE.DodecahedronGeometry(4.2,1),MB(0xff7a2a));m.add(new THREE.Mesh(new THREE.SphereGeometry(7.2,14,10),glowMat(0xff5a1a,.4)));scene.add(m);meteors.push({x,z,t:1.5,T:1.5,dx:(rand()-.5)*40,dz:(rand()-.5)*40,m,ring:ring_,dmg})}
 function telegraphRing(x,z,r){const geo=conform(new THREE.RingGeometry(r*.85,r,28).rotateX(-Math.PI/2),x,z,.1),m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0xff3020,transparent:true,opacity:.55,depthWrite:false,side:THREE.DoubleSide}));m.position.set(x,0,z);scene.add(m);
   const geo2=conform(new THREE.CircleGeometry(r,28).rotateX(-Math.PI/2),x,z,.09),m2=new THREE.Mesh(geo2,new THREE.MeshBasicMaterial({color:0xff3020,transparent:true,opacity:.15,depthWrite:false}));m2.position.set(x,0,z);m.add(m2);m2.position.set(0,0,0);return m}
 function updateMeteors(dt){for(let i=meteors.length-1;i>=0;i--){const o=meteors[i];o.t-=dt;const k=Math.max(0,o.t/o.T),gh=groundH(o.x,o.z);o.m.position.set(o.x+o.dx*k,gh+3+k*120,o.z+o.dz*k);o.m.rotation.x+=dt*3;o.m.rotation.y+=dt*2;
     for(let q=0;q<3;q++)spawnGoreV(o.m.position.x+(rand()-.5)*6,o.m.position.y+(rand()-.5)*6,o.m.position.z+(rand()-.5)*6,(rand()-.5)*3,3,(rand()-.5)*3,rand()<.5?0xff8a2a:0x6a3a2a);o.ring.material.opacity=.3+.4*(1-k);
-    if(o.t<=0){scene.remove(o.m);scene.remove(o.ring);impact(o.x,o.z,7.5,{cracks:8,glow:true});ring(o.x,o.z,16*WR,0xff7a2a,.8);sfx('slam',o.x,o.z);sfx('slam',o.x,o.z);const d=Math.hypot(P.x-o.x,P.z-o.z);if(d<10.8*WR&&!P.dead)hurtPlayer(o.dmg*(1-d/(24*WR)),'Moonwhale: อุกกาบาต',null,{slam:1,heavy:1});meteors.splice(i,1)}}}
+    if(o.t<=0){scene.remove(o.m);scene.remove(o.ring);const rp=NET.replay;NET.replay=true;impact(o.x,o.z,7.5,{cracks:8,glow:true});ring(o.x,o.z,16*WR,0xff7a2a,.8);sfx('slam',o.x,o.z);sfx('slam',o.x,o.z);NET.replay=rp;if(o.dmg>0)for(const pl of netAllPlayers()){const d=Math.hypot(pl.x-o.x,pl.z-o.z);if(d<10.8*WR&&!pl.dead)hurtAny(pl,o.dmg*(1-d/(24*WR)),'Moonwhale: อุกกาบาต',{slam:1,heavy:1})}meteors.splice(i,1)}}}
 function summonMoon(z){moonT=60;const nowFrac=(Wd.time%DAY)/DAY;if(!isNight()){Wd.time=Math.floor(Wd.time/DAY)*DAY+.7*DAY+(nowFrac>.7?DAY:0)}
-  if(!moonMesh){moonMesh=new THREE.Group();const c=new THREE.Mesh(new THREE.SphereGeometry(70,32,20),MB(0xeef0ff));moonMesh.add(c);moonMesh.add(new THREE.Mesh(new THREE.SphereGeometry(110,24,16),glowMat(0xb8c8ff,.18)));
+  summonMoonFx();sfx('whale',z.x,z.z);ring(z.x,z.z,30*WR,0xb8c8ff,1.4);toast('<b>Moonwhale เรียกดวงจันทร์!</b> ฟ้ามืดลงเป็นกลางคืน · พลังของมันเพิ่มเป็นเท่าตัว','#b8c8ff')}
+function summonMoonFx(){if(!moonMesh){moonMesh=new THREE.Group();const c=new THREE.Mesh(new THREE.SphereGeometry(70,32,20),MB(0xeef0ff));moonMesh.add(c);moonMesh.add(new THREE.Mesh(new THREE.SphereGeometry(110,24,16),glowMat(0xb8c8ff,.18)));
     for(let i=0;i<10;i++){const a=rand()*TAU,b=rand()*1.2,cr=new THREE.Mesh(new THREE.SphereGeometry(6+rand()*10,10,8),MB(0xc0c4d8));cr.position.set(Math.sin(b)*Math.cos(a)*66,Math.sin(b)*Math.sin(a)*66,Math.cos(b)*66);c.add(cr)}moonMesh.renderOrder=-1;scene.add(moonMesh)}
-  moonMesh.visible=true;sfx('whale',z.x,z.z);ring(z.x,z.z,30*WR,0xb8c8ff,1.4);toast('<b>Moonwhale เรียกดวงจันทร์!</b> ฟ้ามืดลงเป็นกลางคืน · พลังของมันเพิ่มเป็นเท่าตัว','#b8c8ff')}
+  moonMesh.visible=true}
 function updateMoon(dt){if(moonT>0)moonT-=dt;if(moonMesh){if(moonT>0){moonMesh.position.set(camera.position.x+300,camera.position.y+380,camera.position.z-520);moonMesh.lookAt(camera.position);moonMesh.visible=true}else moonMesh.visible=false}}
 function whaleUpdate(z,dt,d){z.down=0;z.root=0;z.frz=0;
   const want=z.lv0+Math.floor(Math.max(0,Wd.time-z.born)/DAY);if(want>z.lvl){z.lvl=want;applyZLvl(z);setWhaleDims(z);if(d<120)toast(`Moonwhale แข็งแกร่งขึ้นตามวันเวลา · Lv ${z.lvl}`,'#9ad0ff')}
@@ -1689,10 +1700,10 @@ function whaleUpdate(z,dt,d){z.down=0;z.root=0;z.frz=0;
   if(z.face){const fy=Math.atan2(P.x-z.x,P.z-z.z);let dy=((fy-z.yaw+Math.PI*3)%TAU)-Math.PI;z.yaw+=dy*Math.min(1,dt*2.5)}
   const gh=Math.max(groundH(z.x,z.z),-1);alt=Math.max(alt,12);z.alt=lerp(z.alt,alt,Math.min(1,dt*(z.ctl?2.5:.8)));const cy=gh+z.alt*s+4.6*s;z.y=cy-z.sc;z.bot=cy-4.6*s;z.yo=0;
   z.pitch=lerp(z.pitch,z.ptgt||0,Math.min(1,dt*2));z.ph=(z.ph||0)+dt*(1+sp*.12);z.flash-=dt;
-  if(aggro&&Math.hypot(P.x-z.x,P.z-z.z)<26*s*WR)P.wslow=.3;
+  if(aggro)for(const pl of netAllPlayers())if(Math.hypot(pl.x-z.x,pl.z-z.z)<26*s*WR)pl.wslow=.3;
   if(z.phase===3&&!z.dead){if(!(z.tide>0)){z.twt=0;if(d<TIDE_R+40)toast('<b>กระแสโลหิต (พาสซีพ)</b> — รัศมี '+TIDE_R+' ม. รอบวาฬจะทำให้เสียเลือดตลอดเวลา','#ff4040')}z.tide=1}
   if(z.tide>0){z.tide-=dt;z.tk=(z.tk||0)-dt;if(!z.aura){z.aura=new THREE.Mesh(new THREE.RingGeometry(TIDE_R-2,TIDE_R,96).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xff2020,transparent:true,opacity:.5,depthWrite:false,side:THREE.DoubleSide}));scene.add(z.aura)}
-    z.aura.position.set(z.x,gh+.4,z.z);z.aura.material.opacity=.35+Math.sin(performance.now()/200)*.15;const pd=Math.hypot(P.x-z.x,P.z-z.z);if(pd<TIDE_R&&aggro){z.twt=(z.twt||0)-dt;if(z.twt<=0){z.twt=12;woundRoll({})}if(rand()<.5)spawnGoreV(P.x+(rand()-.5)*1.2,P.y+.4+rand()*1.4,P.z+(rand()-.5)*1.2,0,1.5,0,0x9a0a0a);if(z.tk<=0){z.tk=.5;hurtPlayer(z.dmg*.12*(emp?2:1),'Moonwhale: กระแสโลหิต',null,{})}}
+    z.aura.position.set(z.x,gh+.4,z.z);z.aura.material.opacity=.35+Math.sin(performance.now()/200)*.15;const tick=z.tk<=0;if(tick)z.tk=.5;z.twt=(z.twt||0)-dt;const wnd=z.twt<=0;if(wnd)z.twt=12;if(aggro)for(const pl of netAllPlayers()){if(pl.dead||Math.hypot(pl.x-z.x,pl.z-z.z)>=TIDE_R)continue;if(!pl.remote&&rand()<.5)spawnGoreV(pl.x+(rand()-.5)*1.2,pl.y+.4+rand()*1.4,pl.z+(rand()-.5)*1.2,0,1.5,0,0x9a0a0a);if(tick)hurtAny(pl,z.dmg*.12*(emp?2:1),'Moonwhale: กระแสโลหิต',wnd?{wound:1}:{})}
     if(z.tide<=0&&z.aura){scene.remove(z.aura);z.aura=null}}
   if(z.r.blood)BLOODTEX.offset.y-=dt*.12}
 function setWhaleDims(z){const s=[0,1,1.25,1.4][z.phase];z.sc=4.6*s;z.rad=7.5*s}
@@ -1706,7 +1717,7 @@ function whaleSkill(z,dt,d,emp){const s=z.ms;s.t+=dt;const T=s.t,M2=emp?2:1;
     if(T>.6&&s.n<s.max&&T>.6+s.n*.28){const first=s.n===0,a=rand()*TAU,r=first?0:(6+rand()*16)*WR;spawnMeteor(P.x+Math.sin(a)*r,P.z+Math.cos(a)*r,z.dmg*1.5*M2);s.n++}
     if(T>.8+s.max*.28){z.ms=null;z.ptgt=0;z.face=0;z.mc.meteor=15}break}
   case'moon':{z.ptgt=-.55;z.ctl={x:z.x,z:z.z,alt:[0,13,15,17][z.phase]+6,spd:1};if(!s.a&&T>.8){s.a=1;summonMoon(z)}if(T>2.4){z.ms=null;z.ctl=null;z.ptgt=0;z.mc.moon=70}break}
-  case'blind':{z.face=1;z.ptgt=-.2;if(!s.a){s.a=1;sfx('whale',z.x,z.z);ring(z.x,z.z,40*WR,0xd0d8ff,1.6)}if(!s.b&&T>.9){s.b=1;if(Math.hypot(P.x-z.x,P.z-z.z)<40*WR&&!P.dead){P.blindT=Math.max(P.blindT||0,5*M2);toast('<b>เพลงของวาฬทำให้คุณตาบอด!</b>','#d0d8ff')}}if(T>1.6){z.ms=null;z.face=0;z.ptgt=0;z.mc.blind=17}break}
+  case'blind':{z.face=1;z.ptgt=-.2;if(!s.a){s.a=1;sfx('whale',z.x,z.z);ring(z.x,z.z,40*WR,0xd0d8ff,1.6)}if(!s.b&&T>.9){s.b=1;for(const pl of netAllPlayers())if(Math.hypot(pl.x-z.x,pl.z-z.z)<40*WR&&!pl.dead){pl.blindT=Math.max(pl.blindT||0,5*M2);if(!pl.remote)toast('<b>เพลงของวาฬทำให้คุณตาบอด!</b>','#d0d8ff')}}if(T>1.6){z.ms=null;z.face=0;z.ptgt=0;z.mc.blind=17}break}
   case'tide':{z.ptgt=-.15;if(!s.a){s.a=1;z.tide=10;z.tk=.4;sfx('whale',z.x,z.z);ring(z.x,z.z,26*WR,0xff2020,1.4);if(Math.hypot(P.x-z.x,P.z-z.z)<26*WR)woundRoll({});toast('<b>กระแสโลหิต</b> — ใครอยู่ใกล้จะเสียเลือดเรื่อยๆ ถอยออกไป!','#ff4040')}if(T>1.2){z.ms=null;z.ptgt=0;z.mc.tide=20}break}
   case'dive':{if(!s.ph){s.ph=1;s.tx=P.x;s.tz=P.z}
     if(s.ph===1){z.ctl={x:s.tx,z:s.tz,alt:2.2,spd:16};z.ptgt=.25;if(Math.hypot(s.tx-z.x,s.tz-z.z)<6||T>4){s.ph=2;s.t0=T}}
@@ -1769,6 +1780,191 @@ function sbDo(id){const day=Math.floor(Wd.time/DAY)*DAY;
   if(id==='tpmino')return sbTp(minoLair.x,minoLair.z+30);if(id==='tpwhale')return sbTp(whaleLair.x,whaleLair.z);if(id==='tplair')return sbTp(lair.x+20,lair.z);if(id.startsWith('tpc')){const c=cities[+id.slice(3)];return sbTp(c.x,c.z+9)}
   if(id==='exit'){location.reload();return}
   renderPanel('sandbox')}
+
+// ================= online co-op (P2P via PeerJS) =================
+const GAME_V='0.11';
+const NET={on:false,host:false,guest:false,code:'',myId:'host',peer:null,conns:new Map(),conn:null,remotes:new Map(),ev:[],sendT:0,stT:0,attacker:null,applying:false,HP:null,hostName:'',lastRecv:0,zmap:new Map(),amap:new Map(),bridge:null};
+const ZTL=Object.keys(ZT),TRL=Object.keys(TRIBES),ANLc=[],PSET=new Set(['down','kx','kz','blindT','wslow','sick','inf','slowT']);
+const r2=v=>Math.round(v*100)/100,anl=()=>ANLc.length?ANLc:(ANLc.push(...Object.keys(ANIM)),ANLc);
+function genCode(){const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<5;i++)s+=A[Math.floor(Math.random()*A.length)];return s}
+function loadPeerLib(){return new Promise((res,rej)=>{if(window.Peer)return res(window.Peer);const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js';s.onload=()=>window.Peer?res(window.Peer):rej(new Error('no Peer'));s.onerror=()=>rej(new Error('load fail'));document.head.appendChild(s)})}
+function netSendTo(id,msg){if(NET.bridge){NET.bridge.send(id,msg);return}const c=NET.guest?NET.conn:NET.conns.get(id);if(c&&c.open)try{c.send(msg)}catch(e){}}
+function netSend(msg){netSendTo('host',msg)}
+function netBroadcast(msg){for(const id of NET.remotes.keys())netSendTo(id,msg)}
+function netEv(e){if(NET.host&&NET.remotes.size)NET.ev.push(e)}
+function netAllPlayers(){const hp=NET.HP||P,out=[hp];if(NET.host)for(const r of NET.remotes.values())if(r.px&&!r.px.dead)out.push(r.px);return out}
+function hurtAny(p,d,src,o={},tribe=null){if(p.remote){netSendTo(p.peer,{t:'hurt',d,src,tr:tribe,o});return}const sv=P;P=NET.HP||P;hurtPlayer(d,src,tribe,o);P=sv}
+function netTargetFor(x,z,obj){const hp=NET.HP||P;if(!NET.host||!NET.remotes.size)return hp;
+  if(obj&&obj.uniq==='mino'&&arena&&arena.up&&arena.tgt&&arena.tgt!=='host'){const r=NET.remotes.get(arena.tgt);if(r&&r.px&&!r.px.dead)return r.px}
+  if(obj&&obj.uniq==='mino'&&arena&&arena.up&&arena.tgt==='host')return hp;
+  let best=hp,bd=hp.dead?1e9:(hp.x-x)**2+(hp.z-z)**2;for(const r of NET.remotes.values()){const p=r.px;if(!p||p.dead)continue;const d=(p.x-x)**2+(p.z-z)**2;if(d<bd){bd=d;best=p}}return best}
+function makeProxy(id){const o={remote:true,peer:id,x:0,y:0,z:0,dead:false,noise:1,shroud:0,down:0,kx:0,kz:0,grab:null,hp:100,maxHp:100,sick:0,inf:0,blindT:0,wslow:0,slowT:0,fate:0,aliveT:0,lvl:1,kills:0,mood:null,_t:{}};
+  return new Proxy(o,{set(t,k,v){t[k]=v;if(PSET.has(k)&&!NET.applying){const now=performance.now();if(k==='wslow'||k==='blindT'){if(now-(t._t[k]||0)<200)return true}t._t[k]=now;netSendTo(t.peer,{t:'pset',k,v})}return true}})}
+// ---- remote player avatars ----
+const rpEl=document.createElement('div');rpEl.id='rplates';document.body.appendChild(rpEl);
+function rpEnsure(id,st){let r=NET.remotes.get(id);if(!r){r={id,st:null,m:null,eqk:'',race:-1,x:st.x,y:st.y,z:st.z,yaw:st.my||0,ph:0,px:NET.host?makeProxy(id):null,lab:document.createElement('div'),seen:performance.now()};r.lab.className='rpl';rpEl.appendChild(r.lab);NET.remotes.set(id,r)}return r}
+function rpBuild(r){const st=r.st;if(r.m)scene.remove(r.m.g);const L=RACES[st.race].L;r.m=buildHumanoid(L);try{dress(r.m,st.eq||{},L)}catch(e){}const w=(st.eq&&st.eq.main)||{w:'fist',r:0};if(WEAPONS[w.w]&&WEAPONS[w.w].m){const h=weaponMesh(w.w,w.r);h.rotation.x=Math.PI/2;r.m.hand.add(h)}scene.add(r.m.g);r.eqk=st.eqk;r.race=st.race}
+function rpApply(id,st){const r=rpEnsure(id,st);r.st=st;r.seen=performance.now();if(!r.m||r.eqk!==st.eqk||r.race!==st.race)rpBuild(r);
+  if(r.px){NET.applying=true;const p=r.px;p.x=st.x;p.y=st.y;p.z=st.z;p.dead=!!(st.f&4);p.noise=st.no;p.shroud=st.sh;p.hp=st.hp;p.maxHp=st.mhp;p.sick=st.si;p.inf=st.in;p.blindT=st.bl;p.fate=st.fa;p.aliveT=st.at;p.lvl=st.lv;if(!(p.down>0))p.down=st.dn||0;NET.applying=false}}
+function rpRemove(id){const r=NET.remotes.get(id);if(!r)return;if(r.m)scene.remove(r.m.g);for(const a of r.alm||[])scene.remove(a.m.g);for(const o of r.obm||[])scene.remove(o);r.lab.remove();NET.remotes.delete(id);updOnlineBadge()}
+function rpTick(dt){for(const [id,r] of NET.remotes){const st=r.st;if(!st||!r.m)continue;if(performance.now()-r.seen>8000){if(NET.host){toast(`${st.n} หลุดจากห้อง`,'#ff8a70');netBroadcast({t:'left',id})}rpRemove(id);continue}
+    const k=Math.min(1,dt*10),ox=r.x,oz=r.z;r.x=lerp(r.x,st.x,k);r.y=lerp(r.y,st.y,k);r.z=lerp(r.z,st.z,k);let dy=((st.my-r.yaw+Math.PI*3)%TAU)-Math.PI;r.yaw+=dy*k;
+    const sp=Math.hypot(r.x-ox,r.z-oz)/Math.max(dt,1e-3);r.ph+=dt*Math.min(12,sp*1.6);const m=r.m,g=m.g;g.position.set(r.x,r.y,r.z);g.rotation.set(0,r.yaw,0);
+    m.body.rotation.set(0,0,0);m.head.rotation.set(0,0,0);m.armR.rotation.set(0,0,0);m.armL.rotation.set(0,0,0);animHumanoid(m,r.ph,Math.min(1,sp/4));
+    if(st.f&4||st.f&32){g.rotation.set(0,r.yaw,Math.PI/2);g.position.y+=.3}
+    else if(st.f&2){const t=(performance.now()/340)%1;g.rotation.set(t*TAU,r.yaw,0);g.position.y+=.6*(1-Math.cos(t*TAU))}
+    else if(st.f&1){const t=(performance.now()/180)%1;m.armR.rotation.x=-2.6+t*2.4;m.body.rotation.y=Math.sin(t*Math.PI)*.4}
+    if(st.f&8){m.body.rotation.x=.35;g.position.y-=.25}
+    rpExtras(r,st,dt);
+    v3.set(r.x,r.y+2.3,r.z).project(camera);const vis=v3.z<1&&Math.hypot(r.x-P.x,r.z-P.z)<120;r.lab.style.display=vis?'block':'none';
+    if(vis){r.lab.style.left=(v3.x*.5+.5)*innerWidth+'px';r.lab.style.top=(-v3.y*.5+.5)*innerHeight+'px';const hk=st.n+st.lv+Math.round(st.hp/st.mhp*20);if(r.lab._k!==hk){r.lab._k=hk;r.lab.innerHTML=`<b>${escapeHtml(st.n)}</b> <span>Lv ${st.lv}</span><i><u style="width:${Math.max(0,st.hp/st.mhp*100)}%"></u></i>`}}}}
+function rpExtras(r,st,dt){const al=st.al||[];r.alm=r.alm||[];
+  while(r.alm.length>al.length){const a=r.alm.pop();scene.remove(a.m.g)}
+  for(let i=0;i<al.length;i++){const e=al[i];let a=r.alm[i];if(a&&a.k!==e[0]){scene.remove(a.m.g);a=null}
+    if(!a){let m;if(e[0]){m=buildAnimal('wolf');const gm=glowMat(0x9ad8ff,.7);m.g.traverse(o=>{if(o.isMesh){o.material=gm;o.castShadow=false}});m.g.scale.setScalar(1.15)}else m=buildHumanoid({skin:0x7a8a6a,hair:0x222222,cloth:0x3a3a2a,pants:0x2a2a22,eyes:0x9aff6a});scene.add(m.g);a=r.alm[i]={k:e[0],m,x:e[1],y:e[2],z:e[3],yaw:e[4],ph:0}}
+    const k=Math.min(1,dt*10),ox=a.x,oz=a.z;a.x=lerp(a.x,e[1],k);a.y=lerp(a.y,e[2],k);a.z=lerp(a.z,e[3],k);let dy=((e[4]-a.yaw+Math.PI*3)%TAU)-Math.PI;a.yaw+=dy*k;const sp=Math.hypot(a.x-ox,a.z-oz)/Math.max(dt,1e-3);a.ph+=dt*Math.max(sp,.5)*1.6;
+    a.m.g.position.set(a.x,a.y,a.z);a.m.g.rotation.y=a.yaw;if(a.k){const sw=Math.sin(a.ph*1.4)*.7*Math.min(1,sp/3);a.m.legs.forEach((l,j)=>l.rotation.x=(j===0||j===3?sw:-sw));a.m.neck.rotation.x=e[6]?.4:0}else{animHumanoid(a.m,a.ph,Math.min(1,sp/3),true);if(e[6])a.m.armL.rotation.x=a.m.armR.rotation.x=-2.2}}
+  const ob=st.ob||[];r.obm=r.obm||[];while(r.obm.length>ob.length)scene.remove(r.obm.pop());
+  for(let i=0;i<ob.length;i++){const e=ob[i];let o=r.obm[i];if(!o){o=new THREE.Group();o.add(new THREE.Mesh(new THREE.SphereGeometry(.35,16,12),glowMat(0xfff4c0,1)));o.add(new THREE.Mesh(new THREE.SphereGeometry(.9,16,12),glowMat(0xffd070,.25)));scene.add(o);r.obm[i]=o}
+    o.position.set(e[0],groundH(e[0],e[1])+2.2+Math.sin(performance.now()/400)*.2,e[1]);
+    if(P&&!P.dead&&Math.hypot(P.x-e[0],P.z-e[1])<e[2]&&P.hp<ST.maxHp){P.hp=Math.min(ST.maxHp,P.hp+e[3]*dt);r.htk=(r.htk||0)-dt;if(r.htk<=0){r.htk=.5;floatNum(P.x,P.y+2.2,P.z,'+'+Math.round(e[3]*.5),'#fff0a0')}}}}
+function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function myState(){const eq={};for(const k in P.eq){const it=P.eq[k];if(it)eq[k]=it.t==='w'?{w:it.w,r:it.r}:{b:it.b,r:it.r,s:it.s}}const eqk=JSON.stringify(eq);
+  return{n:P.name,lv:P.lvl,race:P.race,x:r2(P.x),y:r2(P.y),z:r2(P.z),my:r2(P.my||0),f:(atk?1:0)|(dashT>0?2:0)|(P.dead?4:0)|(crouch?8:0)|(mounted?16:0)|(P.down>0?32:0),hp:Math.round(P.hp),mhp:Math.round(ST.maxHp),si:Math.round(P.sick||0),in:Math.round(P.inf||0),bl:r2(P.blindT||0),sh:r2(P.shroud||0),no:r2(P.noise||1),fa:P.fate,at:Math.round(P.aliveT||0),dn:r2(P.down||0),eq,eqk,al:allies.filter(a=>!(a.rise>0)).slice(0,6).map(a=>[a.kind==='wolf'?1:0,r2(a.x),r2(a.y),r2(a.z),r2(a.yaw),r2(a.ph),a.lunge>0?1:0]),ob:orbs.slice(0,3).map(o=>[r2(o.x),r2(o.z),o.r,o.heal])}}
+// ---- host: snapshot ----
+function zEntry(z){return[z.id,ZTL.indexOf(z.type),TRL.indexOf(z.tribe),z.lvl,Math.round(z.hp),Math.round(z.maxHp),r2(z.x),r2(z.y),r2(z.z),r2(z.yaw),r2(z.sc),(z.elite?1:0)|(z.boss?2:0)|(z.sk&&z.sk.id==='ambush'?4:0)|(z.down>0?8:0)|(z.lr!=null?16:0),r2(z.bx||0),r2(z.ll||0),r2(z.lr||0),r2(z.al||0),r2(z.ar||0),r2(z.hx||0),r2(z.fall||0),r2(z.yo||0),r2(z.by||0),r2(z.bz||0),r2(z.alz||0),r2(z.arz||0),z.skills?z.skills.join(','):'',r2(z.w||1)]}
+function uEntry(z){return{id:z.id,u:z.uniq,lv:z.lvl,hp:Math.round(z.hp),mhp:Math.round(z.maxHp),x:r2(z.x),y:r2(z.y),z:r2(z.z),yaw:r2(z.yaw),ph:z.phase,pa:z.pa||'',pk:r2(z.pk||0),aph:r2(z.ph||0),mv:r2(z.mv||0),rx:r2(z.rx||0),yo:r2(z.yo||0),inv:z.inv>0?1:0,pi:r2(z.pitch||0),bk:r2(z.bank||0),td:z.tide>0?1:0,hr:r2(z.hr||2.8),hs:r2(z.hspin||1),ag:z.aggro?1:0}}
+function netHostTick(dt){NET.sendT-=dt;if(NET.sendT>0||!NET.remotes.size)return;NET.sendT=.12;const ev=NET.ev;NET.ev=[];const hs=myState();hs.id='host';
+  for(const [id,r] of NET.remotes){const p=r.px;if(!p)continue;const zs=[],us=[];for(const z of zombies){if(z.dead)continue;const d=Math.hypot(z.x-p.x,z.z-p.z);if(z.uniq){if(d<350)us.push(uEntry(z))}else if(d<(z.boss?160:110)&&zs.length<140)zs.push(zEntry(z))}
+    const an=[];for(const a of animals){if(a.id==null)a.id=NET.aid=(NET.aid||0)+1;if(Math.hypot(a.x-p.x,a.z-p.z)<120&&an.length<40)an.push([a.id,anl().indexOf(a.type),r2(a.x),r2(a.y),r2(a.z),r2(a.yaw),Math.round(a.hp/a.maxHp*100)])}
+    const ps=[hs];for(const [id2,r2_] of NET.remotes)if(id2!==id&&r2_.st)ps.push(Object.assign({id:id2},r2_.st));
+    netSendTo(id,{t:'snap',tm:Wd.time,z:zs,u:us,a:an,p:ps,e:ev,mt:moonT,wd:[Wd.bossAt||0,Wd.minoAt||0,Wd.minoBorn||0,Wd.whaleAt||0,Wd.whaleBorn||0]})}}
+// ---- host: receive ----
+function netHostRecv(from,m){
+  if(m.t==='hello'){if(m.v!==GAME_V){netSendTo(from,{t:'reject',why:`เวอร์ชันเกมไม่ตรงกัน (host ${GAME_V}, คุณ ${m.v}) ให้ทุกคนรีเฟรชหน้าเว็บ`});return}if(NET.remotes.size>=3){netSendTo(from,{t:'reject',why:'ห้องเต็ม (สูงสุด 4 คน)'});return}
+    rpApply(from,m.st);netSendTo(from,{t:'welcome',re:m.re,tm:Wd.time,x:P.x+2,z:P.z+2,hn:P.name,arena:arena&&arena.up?{x:arena.x,z:arena.z,R:arena.R,tgt:arena.tgt}:null});if(!m.re){toast(`<b>${escapeHtml(m.st.n)}</b> เข้าร่วมห้อง`,'#9ad0ff');netBroadcast({t:'joined',n:m.st.n})}updOnlineBadge();return}
+  const r=NET.remotes.get(from);if(!r)return;
+  if(m.t==='st'){rpApply(from,m.st);return}
+  if(m.t==='hit'){const z=zombies.find(o=>o.id===m.id&&!o.dead);if(!z)return;const sv=P;P=r.px;NET.attacker=from;try{hitZombie(z,m.dmg,Object.assign({},m.o||{},{nocrit:1,net:1}))}finally{P=sv;NET.attacker=null}return}
+  if(m.t==='zset'){const z=zombies.find(o=>o.id===m.id&&!o.dead);if(z&&!z.uniq&&['root','frz','down'].includes(m.k)&&!(m.k==='down'&&z.boss))z[m.k]=Math.max(z[m.k]||0,m.v);return}
+  if(m.t==='ahit'){const a=animals.find(o=>o.id===m.id);if(!a)return;NET.attacker=from;try{hitAnimal(a,m.dmg)}finally{NET.attacker=null}return}
+  if(m.t==='bye'){toast(`${r.st?escapeHtml(r.st.n):'ผู้เล่น'} ออกจากห้อง`,'#ff8a70');rpRemove(from);netBroadcast({t:'left',id:from})}}
+// ---- guest: receive ----
+function gZombie(e){let z=NET.zmap.get(e[0]);const ty=ZTL[e[1]],tr=TRL[e[2]],isB=!!(e[11]&2);
+  if(!z){NET.applying=true;z=makeZombie(e[6],e[8],ty,tr,{lvl:e[3],elite:!!(e[11]&1),boss:isB});NET.applying=false;z.hid=e[0];z.skills=e[24]?e[24].split(','):[];z.scd={};z.sk=null;
+    for(const k of ['root','frz','down']){let v=0;Object.defineProperty(z,k,{get:()=>v,set:nv=>{v=nv;if(!NET.applying&&NET.guest&&nv>0&&z.hid!=null)netSend({t:'zset',id:z.hid,k,v:nv})},configurable:true})}
+    z.x=e[6];z.y=e[7];z.z=e[8];z.yaw=e[9];NET.zmap.set(e[0],z);if(isB)boss=z}
+  z.tg=e;z.seen=performance.now();z.lvl=e[3];z.hp=e[4];z.maxHp=e[5];z.sc=e[10];z.w=e[25]||z.w;z.elite=!!(e[11]&1);z.sk=e[11]&4?{id:'ambush'}:null;NET.applying=true;z.down=e[11]&8?1:0;NET.applying=false;return z}
+function gUniq(e){let z=NET.zmap.get(e.id);
+  if(!z){NET.applying=true;z=e.u==='mino'?spawnMino(e.x,e.z,e.ph,true):spawnWhale(e.x,e.z,e.ph,true);NET.applying=false;z.hid=e.id;z.sb=1;NET.zmap.set(e.id,z)}
+  if(z.phase!==e.ph){z.phase=e.ph;if(e.u==='mino')setMinoModel(z,e.ph);else setWhaleModel(z,e.ph)}
+  z.tu=e;z.seen=performance.now();z.lvl=e.lv;z.hp=e.hp;z.maxHp=e.mhp;z.pa=e.pa;z.pk=e.pk;z.mv=e.mv;z.rx=e.rx;z.inv=e.inv;z.tide=e.td?1:0;z.hr=e.hr;z.hspin=e.hs;z.aggro=!!e.ag;return z}
+function netGuestRecv(m){NET.lastRecv=performance.now();
+  if(m.t==='snap'){Wd.time=m.tm;if(m.mt>0&&moonT<=0)moonT=m.mt;const seen=new Set();for(const e of m.z){gZombie(e);seen.add(e[0])}for(const e of m.u){gUniq(e);seen.add(e.id)}
+    for(const [id,z] of NET.zmap)if(!seen.has(id)&&performance.now()-z.seen>1500)gRemoveZ(id,false);
+    const as=new Set();for(const e of m.a){as.add(e[0]);let a=NET.amap.get(e[0]);if(!a){const type=anl()[e[1]],A=ANIM[type],mm=buildAnimal(type);scene.add(mm.g);a={hid:e[0],type,x:e[2],y:e[3],z:e[4],yaw:e[5],hp:A.hp,maxHp:A.hp,m:mm,rad:A.len*.4+(A.fly?.3:0),h:mm.h,ph:0,flash:0};animals.push(a);NET.amap.set(e[0],a)}a.tg=e;a.seen=performance.now();a.hp=a.maxHp*e[6]/100}
+    for(const [id,a] of NET.amap)if(!as.has(id)&&performance.now()-a.seen>2000){scene.remove(a.m.g);const i=animals.indexOf(a);if(i>=0)animals.splice(i,1);NET.amap.delete(id)}
+    if(m.wd){[Wd.bossAt,Wd.minoAt,Wd.minoBorn,Wd.whaleAt,Wd.whaleBorn]=m.wd}NET.peerSeen=NET.peerSeen||new Map();const ps=new Set();for(const st of m.p){ps.add(st.id);rpApply(st.id,st);if(st.id!=='host')NET.peerSeen.set(st.id,performance.now())}
+    for(const e of m.e)gEvent(e);return}
+  if(m.t==='hurt'){hurtPlayer(m.d,m.src,m.tr,m.o||{});return}
+  if(m.t==='pset'){if(m.k==='down'){if(!(P.down>0)&&!mounted)P.down=m.v}else if(m.k==='kx'||m.k==='kz')P[m.k]=m.v;else P[m.k]=Math.max(P[m.k]||0,m.v);return}
+  if(m.t==='xp'){gainXp(m.x);P.kills++;if(m.el&&rand()<.6){const rr=rollRarity(ST.luck+.15,1);grant([rand()<.4?makeWeapon(rr):makeGear(rr,null,itemLevel())],'Elite')}return}
+  if(m.t==='adrop'){if(m.drop&&m.drop.length){dropToGround(m.drop,m.x,m.z);toast('ล่าสำเร็จ: กด E ที่ซากเพื่อเก็บเนื้อและหนัง','#c8a070')}gainXp(m.xp);return}
+  if(m.t==='welcome'){NET.hostName=m.hn;if(!m.re){P.x=m.x;P.z=m.z;P.y=groundH(m.x,m.z)+.5;P.vy=0;toast(`เข้าร่วมห้องของ <b>${escapeHtml(m.hn)}</b> แล้ว!`,'#9ad0ff')}Wd.time=m.tm;if(NET.joinRes)NET.joinRes(true);if(m.arena)gEvent(Object.assign({k:'arena'},m.arena));updOnlineBadge();return}
+  if(m.t==='reject'){if(NET.joinRes)NET.joinRes(false,'<b>เข้าห้องไม่ได้:</b> '+m.why);return}
+  if(m.t==='joined'){toast(`<b>${escapeHtml(m.n)}</b> เข้าร่วมห้อง`,'#9ad0ff');return}
+  if(m.t==='left'){rpRemove(m.id);return}
+  if(m.t==='bye'){if(NET.nextHost||(NET.peerSeen&&NET.peerSeen.size))netHostLost();else{toast('<b>Host ปิดห้องแล้ว</b> กำลังกลับเมนู…','#ff8a70');savePlayer();setTimeout(()=>location.reload(),2500)}return}
+  if(m.t==='migrate'){NET.nextHost=m.to;return}}
+function gRemoveZ(id,died){const z=NET.zmap.get(id);if(!z)return;NET.zmap.delete(id);const i=zombies.indexOf(z);if(i>=0)zombies.splice(i,1);
+  if(died){z.dead=true;z.ct=0;z.flash=0;z.fd=z.fall>.5?0:rand()<.5?-1:1;z.f0=z.fall||0;corpses.push(z);spawnGore(z.x,z.y+1*z.sc,z.z,z.boss?40:12);sfx('zdie',z.x,z.z);if(z.hornG){scene.remove(z.hornG);z.hornG=null}if(z.aura){scene.remove(z.aura);z.aura=null}}
+  else if(z.r){scene.remove(z.r.g);if(z.hornG)scene.remove(z.hornG);if(z.aura)scene.remove(z.aura)}
+  if(z===mino)mino=null;if(z===whale)whale=null;if(z===boss)boss=null}
+function gEvent(e){NET.replay=true;try{switch(e.k){
+  case'impact':impact(e.x,e.z,e.r,e.o||{});break;case'ring':ring(e.x,e.z,e.r,e.c,e.d);break;case'meteor':spawnMeteor(e.x,e.z,0);break;
+  case'proj':{const m=e.w?waterMesh():e.rot?new THREE.Mesh(new THREE.DodecahedronGeometry(.42,0),M(0x6a645c)):acidMesh();scene.add(m);projs.push({m,p:new THREE.Vector3(...e.p),v:new THREE.Vector3(...e.v),dmg:0,from:'z',life:e.l,g:e.g,vis:1,rot:e.rot,col:e.c,pool:0});break}
+  case'arena':{endArena(true);makeArenaAt(e.x,e.z,e.R);arena.tgt=e.tgt;break}case'arenaEnd':endArena();break;
+  case'moon':moonT=60;if(whale)summonMoonFx();break;case'sfx':sfx(e.n,...e.a);break;
+  case'zdie':gRemoveZ(e.id,true);break;
+  case'adie':{const a=NET.amap.get(e.id);if(a){NET.amap.delete(e.id);const i=animals.indexOf(a);if(i>=0)animals.splice(i,1);a.m.g.rotation.z=Math.PI/2;a.m.g.position.y=groundH(a.x,a.z)+.2;setTimeout(()=>scene.remove(a.m.g),45000)}break}
+  case'bosskill':if(Math.hypot(P.x-e.x,P.z-e.z)<220){grant(rollChest(.4,true,true),e.n);toast(`<b>${e.n} ถูกปราบแล้ว!</b> คุณได้รับรางวัลด้วย`,'#ffb040')}break;
+  case'toast':toast(e.h,e.c);break}}finally{NET.replay=false}}
+function netGuestTick(dt){NET.stT-=dt;if(NET.stT<=0){NET.stT=.1;netSend({t:'st',st:myState()})}
+  const k=Math.min(1,dt*10);NET.applying=true;
+  for(const z of zombies){if(z.uniq){const e=z.tu;if(!e)continue;z.x=lerp(z.x,e.x,k);z.y=lerp(z.y,e.y,k);z.z=lerp(z.z,e.z,k);let dy=((e.yaw-z.yaw+Math.PI*3)%TAU)-Math.PI;z.yaw+=dy*k;z.yo=lerp(z.yo||0,e.yo,k);z.pitch=lerp(z.pitch||0,e.pi,k);z.bank=lerp(z.bank||0,e.bk,k);z.ph=(z.ph||0)+dt*(z.mv*4+.5);
+      if(z.uniq==='mino'){if(z.hornS)updateHorns(z,dt)}else{if(z.tide>0){if(!z.aura){z.aura=new THREE.Mesh(new THREE.RingGeometry(TIDE_R-2,TIDE_R,96).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xff2020,transparent:true,opacity:.5,depthWrite:false,side:THREE.DoubleSide}));scene.add(z.aura)}z.aura.position.set(z.x,groundH(z.x,z.z)+.4,z.z)}else if(z.aura){scene.remove(z.aura);z.aura=null}if(z.r&&z.r.blood)BLOODTEX.offset.y-=dt*.12;z.bot=z.y+z.sc-4.6*(z.wsc||1)}
+      z.flash-=dt;poseModel(z);continue}
+    const e=z.tg;if(!e)continue;z.x=lerp(z.x,e[6],k);z.y=lerp(z.y,e[7],k);z.z=lerp(z.z,e[8],k);let dy=((e[9]-z.yaw+Math.PI*3)%TAU)-Math.PI;z.yaw+=dy*k;
+    const kk=Math.min(1,dt*14);z.bx=lerp(z.bx,e[12],kk);z.ll=lerp(z.ll,e[13],kk);z.lr=e[11]&16?lerp(z.lr??e[14],e[14],kk):null;z.al=lerp(z.al,e[15],kk);z.ar=lerp(z.ar,e[16],kk);z.hx=lerp(z.hx,e[17],kk);z.fall=lerp(z.fall||0,e[18],kk);z.yo=lerp(z.yo||0,e[19],kk);z.by=lerp(z.by||0,e[20],kk);z.bz=lerp(z.bz||0,e[21],kk);z.alz=lerp(z.alz||0,e[22],kk);z.arz=lerp(z.arz||0,e[23],kk);
+    z.flash-=dt;if(z.r)poseModel(z)}
+  NET.applying=false;buildZGrid();
+  for(const a of animals){const e=a.tg;if(!e)continue;const ox=a.x,oz=a.z;a.x=lerp(a.x,e[2],k);a.y=lerp(a.y,e[3],k);a.z=lerp(a.z,e[4],k);let dy=((e[5]-a.yaw+Math.PI*3)%TAU)-Math.PI;a.yaw+=dy*k;const sp=Math.hypot(a.x-ox,a.z-oz)/Math.max(dt,1e-3);a.ph+=dt*(8+sp*2);a.flash-=dt;
+    a.m.g.position.set(a.x,a.y,a.z);a.m.g.rotation.set(0,a.yaw,0);if(a.m.wings){const f=Math.sin(a.ph*2)*.9;a.m.wings[0].rotation.z=f;a.m.wings[1].rotation.z=-f;a.m.wo[0].rotation.z=f*.7;a.m.wo[1].rotation.z=-f*.7}else{const sw=Math.sin(a.ph)*.6*Math.min(1,sp/3);a.m.legs.forEach((l,i)=>l.rotation.x=(i===0||i===3?sw:-sw))}}
+  if(performance.now()-NET.lastRecv>20000&&NET.lastRecv>0&&!NET.migrating){NET.lastRecv=0;NET.migrating=true;toast('<b>ไม่ได้รับข้อมูลจาก host นานเกินไป</b> กำลังเชื่อมต่อใหม่…','#ffb040');netRejoin()}}
+// ---- session control ----
+async function netTransport(id){if(window.__netTest){NET.bridge=window.__netTest(id,(from,msg)=>netRecv(from,msg));return id}
+  const Peer=await loadPeerLib();return new Promise((res,rej)=>{const p=new Peer(id||undefined,{debug:0});NET.peer=p;let done=false;p.on('open',pid=>{done=true;res(pid)});p.on('error',err=>{if(!done)rej(err);else toast('ออนไลน์: '+(err.type||err),'#ff8a70')});setTimeout(()=>{if(!done)rej(new Error('timeout'))},15000)})}
+function netRecv(from,m){if(!m||typeof m!=='object')return;if(NET.host)netHostRecv(from,m);else if(NET.guest)netGuestRecv(m)}
+function hookHostPeer(){if(NET.peer)NET.peer.on('connection',c=>{c.on('open',()=>{NET.conns.set(c.peer,c)});c.on('data',d=>netRecv(c.peer,d));c.on('close',()=>{if(NET.remotes.has(c.peer)){toast('ผู้เล่นออกจากห้อง','#ff8a70');rpRemove(c.peer);netBroadcast({t:'left',id:c.peer})}NET.conns.delete(c.peer)})})}
+async function netHost(){if(SANDBOX){toast('ใช้โหมดออนไลน์ในแซนด์บ็อกซ์ไม่ได้','#ff8a70');return}if(NET.on)return;const code=genCode();toast('กำลังสร้างห้อง…','#9ad0ff');
+  try{await netTransport('realmofash-'+code)}catch(e){toast('<b>สร้างห้องไม่สำเร็จ</b> ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่ ('+(e.type||e.message||e)+')','#ff8a70');return}
+  NET.on=true;NET.host=true;NET.code=code;NET.myId='host';hookHostPeer();
+  updOnlineBadge();toast(`<b>สร้างห้องแล้ว!</b> รหัสห้อง: <b style="font-size:18px;letter-spacing:2px">${code}</b> ส่งให้เพื่อนกรอกที่ "เล่นออนไลน์"`,'#9ad0ff');if(panelOpen==='online')renderPanel('online')}
+function netReset(){try{NET.peer&&NET.peer.destroy()}catch(e){}NET.peer=null;for(const id of [...NET.remotes.keys()])rpRemove(id);NET.on=NET.host=NET.guest=false;NET.conns.clear();NET.conn=null;NET.bridge=null;NET.joinRes=null;updOnlineBadge()}
+function netJoin(code,re){code=(code||'').trim().toUpperCase();if(!/^[A-Z0-9]{5}$/.test(code)){toast('รหัสห้องต้องเป็นตัวอักษร 5 ตัว','#ff8a70');return Promise.resolve(false)}if(NET.on)return Promise.resolve(false);if(!re)toast('กำลังเชื่อมต่อห้อง '+code+'…','#9ad0ff');
+  return new Promise(async res=>{let done=false;const fin=(ok,msg)=>{if(done)return;done=true;NET.joinRes=null;if(!ok){if(msg&&!re)toast(msg,'#ff8a70');const wasHello=NET.helloSent;netReset();if(wasHello&&!re){savePlayer();setTimeout(()=>location.reload(),1800)}}res(ok)};
+    let myid;try{myid=await netTransport(window.__netTest?'g'+genCode():null)}catch(e){fin(false,'<b>เชื่อมต่อไม่สำเร็จ</b> ('+(e.type||e.message||e)+')');return}
+    NET.on=true;NET.guest=true;window.__netGuest=true;NET.code=code;NET.myId=myid;NET.helloSent=false;NET.joinRes=fin;NET.migrating=false;NET.nextHost=null;
+    const hello=()=>{NET.lastRecv=performance.now();NET.helloSent=true;clearZombies();for(const a of animals)scene.remove(a.m.g);animals.length=0;NET.zmap.clear();NET.amap.clear();netSend({t:'hello',v:GAME_V,st:myState(),re:re?1:0})};
+    if(NET.bridge){hello()}else{const c=NET.peer.connect('realmofash-'+code,{reliable:true,serialization:'json'});NET.conn=c;
+      c.on('open',hello);c.on('data',d=>netRecv('host',d));c.on('close',()=>{if(NET.guest&&!done)fin(false,'<b>เชื่อมต่อห้องไม่สำเร็จ</b>');else if(NET.guest)netHostLost()});
+      NET.peer.on('error',err=>{if(!done)fin(false,'<b>ไม่พบห้อง '+code+'</b> ตรวจรหัสอีกครั้ง หรือห้องอาจปิดไปแล้ว')})}
+    setTimeout(()=>fin(false,'<b>เชื่อมต่อห้องไม่สำเร็จ</b> (หมดเวลา) เครือข่ายนี้อาจบล็อกการเชื่อมต่อแบบ P2P'),15000);updOnlineBadge()})}
+function netLeave(silent){if(!NET.on)return;const wasGuest=NET.guest;
+  if(NET.host&&NET.remotes.size){const nh=[...NET.remotes.keys()].sort()[0];netBroadcast({t:'migrate',to:nh});netBroadcast({t:'bye'});setTimeout(()=>{netReset();if(!silent)toast('ออกจากห้องแล้ว ห้องยังเปิดอยู่ โดยส่ง host ต่อให้เพื่อน','#9ad0ff')},400);return}
+  if(NET.host)netBroadcast({t:'bye'});else netSend({t:'bye'});netReset();NET.code='';
+  if(wasGuest){savePlayer();if(!silent)toast('ออกจากห้องแล้ว กำลังโหลดโลกของคุณ…');setTimeout(()=>location.reload(),silent?1500:1200)}else if(!silent)toast('ปิดห้องแล้ว')}
+function netHostLost(){if(NET.migrating||!NET.guest)return;NET.migrating=true;const now=performance.now(),peers=[...(NET.peerSeen||new Map())].filter(([id,t])=>now-t<15000).map(([id])=>id);const cand=[NET.myId,...peers].sort();const nh=NET.nextHost||cand[0];
+  toast('<b>Host ออกจากเกม</b> กำลังย้ายห้องไปให้ผู้เล่นคนต่อไป…','#ffb040');if(nh===NET.myId)netPromote();else netRejoin()}
+async function netPromote(){const code=NET.code;try{NET.peer&&NET.peer.destroy()}catch(e){}NET.peer=null;NET.conn=null;NET.bridge=null;for(const id of [...NET.remotes.keys()])rpRemove(id);
+  NET.guest=false;NET.host=true;NET.myId='host';NET.migrated=true;NET.zmap.clear();for(const a of animals)scene.remove(a.m.g);animals.length=0;NET.amap.clear();
+  for(const z of zombies){delete z.tg;delete z.tu;z.hid=undefined;if(z.uniq){z.home2=z.home2||{x:z.x,z:z.z};z.ms=null;z.mc=z.mc||{}}}
+  let ok=false;for(let i=0;i<20&&!ok;i++){try{await netTransport('realmofash-'+code);ok=true}catch(e){await new Promise(r=>setTimeout(r,1500))}}
+  NET.migrating=false;if(!ok){NET.host=false;NET.guest=true;netRejoin();return}
+  hookHostPeer();updOnlineBadge();toast(`<b>คุณเป็น host คนใหม่แล้ว</b> (ห้อง ${code}) เพื่อนจะกลับเข้ามาเองอัตโนมัติ`,'#9ad0ff')}
+async function netRejoin(){const code=NET.code;netReset();NET.code=code;window.__netGuest=true;
+  for(let i=0;i<24;i++){await new Promise(r=>setTimeout(r,i?2500:1500));const ok=await netJoin(code,true);if(ok){toast('<b>กลับเข้าห้องแล้ว</b> host คนใหม่: '+escapeHtml(NET.hostName),'#9ad0ff');return}}
+  toast('หา host คนใหม่ไม่เจอ กำลังกลับเมนู…','#ff8a70');savePlayer();setTimeout(()=>location.reload(),2500)}
+addEventListener('beforeunload',()=>{if(NET.host&&NET.remotes.size){netBroadcast({t:'migrate',to:[...NET.remotes.keys()].sort()[0]});netBroadcast({t:'bye'})}});
+function updOnlineBadge(){const b=$('#netBadge');if(!b)return;if(!NET.on){b.classList.add('hidden');return}b.classList.remove('hidden');b.innerHTML=NET.host?`🌐 ห้อง <b>${NET.code}</b> · ${NET.remotes.size+1}/4 คน`:`🌐 ออนไลน์ · ห้อง <b>${NET.code}</b>`}
+function renderOnline(T,B){T.textContent='เล่นออนไลน์ (Co-op)';const saved=store.get(SKEY),inGame=state==='play'&&P;
+  const ch=inGame?`${escapeHtml(P.name)} · Lv ${P.lvl}`:saved?`${escapeHtml(saved.name)} · Lv ${saved.lvl}`:null;
+  let h=`<p style="font-size:13px;color:var(--mut);margin-top:0">เล่นด้วยกันได้สูงสุด 4 คน · ตัวละครและเซฟของแต่ละคนอยู่ในเครื่องตัวเอง · โลกและมอนสเตอร์คำนวณที่เครื่อง host (เดินไปไหนก็เจอมอนสเตอร์ได้) · host ออกหรือตาย ห้องจะย้ายไปให้ผู้เล่นคนต่อไปอัตโนมัติ · ทุกคนต้องเปิดเกมเวอร์ชันเดียวกัน (${GAME_V})</p>`;
+  if(NET.on){h+=`<div class="fc a"><b>${NET.host?'คุณเป็น Host':'คุณอยู่ในห้องของ '+escapeHtml(NET.hostName||'host')}</b><p style="font-size:20px;letter-spacing:3px;margin:6px 0">รหัสห้อง: <b>${NET.code}</b> ${NET.host?'<button class="sm" id="netCopy">คัดลอก</button>':''}</p><p>ผู้เล่น: ${[NET.host?escapeHtml(P.name)+' (host)':escapeHtml(NET.hostName)+' (host)',...[...NET.remotes.values()].filter(r=>r.st&&r.id!=='host').map(r=>escapeHtml(r.st.n))].join(' · ')}</p></div><p><button class="danger" id="netLeave">${NET.host?(NET.remotes.size?'ออกจากห้อง (ส่ง host ต่อให้เพื่อน)':'ปิดห้อง'):'ออกจากห้อง'}</button></p>`}
+  else{h+=`<div class="fc a"><b>ตัวละครของคุณ</b><p>${ch||'ยังไม่มีตัวละคร — สร้างตัวละครก่อน แล้วค่อยกลับมาที่นี่'}</p></div>`;
+    if(ch){h+=`<h3>สร้างห้อง</h3><p><button id="netHost">สร้างห้อง (เป็น Host)</button></p><h3>เข้าร่วมห้องเพื่อน</h3><div class="sbgrid"><input id="netCode" maxlength="5" placeholder="รหัส 5 ตัว" style="width:130px;text-transform:uppercase;font-size:18px;letter-spacing:3px;background:#1c140d;color:var(--txt);border:1px solid var(--line2);border-radius:6px;padding:6px 10px"><button id="netJoinB">เข้าร่วม</button></div>`}
+    else h+=`<p><button id="netNew">สร้างตัวละคร</button></p>`}
+  B.innerHTML=h;
+  const go=fn=>{if(!inGame){const p=store.get(SKEY);if(!p)return;closePanel();startPlay(p,false);setTimeout(fn,400)}else{closePanel();fn()}};
+  if($('#netHost'))$('#netHost').onclick=()=>go(()=>netHost());
+  if($('#netJoinB'))$('#netJoinB').onclick=()=>{const c=$('#netCode').value;go(()=>netJoin(c))};
+  if($('#netNew'))$('#netNew').onclick=()=>{closePanel();$('#bNew').click()};
+  if($('#netLeave'))$('#netLeave').onclick=()=>{netLeave();renderPanel('online')};
+  if($('#netCopy'))$('#netCopy').onclick=()=>{try{navigator.clipboard.writeText(NET.code);toast('คัดลอกรหัสห้องแล้ว')}catch(e){}}}
+// ---- event wrappers (host broadcasts monster effects) ----
+{const _impact=impact;impact=function(x,z,r,o={}){_impact(x,z,r,o);if(NET.host&&!NET.replay)netEv({k:'impact',x:r2(x),z:r2(z),r,o:{cracks:o.cracks,glow:o.glow,t:o.t}})};
+ const _ring=ring;ring=function(x,z,r,c,d){_ring(x,z,r,c,d);if(NET.host&&!NET.replay)netEv({k:'ring',x:r2(x),z:r2(z),r,c,d})};
+ const _met=spawnMeteor;spawnMeteor=function(x,z,dmg){_met(x,z,dmg);if(NET.host&&!NET.replay)netEv({k:'meteor',x:r2(x),z:r2(z)})};
+ const _sfx=sfx,NSFX=new Set(['slam','roar','whale','groan','screech','zdie']);sfx=function(n,...a){_sfx(n,...a);if(NET.host&&!NET.replay&&NSFX.has(n)&&typeof a[0]==='number')netEv({k:'sfx',n,a:a.map(v=>typeof v==='number'?r2(v):v)})};
+ const _sm=summonMoon;summonMoon=function(z){_sm(z);if(NET.host)netEv({k:'moon'})};
+ const _ea=endArena;endArena=function(now){const had=!!arena;_ea(now);if(had&&NET.host&&!NET.replay)netEv({k:'arenaEnd'})}}
+function netProjHit(pr){for(const r of NET.remotes.values()){const p=r.px;if(!p||p.dead)continue;const dx=p.x-pr.p.x,dz=p.z-pr.p.z,dy=p.y+1-pr.p.y;if(dx*dx+dz*dz<.8&&Math.abs(dy)<1.3){hurtAny(p,pr.dmg*(isNight()?1.3:1),pr.src,pr.o||{acid:1},pr.tribe);return true}}return false}
+function updBossBar(){const bb=$('#boss'),show=(t,z)=>{bb.classList.remove('hidden');bb.querySelector('b').textContent=t;bb.querySelector('i').style.width=(z.hp/z.maxHp*100)+'%'};
+  if(boss&&!boss.dead&&Math.hypot(P.x-boss.x,P.z-boss.z)<70)show(`The Rot King · Lv ${boss.lvl}`,boss);
+  else if(whale&&!whale.dead&&Math.hypot(P.x-whale.x,P.z-whale.z)<260&&whale.aggro)show(`Nocturne the Moonwhale · Lv ${whale.lvl} · ร่างที่ ${whale.phase}${whaleEmp(whale)?' · พลังจันทร์ ×2':''}`,whale);
+  else if(mino&&!mino.dead&&Math.hypot(P.x-mino.x,P.z-mino.z)<70&&mino.aggro)show(`Asterion the Minotaur · Lv ${mino.lvl} · ร่างที่ ${mino.phase}`,mino);else bb.classList.add('hidden')}
+function exportSave(){const data={game:'realm-of-ash',v:GAME_V,char:store.get(SKEY),world:store.get(WKEY),at:new Date().toISOString()};const b=new Blob([JSON.stringify(data)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`realm-of-ash-save-${(data.char&&data.char.name)||'empty'}.json`;document.body.appendChild(a);a.click();a.remove();toast('ดาวน์โหลดไฟล์เซฟแล้ว เก็บไว้เป็นสำรอง','#9fd36e')}
+function importSave(){const i=document.createElement('input');i.type='file';i.accept='.json,application/json';i.onchange=async()=>{try{const d=JSON.parse(await i.files[0].text());if(d.game!=='realm-of-ash')throw 0;if(!confirm('นำเข้าเซฟนี้? เซฟปัจจุบันในเบราว์เซอร์นี้จะถูกแทนที่'))return;if(d.char)store.set(SKEY,d.char);if(d.world)store.set(WKEY,d.world);toast('นำเข้าเซฟแล้ว กำลังโหลดใหม่…','#9fd36e');setTimeout(()=>location.reload(),900)}catch(e){toast('ไฟล์นี้ไม่ใช่เซฟของ Realm of Ash','#ff8a70')}};i.click()}
 
 // ================= aspects =================
 const aspId=()=>P?FATES[P.fate].id:'';
@@ -1948,7 +2144,7 @@ function skillUpdate(z,dt,d){const s=z.sk,T=s.t;s.t+=dt;zBase(z);let done=false;
   case'ambush':{z.fall=1.5;z.yo=.12;z.al=z.ar=-2.9;z.alz=-.4;z.arz=.4;z.hx=-.8;if(!P.dead&&d<(crouch?1.8:3.2)){s.id='ankle';s.ph='wind';s.t=.25;z.aggro=true;sfx('snarlW',z.x,z.z);z.scd.ankle=8}break}
   case'grab':case'ankle':{const low=s.id==='ankle';if(low){z.fall=1.42;z.yo=.14;z.hx=-.6}
     if(s.ph==='wind'){faceTo(z,P.x,P.z);const k=Math.min(1,T/.45);if(low){z.al=z.ar=-2.9+k*.3;z.alz=-.6*k;z.arz=.6*k}else setPose(z,{al:-1.5,ar:-1.5,alz:-.6,arz:.6,bx:.35},k);
-      if(T>=.45){if(d<z.rad+1.9&&!P.grab&&!(P.down>0)&&invuln<=0&&!mounted&&!P.dead){P.grab={z,str:3+Math.min(4,Math.floor(z.lvl/4))+(z.elite?2:0),t:0,low};s.ph='hold';s.t=0;cancelAction();if(sleeping)wake();toast(`<b>ถูก${low?'คว้าข้อเท้า':'จับรัด'}!</b> กด ${keyName(CFG.binds.jump)} รัวๆ หรือโจมตีเพื่อดิ้นหลุด`,'#c8402c')}else{s.ph='rec';s.t=0}}}
+      if(T>=.45){if(d<z.rad+1.9&&!P.grab&&!P.remote&&!(P.down>0)&&invuln<=0&&!mounted&&!P.dead){P.grab={z,str:3+Math.min(4,Math.floor(z.lvl/4))+(z.elite?2:0),t:0,low};s.ph='hold';s.t=0;cancelAction();if(sleeping)wake();toast(`<b>ถูก${low?'คว้าข้อเท้า':'จับรัด'}!</b> กด ${keyName(CFG.binds.jump)} รัวๆ หรือโจมตีเพื่อดิ้นหลุด`,'#c8402c')}else{s.ph='rec';s.t=0}}}
     else if(s.ph==='hold'){if(!P.grab||P.grab.z!==z){s.ph='rec';s.t=0;break}const a=Math.atan2(z.x-P.x,z.z-P.z);z.x=P.x+Math.sin(a)*.85;z.z=P.z+Math.cos(a)*.85;faceTo(z,P.x,P.z);
       if(low){z.al=z.ar=-2.6;z.alz=.2;z.arz=-.2;z.hx=-.3+Math.sin(T*14)*.15}else{z.al=z.ar=-1.65;z.alz=.35;z.arz=-.35;z.bx=.4;z.hx=.4+Math.sin(T*14)*.15}
       P.grab.t+=dt;if(P.grab.t>2.4){P.grab=null;zHit(z,1.4,{bite:1,low},'ถูกกัดขณะถูกจับ');s.ph='rec';s.t=0}}
@@ -1991,7 +2187,7 @@ function skillUpdate(z,dt,d){const s=z.sk,T=s.t;s.t+=dt;zBase(z);let done=false;
   case'volley':{faceTo(z,P.x,P.z);const i=Math.floor(T/.28);z.hx=-.3+((T%.28)/.28)*.7;z.bx=.3;z.al=z.ar=-.4;if(i<3&&s.hit!==i){s.hit=i;spit(z,(i-1)*.18)}if(T>1)done=true;break}
   case'pool':{faceTo(z,P.x,P.z);const k=Math.min(1,T/.6);z.hx=-.6*k;z.bx=.2-.3*k;if(T>=.6&&!s.hit){s.hit=1;lob(z)}if(T>1)done=true;break}
   case'hop':{if(s.ph==='wind'){faceTo(z,P.x,P.z);z.yo=-.25*Math.min(1,T/.2);if(T>=.2){s.ph='air';nx();const dd=Math.hypot(z.x-P.x,z.z-P.z)||1;s.tx=z.x+(z.x-P.x)/dd*6;s.tz=z.z+(z.z-P.z)/dd*6}}else if(s.ph==='air'){z.bx=-.3;z.al=z.ar=.3;z.ll=-.5;z.lr=.4;if(arc(.5,s.tx,s.tz,1.3)){s.ph='rec';s.t=0}}else if(T>.2)done=true;break}
-  case'roar':{faceTo(z,P.x,P.z);const k=Math.min(1,T/.4);z.bx=.2-.5*k;z.hx=-.7*k;z.al=z.ar=-.4;z.alz=-.9*k;z.arz=.9*k;if(T>=.4&&!s.hit){s.hit=1;sfx('roar',z.x,z.z);ring(z.x,z.z,12,0xb067e6,.9);shake=Math.max(shake,.3);if(Math.hypot(P.x-z.x,P.z-z.z)<14){panic=Math.min(4,panic+2.5);slowT=2.5;moodAdd('stress',15);toast('เสียงคำรามทำให้ขวัญผวา!','#b067e6')}}if(T>1.5)done=true;break}
+  case'roar':{faceTo(z,P.x,P.z);const k=Math.min(1,T/.4);z.bx=.2-.5*k;z.hx=-.7*k;z.al=z.ar=-.4;z.alz=-.9*k;z.arz=.9*k;if(T>=.4&&!s.hit){s.hit=1;sfx('roar',z.x,z.z);ring(z.x,z.z,12,0xb067e6,.9);shake=Math.max(shake,.3);if(Math.hypot(P.x-z.x,P.z-z.z)<14){if(P.remote){P.slowT=2.5}else{panic=Math.min(4,panic+2.5);slowT=2.5;moodAdd('stress',15);toast('เสียงคำรามทำให้ขวัญผวา!','#b067e6')}}}if(T>1.5)done=true;break}
   case'leap':{if(s.ph==='wind'){faceTo(z,P.x,P.z);const k=Math.min(1,T/.6);z.yo=-.35*k;z.bx=.2+.4*k;z.al=z.ar=lerp(-1.35,.3,k);if(T>=.6){s.ph='air';nx();s.tx=P.x;s.tz=P.z;ring(s.tx,s.tz,6,0xff3a2a,.9)}}
     else if(s.ph==='air'){z.al=z.ar=-3;z.bx=lerp(-.3,.6,Math.min(1,T/.9));z.ll=z.lr=-.7;if(arc(.9,s.tx,s.tz,5)){zSlam(z,6,1.6,'Rot King: Leap Slam');s.ph='rec';s.t=0}}
     else{z.bx=.7;z.yo=-.3;if(T>1)done=true}break}
@@ -1999,8 +2195,9 @@ function skillUpdate(z,dt,d){const s=z.sk,T=s.t;s.t+=dt;zBase(z);let done=false;
   const ci=cityAt(z.x,z.z,4);if(ci>=0){const c=cities[ci],ax=z.x-c.x,az=z.z-c.z,ad=Math.hypot(ax,az)||1;z.x=c.x+ax/ad*(c.r+4.1);z.z=c.z+az/ad*(c.r+4.1);done=true}
   z.y=Math.max(groundH(z.x,z.z),-1.3);if(done){if(s.rock)scene.remove(s.rock);z.sk=null;z.atk=Math.max(z.atk,.6)}z.phase+=dt*3}
 let zFrame=0;const sepN=[];
-function updateZombies(dt){zFrame++;buildZGrid();const pc=cityAt(P.x,P.z,2)>=0,night=isNight(),bm=bloodMoon()?1.3:1;
-  for(let i=zombies.length-1;i>=0;i--){const z=zombies[i];if(!z)continue;
+function updateZombies(dt){NET.HP=P;try{_updateZombies(dt)}finally{P=NET.HP}}
+function _updateZombies(dt){zFrame++;buildZGrid();let pc=cityAt(P.x,P.z,2)>=0;const night=isNight(),bm=bloodMoon()?1.3:1,multi=NET.host&&NET.remotes.size>0;
+  for(let i=zombies.length-1;i>=0;i--){const z=zombies[i];if(!z)continue;if(multi){P=netTargetFor(z.x,z.z,z);pc=cityAt(P.x,P.z,2)>=0}
     const dx=P.x-z.x,dz=P.z-z.z,d=Math.hypot(dx,dz);
     if(!z.boss&&d>560){zombies.splice(i,1);continue}
     if(z.uniq){(z.uniq==='whale'?whaleUpdate:minoUpdate)(z,dt,d);poseModel(z);continue}
@@ -2044,21 +2241,22 @@ function updateZombies(dt){zFrame++;buildZGrid();const pc=cityAt(P.x,P.z,2)>=0,n
     else if(z.lunge>0){z.lunge-=zdt;if(!ZT[z.type].crawl)setPose(z,ATKP[z.at||'swipe'][1],1)}
     else if(z.hitT>0){z.hitT-=zdt;const k=z.hitT/.22;z.bx=z.bx-.65*k;z.hx=-.5*k}
     z.flash-=zdt;if(z.r)poseModel(z)}
-  const ld=Math.hypot(P.x-lair.x,P.z-lair.z);
+  P=NET.HP;const ld=Math.hypot(P.x-lair.x,P.z-lair.z);
   if(!boss&&ld<120&&Wd.time>=Wd.bossAt){boss=makeZombie(lair.x,lair.z,'brute',BIOMES[biomeAt(lair.x,lair.z,lair.h)].tribe,{boss:true});toast('<b>พื้นดินสั่นสะเทือน… The Rot King ตื่นขึ้นแล้ว</b>','#b067e6')}
-  updateMinoWorld();updateWhaleWorld();
+  P=netTargetFor(minoLair.x,minoLair.z);updateMinoWorld();P=netTargetFor(whaleLair.x,whaleLair.z);updateWhaleWorld();P=NET.HP;
   if(boss&&ld>200&&!boss.sb){scene.remove(boss.r.g);zombies.splice(zombies.indexOf(boss),1);boss=null}
-  const bb=$('#boss');if(boss&&(ld<70||boss.sb)&&Math.hypot(P.x-boss.x,P.z-boss.z)<70){bb.classList.remove('hidden');bb.querySelector('b').textContent=`The Rot King · Lv ${boss.lvl}`;bb.querySelector('i').style.width=(boss.hp/boss.maxHp*100)+'%'}else if(whale&&Math.hypot(P.x-whale.x,P.z-whale.z)<260&&whale.aggro){bb.classList.remove('hidden');bb.querySelector('b').textContent=`Nocturne the Moonwhale · Lv ${whale.lvl} · ร่างที่ ${whale.phase}${whaleEmp(whale)?' · พลังจันทร์ ×2':''}`;bb.querySelector('i').style.width=(whale.hp/whale.maxHp*100)+'%'}else if(mino&&Math.hypot(P.x-mino.x,P.z-mino.z)<70&&mino.aggro){bb.classList.remove('hidden');bb.querySelector('b').textContent=`Asterion the Minotaur · Lv ${mino.lvl} · ร่างที่ ${mino.phase}`;bb.querySelector('i').style.width=(mino.hp/mino.maxHp*100)+'%'}else bb.classList.add('hidden')}
-function updateProjs(dt){for(let j=projs.length-1;j>=0;j--){const pr=projs[j];pr.life-=dt;pr.v.y-=pr.g*dt;pr.p.addScaledVector(pr.v,dt);pr.m.position.copy(pr.p);
+  updBossBar()}
+function updateProjs(dt){if(NET.host&&NET.remotes.size){for(const pr of projs)if(pr.from==='z'&&!pr._n&&!pr.vis){pr._n=1;netEv({k:'proj',p:[r2(pr.p.x),r2(pr.p.y),r2(pr.p.z)],v:[r2(pr.v.x),r2(pr.v.y),r2(pr.v.z)],g:pr.g,l:pr.life,rot:pr.rot?1:0,c:pr.col,w:pr.col===0x8ad8ff?1:0})}}const rp=NET.replay;if(NET.host)NET.replay=true;try{_updateProjs(dt)}finally{NET.replay=rp}}
+function _updateProjs(dt){for(let j=projs.length-1;j>=0;j--){const pr=projs[j];pr.life-=dt;pr.v.y-=pr.g*dt;pr.p.addScaledVector(pr.v,dt);pr.m.position.copy(pr.p);
     if(!pr.magic&&pr.from==='p')pr.m.quaternion.setFromUnitVectors(UP,v3.copy(pr.v).normalize());
     let hit=false;
     if(pr.from==='p'&&whale&&!whale.dead){const dx=whale.x-pr.p.x,dz=whale.z-pr.p.z,dy=(whale.y+whale.sc)-pr.p.y;if(dx*dx+dz*dz<(whale.rad+.4)**2&&Math.abs(dy)<whale.sc*1.1){hitZombie(whale,pr.dmg,{col:pr.magic?'#ffb060':undefined});hit=true}}
     if(pr.from==='p'&&!hit){for(const z of zNear(pr.p.x,pr.p.z,3)){const dx=z.x-pr.p.x,dz=z.z-pr.p.z,dy=(z.y+1*z.sc)-pr.p.y;if(dx*dx+dz*dz<(z.rad+.35)**2&&Math.abs(dy)<1.1*z.sc){hitZombie(z,pr.dmg,{knock:ST.knock?3:.6,col:pr.magic?'#ffb060':undefined});hit=true;break}}}
     if(pr.from==='p'&&!hit){for(const an of animals){const dx=an.x-pr.p.x,dz=an.z-pr.p.z;if(dx*dx+dz*dz<(an.rad+.3)**2&&Math.abs(an.y+an.h*.6-pr.p.y)<an.h){hitAnimal(an,pr.dmg);hit=true;break}}}
-    if(pr.from==='p'){}else{const dx=P.x-pr.p.x,dz=P.z-pr.p.z,dy=P.y+1-pr.p.y;if(dx*dx+dz*dz<.7&&Math.abs(dy)<1.2){hurtPlayer(pr.dmg*(isNight()?1.3:1),pr.src,pr.tribe,pr.o||{acid:1});if(pr.z)zGainXp(pr.z,6);hit=true}}
+    if(pr.from==='p'){}else if(pr.vis){const dx=P.x-pr.p.x,dz=P.z-pr.p.z,dy=P.y+1-pr.p.y;if(dx*dx+dz*dz<.7&&Math.abs(dy)<1.2)hit=true}else{const dx=P.x-pr.p.x,dz=P.z-pr.p.z,dy=P.y+1-pr.p.y;if(dx*dx+dz*dz<.7&&Math.abs(dy)<1.2){hurtPlayer(pr.dmg*(isNight()?1.3:1),pr.src,pr.tribe,pr.o||{acid:1});if(pr.z)zGainXp(pr.z,6);hit=true}if(!hit&&NET.host&&NET.remotes.size)hit=netProjHit(pr)}
     if(pr.rot){pr.m.rotation.x+=dt*9;pr.m.rotation.z+=dt*6}
     if(pr.from==='z'&&!pr.rot&&rand()<.7)spawnGoreV(pr.p.x,pr.p.y,pr.p.z,(rand()-.5)*.8,.4,(rand()-.5)*.8,pr.col||(rand()<.5?0x9aff3a:0x5a9a1a));
-    if(hit||pr.life<=0||pr.p.y<groundH(pr.p.x,pr.p.z)){if(pr.pool)makePool(pr.p.x,pr.p.z);if(pr.from==='z'&&!pr.rot){spawnGore(pr.p.x,pr.p.y+.2,pr.p.z,8,pr.col||0x9aff3a);ring(pr.p.x,pr.p.z,1.2,pr.col||0x9aff3a,.35);if(!hit&&!pr.col&&rand()<.5)addScar((()=>{const geo=conform(new THREE.CircleGeometry(.9,12).rotateX(-Math.PI/2),pr.p.x,pr.p.z,.06),m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0x6aaa20,transparent:true,opacity:.55,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-3}));m.position.set(pr.p.x,0,pr.p.z);return m})(),6)}if(pr.rot&&!hit){sfx('slam',pr.p.x,pr.p.z);spawnGore(pr.p.x,pr.p.y,pr.p.z,6,0x6a645c)}scene.remove(pr.m);projs.splice(j,1)}}
+    if(hit||pr.life<=0||pr.p.y<groundH(pr.p.x,pr.p.z)){if(pr.pool&&!pr.vis)makePool(pr.p.x,pr.p.z);if(pr.from==='z'&&!pr.rot){spawnGore(pr.p.x,pr.p.y+.2,pr.p.z,8,pr.col||0x9aff3a);ring(pr.p.x,pr.p.z,1.2,pr.col||0x9aff3a,.35);if(!hit&&!pr.col&&rand()<.5)addScar((()=>{const geo=conform(new THREE.CircleGeometry(.9,12).rotateX(-Math.PI/2),pr.p.x,pr.p.z,.06),m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0x6aaa20,transparent:true,opacity:.55,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-3}));m.position.set(pr.p.x,0,pr.p.z);return m})(),6)}if(pr.rot&&!hit){sfx('slam',pr.p.x,pr.p.z);spawnGore(pr.p.x,pr.p.y,pr.p.z,6,0x6a645c)}scene.remove(pr.m);projs.splice(j,1)}}
   for(let j=rings.length-1;j>=0;j--){const r=rings[j];r.t+=dt;const k=r.t/r.dur;r.m.scale.setScalar(r.r*(r.grow?Math.min(1,k*1.6):1));r.m.material.opacity=.9*(1-k);if(k>=1){scene.remove(r.m);r.m.geometry.dispose();r.m.material.dispose();rings.splice(j,1)}}}
 // nameplates
 const plEl=$('#plates'),plPool=[];
@@ -2094,13 +2292,14 @@ function spawnAnimals(dt){animT-=dt;if(animT>0)return;animT=1.2;const cap=(isNig
   const type=pick(opts),A=ANIM[type],n=A.grp[0]+ri(A.grp[1]-A.grp[0]+1);
   for(let i=0;i<n;i++){const x2=x+(rand()-.5)*8,z2=z+(rand()-.5)*8,m=buildAnimal(type);scene.add(m.g);animals.push({type,x:x2,z:z2,y:groundH(x2,z2)+(A.fly?6:0),yaw:rand()*TAU,hp:A.hp,maxHp:A.hp,m,rad:A.len*.4,h:m.h,st:'graze',t:rand()*3,ph:rand()*6,hostile:!!A.aggro,atk:0,wind:0,flash:0,lead:null})}
   if(type==='wolf'&&isNight())sfx('howl',x,z)}
-function hitAnimal(an,dmg){dmg=Math.round(dmg);an.hp-=dmg;an.flash=.15;floatNum(an.x,an.y+an.h+.6,an.z,''+dmg,'#ffe0a0');spawnGore(an.x,an.y+an.h*.7,an.z,4,0x6a1410);sfx('hit',false,an.x,an.z);
+function hitAnimal(an,dmg){dmg=Math.round(dmg);if(NET.guest){an.flash=.15;floatNum(an.x,an.y+an.h+.6,an.z,''+dmg,'#ffe0a0');spawnGore(an.x,an.y+an.h*.7,an.z,4,0x6a1410);sfx('hit',false,an.x,an.z);if(an.hid!=null)netSend({t:'ahit',id:an.hid,dmg});return}an.hp-=dmg;an.flash=.15;floatNum(an.x,an.y+an.h+.6,an.z,''+dmg,'#ffe0a0');spawnGore(an.x,an.y+an.h*.7,an.z,4,0x6a1410);sfx('hit',false,an.x,an.z);
   const A=ANIM[an.type];if(A.neutral){an.hostile=true;sfx('grunt',an.x,an.z)}if(A.flee)an.st='flee';
   if(an.hp<=0){animals.splice(animals.indexOf(an),1);an.m.g.rotation.z=Math.PI/2;an.m.g.position.y+=an.h*.4;setTimeout(()=>scene.remove(an.m.g),45000);
     if(A.fly){an.m.g.position.y=groundH(an.x,an.z)+.15;an.m.g.rotation.set(0,an.yaw,Math.PI)}
-    const drop=A.meat[1]?[{t:'c',c:'meat_raw',n:A.meat[0]+ri(A.meat[1]-A.meat[0]+1)}]:[];if(A.hide)drop.push({t:'c',c:'hide',n:A.hide});if(drop.length){dropToGround(drop,an.x,an.z);toast(`ล่า${A.th}สำเร็จ: กด E ที่ซากเพื่อเก็บเนื้อและหนัง`,'#c8a070')}gainXp(A.xp)}}
-function updateAnimals(dt){const night=isNight();
-  for(let i=animals.length-1;i>=0;i--){const an=animals[i],A=ANIM[an.type],dx=P.x-an.x,dz=P.z-an.z,d=Math.hypot(dx,dz);
+    const drop=A.meat[1]?[{t:'c',c:'meat_raw',n:A.meat[0]+ri(A.meat[1]-A.meat[0]+1)}]:[];if(A.hide)drop.push({t:'c',c:'hide',n:A.hide});if(NET.host)netEv({k:'adie',id:an.id});if(NET.attacker)netSendTo(NET.attacker,{t:'adrop',drop,x:an.x,z:an.z,xp:A.xp});else{if(drop.length){dropToGround(drop,an.x,an.z);toast(`ล่า${A.th}สำเร็จ: กด E ที่ซากเพื่อเก็บเนื้อและหนัง`,'#c8a070')}gainXp(A.xp)}}}
+function updateAnimals(dt){NET.HP=P;try{_updateAnimals(dt)}finally{P=NET.HP}}
+function _updateAnimals(dt){const night=isNight(),multi=NET.host&&NET.remotes.size>0;
+  for(let i=animals.length-1;i>=0;i--){if(multi)P=netTargetFor(animals[i].x,animals[i].z);const an=animals[i],A=ANIM[an.type],dx=P.x-an.x,dz=P.z-an.z,d=Math.hypot(dx,dz);
     if(d>190){scene.remove(an.m.g);animals.splice(i,1);continue}
     if(A.fly){updateBat(an,A,dt,d);continue}
     let mx=0,mz=0,spd=0;an.t-=dt;
@@ -2147,7 +2346,7 @@ function updateGrass(){if(!grassIM){grassIM=new THREE.InstancedMesh(grassGeo(),g
 function blocked(x,z){for(const o of nearColliders(x,z)){if((x-o.x)**2+(z-o.z)**2<(o.r+.35)**2)return true}return false}
 function collide(){const air=P.y-groundH(P.x,P.z);for(const o of nearColliders(P.x,P.z)){if(o.h&&o.h<3&&air>o.h*.5)continue;const dx=P.x-o.x,dz=P.z-o.z,rr=o.r+.38,d2=dx*dx+dz*dz;if(d2<rr*rr&&d2>1e-6){const d=Math.sqrt(d2);P.x=o.x+dx/d*rr;P.z=o.z+dz/d*rr}}
   const dw=Math.hypot(P.x,P.z),lim=WORLD_R-230;if(dw>lim){P.x*=lim/dw;P.z*=lim/dw}
-  if(arena&&arena.up){const ax=P.x-arena.x,az=P.z-arena.z,ad=Math.hypot(ax,az)||1;if(ad>arena.R-1){P.x=arena.x+ax/ad*(arena.R-1);P.z=arena.z+az/ad*(arena.R-1)}}}
+  if(arena&&arena.up){const ax=P.x-arena.x,az=P.z-arena.z,ad=Math.hypot(ax,az)||1,inside=NET.guest?arena.tgt===NET.myId:(!arena.tgt||arena.tgt==='host');if(inside){if(ad>arena.R-1){P.x=arena.x+ax/ad*(arena.R-1);P.z=arena.z+az/ad*(arena.R-1)}}else if(ad<arena.R+1.5){P.x=arena.x+ax/ad*(arena.R+1.5);P.z=arena.z+az/ad*(arena.R+1.5)}}}
 let poseF={};
 function updatePlayer(dt){
   if(keys.ArrowLeft)yaw+=1.8*dt;if(keys.ArrowRight)yaw-=1.8*dt;if(keys.ArrowUp)pitch=clamp(pitch+dt,-1.25,1.05);if(keys.ArrowDown)pitch=clamp(pitch-dt,-1.25,1.05);
@@ -2325,6 +2524,7 @@ function renderPanel(kind,arg){panelArg=arg;const T=$('#ptitle'),B=$('#pbody');i
   if(kind==='char'){renderChar();return}
   if(kind==='craft'){renderCraft(T,B);return}
   if(kind==='sandbox'){renderSandbox(T,B);return}
+  if(kind==='online'){renderOnline(T,B);return}
   if(kind==='stats'){T.textContent='อัพสเตท';setTimeout(()=>{const b=$('#pbody')||B;if(b&&!b.querySelector('.aspbox')){const d=document.createElement('div');d.className='aspbox';d.innerHTML=aspectHTML(true);b.prepend(d)}},0);const pend=panelArg&&panelArg.pend?panelArg.pend:{str:0,dex:0,vit:0,end:0,agi:0,per:0};panelArg={pend};const used=Object.values(pend).reduce((a,b)=>a+b,0),left=P.ap-used,base=RACES[P.race].s;
     const cur={str:ST.str,dex:ST.dex,vit:P.attr.vit,end:P.attr.end,agi:P.attr.agi,per:P.attr.per};
     B.innerHTML=`<div class="res"><span>Lv ${P.lvl}</span><span style="color:#7fffb0">แต้มคงเหลือ <b>${left}</b></span><span style="color:var(--mut)">ได้ ${AP_PER_LVL} แต้มทุกเลเวล · เก็บไว้อัพทีหลังได้</span>${ST.moodPen.str||ST.moodPen.dex?`<span style="color:#ff8a70">อารมณ์: STR −${ST.moodPen.str} DEX −${ST.moodPen.dex}</span>`:''}</div>`+ATTRS.map(([k,ab,th,d])=>`<div class="attr"><b>${ab}</b><div>${th}<small>${d}</small></div><div class="v">${cur[k]}${pend[k]?`<em> +${pend[k]}</em>`:''}</div><button class="sm ghost" data-m="${k}" ${pend[k]?'':'disabled'}>−</button><button class="sm" data-p="${k}" ${left>0?'':'disabled'}>+</button></div>`).join('')+
@@ -2400,7 +2600,7 @@ function helpHTML(){return `<table class="k"><tbody>
 <tr><td>Esc</td><td>ปลดล็อกเมาส์ / หยุดพัก</td></tr></tbody></table>
 <p style="color:var(--mut);font-size:13px">ปุ่มด้านบนเป็นค่าเริ่มต้น เปลี่ยนได้ทั้งหมดในตั้งค่า (O)</p>
 <h3>กฎของโลกนี้</h3>
-<p>• <b>โลก 5 ทวีป</b>: Valdren (เริ่มต้น) · Thornhold (ป่า) · Mirefen (บึง) · Frostmarch (หิมะ) · Emberwaste (เถ้า) — ล่องเรือข้ามทวีปได้ที่โรงเตี๊ยม ทวีปไกลๆ ซอมบี้เลเวลสูงกว่า<br>• <b>Asterion the Minotaur</b> (มอนสเตอร์ยูนีค ♉ บนแผนที่): ลดดาเมจที่ได้รับ 60% · สะท้อนดาเมจเต็ม (ก่อนลด) ใส่ผู้เล่นในระยะ 16 ม. หารกันถ้ามีหลายคน · ฟื้นเลือด 2% ทุก 5 วิ · 3 ร่าง เปลี่ยนเมื่อเลือดลด · กางโคลอสเซียมขังให้สู้ 1-1 · เลเวลเพิ่มวันละ 1 ตราบที่ยังไม่ถูกฆ่า<br>• <b>Nocturne the Moonwhale</b> (◐ บนแผนที่ เหนือทวีป Mirefen): วาฬบินยักษ์ ยิงกระสุนน้ำตลอด · ใกล้ตัวแล้วเดินช้าลง · เรียกอุกกาบาต · เรียกดวงจันทร์ทำให้เป็นกลางคืน · ตอนกลางคืน/มีพระจันทร์ พลัง ×2 และฟื้นเลือด 2%/4 วิ · ร่าง 2 เพลงทำให้ตาบอด · ร่าง 3 แบกพระจันทร์แดง (พลัง ×2 ตลอด) และมีพาสซีพกระแสโลหิต: ใครอยู่ในรัศมี 130 ม. เสียเลือดตลอดเวลา และโดนแผลเลือดไหลทุก 12 วิ · มันไม่ลงมาใกล้พื้นเลย ต้องใช้ธนู/เวท/Aspect · ถูกสโลว์ 45% แต่ Dash (Q) ยังพุ่งหนีได้เต็มระยะ<br>• <b>ค้างคาวเน่า</b> บินวนแล้วโฉบลงมา ตีได้ตอนมันลงต่ำ หรือยิงธนู<br>• <b>แซนด์บ็อกซ์</b>: เลือกจากเมนูหลัก ทดสอบมอนสเตอร์ทุกตัวได้ (F2) ไม่บันทึกและไม่กระทบเกมปกติ<br>• <b>Aspect</b> (ปุ่ม T): พลังพิเศษที่กดใช้ มีคูลดาวน์ และพัฒนาขึ้นเมื่อรอดชีวิตครบ 20 / 60 / 120 นาที ดูรายละเอียดที่หน้าอัพสเตท (U)<br>• <b>หลบ (Q)</b>: กลิ้งหลบไปทางที่กดเดิน ใช้สแตมินา 16 อมตะช่วงสั้นๆ ถ้าหลบตอนกำลังจะโดนตีพอดี เวลาจะช้าลงแวบหนึ่งและได้สแตมินาคืน<br>• <b>เก็บทรัพยากร</b>: เดินไปที่ต้นไม้ (ไม้) ก้อนหิน (หิน) พุ่มไม้ (เส้นใย สมุนไพร) ซากปรักหักพัง (เศษเหล็ก) แล้วกด E · ถือขวานตัดไม้ไวขึ้น · แต่ละจุดเก็บได้จำกัดและฟื้นในวันถัดไป<br>• <b>สร้างสิ่งของ (N)</b>: ยา ผ้าพันแผล อาวุธ เกราะ กระเป๋า · บางสูตรต้องอยู่ใกล้กองไฟหรือในเมือง<br>• <b>ซอมบี้มีสกิลเฉพาะตัว</b> (ดูใต้ชื่อ): Walker จับรัด/พุ่งกัด/อ้วกพิษ · Runner กระโจน/ข่วนรัว/หลบหลีก · Brute <b>ปีนต้นไม้แล้วดีดตัวลงมาทุบ</b> (เมื่อโดนตีหนัก) พุ่งชน กระทืบพื้น ขว้างหิน · Spitter พ่นรัว/บ่อกรด/กระโดดถอย · Crawler คว้าข้อเท้า/<b>แกล้งตาย</b> · ท่าตีปกติสุ่มทุกครั้ง: ปัดขวา ปัดซ้าย ทุบสองมือ งับ ทุบเหนือหัว · วงสีแดงบนพื้น = จุดที่กำลังจะโดนทุบ<br>• <b>ถูกจับ</b>: กด Space รัวๆ หรือโจมตีเพื่อดิ้นหลุด ไม่งั้นจะโดนกัด<br>• <b>กระโดด</b> (Space ใช้สแตมินา 8) ข้ามหิน ลังไม้ แนวกั้นเตี้ยๆ ได้ · กดโจมตีกลางอากาศ = ดิ่งทุบ แรงขึ้น 50% และทำให้ซอมบี้ล้ม<br>• <b>อารมณ์</b>: เครียด เศร้า เบื่อ มีความสุข มีผลต่อ STR/DEX ความเร็วการกระทำ XP และดาเมจ (ดูที่ H)<br>• <b>บาดแผลแบบ Project Zomboid</b>: โดนซอมบี้ตีอาจเกิดแผลที่อวัยวะต่างๆ (ถลอก ฉีกขาด ถูกกัด แผลลึก กระดูกหัก) แผลทำให้เลือดออก ต้องพันแผล แผลลึกต้องเย็บ กระดูกหักต้องดามเฝือก แผลที่ไม่ได้ฆ่าเชื้อหรือผ้าพันแผลสกปรกจะติดเชื้อ · <b>ถูกกัด</b>มีโอกาสสูงมากที่จะติดเชื้อซอมบี้ เชื้อจะลุกลามจนตายถ้าไม่มียาแก้เชื้อ · เกราะในช่องนั้นช่วยกันแผล<br>• <b>อาการ (Moodles)</b> ขวามือ: หิว กระหาย ง่วง หอบ เจ็บปวด เลือดออก ป่วย ตื่นตระหนก ของหนัก หนาว/ร้อน แต่ละอาการมี 4 ระดับ ทำให้ช้าลง ตีช้า ตีเบา หรือฟื้นสแตมินาช้า<br>• <b>นอนหลับ</b>ได้ทุกที่ (เวลาเร็วขึ้น 20 เท่า) แต่ซอมบี้อาจมาปลุก ถ้าแรงหมดจะหมดสติเอง · ทุกการกระทำใช้เวลา และขยับตัวจะยกเลิก<br>• ซอมบี้กระจายอยู่ทั่วโลก ซากเมืองและถนนมีเยอะที่สุด ฆ่าแล้วพื้นที่จะโล่งไปพักหนึ่ง ซอมบี้รับรู้ได้ใกล้ลง แต่การวิ่งและการต่อสู้มีเสียงดึงดูดพวกมัน<br>• <b>เอาชีวิตรอด</b>: ต้องกิน ดื่ม และพักผ่อน หิวทำให้สแตมินาลดและ HP ไม่ฟื้น กระหายทำให้ฟื้นสแตมินาช้า เหนื่อยทำให้เดินช้า ถ้าอาหารหรือน้ำหมดจะเสีย HP เรื่อยๆ · วิ่ง ต่อสู้ ทะเลทรายร้อน และหิมะหนาว ทำให้หมดเร็วขึ้น<br>• <b>สัตว์ป่า</b>: ล่ากวาง กระต่าย หมูป่า หมาป่า เพื่อเอาเนื้อและหนัง เนื้อดิบควรย่างก่อนกิน (กองไฟ หรือให้พ่อค้าย่าง) หมาป่าล่าเป็นฝูงโดยเฉพาะกลางคืน<br>• <b>เลเวลอัป</b> ได้ 3 แต้มสเตท อัพทันทีหรือเก็บไว้ก่อนก็ได้<br>• <b>Hardcore</b>: HP หมดคือจบ ตัวละครถูกลบ ของหายหมด<br>• <b>ซอมบี้ให้แค่ XP</b> ไม่ดรอปเงิน เงินได้จากหีบ เควส และการขายของ<br>• <b>ซอมบี้มีเลเวล</b> และเก็บเลเวลได้เอง: อยู่นานขึ้น กัดคุณ หรือกินศพพวกเดียวกันจะเลเวลอัป ตัวใหญ่และแรงขึ้น ตาส้มคือ Lv10+ ตาแดงคือ Lv20+<br>• ยิ่งไกลจาก Emberhold และยิ่งผ่านไปหลายวัน ซอมบี้ยิ่งเลเวลสูง<br>• <b>เชื้อซอมบี้</b>: โดนกัดแล้วเชื้อสะสม ดูด HP จนกว่าจะดื่มยาแก้เชื้อ<br>• <b>เกราะ</b> ลดดาเมจที่ได้รับ เกราะเหล็กหนักทำให้ช้าลงเล็กน้อย<br>• <b>กลางวัน/กลางคืน</b> สลับทุก 10 นาที กลางคืนมองเห็นสั้นลง ซอมบี้ดุและเยอะขึ้น · <b>Blood Moon</b> ทุกคืนที่ 3<br>• <b>ซากนคร</b> (▣ บนแผนที่) มีหีบเยอะ แต่ซอมบี้ก็หนาแน่นกว่าที่อื่น<br>• ซอมบี้ยกแขนง้างก่อนตี ถอยออกทันจะไม่โดน · ตีต่อเนื่อง 3 ครั้งเป็นคอมโบ<br>• <b>เมือง</b>เป็นเขตปลอดภัย ผูกพันศิลาเมืองได้ทีละ 1 เมืองเพื่อรับ perk</p>
+<p>• <b>เล่นออนไลน์ (Co-op)</b>: เมนูหลัก → เล่นออนไลน์ หรือกด F3 ในเกม · Host กดสร้างห้องแล้วส่งรหัส 5 ตัวให้เพื่อน · สูงสุด 4 คน · ตัวละครของแต่ละคนเซฟในเครื่องตัวเอง · แยกกันเดินไปไหนก็เจอมอนสเตอร์ · host ออกหรือตาย ห้องย้ายไปให้คนต่อไปอัตโนมัติ · เห็นหมาป่า/ศพ/ลูกบอลแสงของเพื่อน และลูกบอลแสงของเพื่อนรักษาเราได้ · ของจากหีบแยกกันของใครของมัน<br>• <b>สำรองเซฟ</b>: ปุ่มในเมนูหลัก ดาวน์โหลดไฟล์เก็บไว้ ย้ายเครื่องหรือเบราว์เซอร์ก็นำเข้าได้<br>• <b>โลก 5 ทวีป</b>: Valdren (เริ่มต้น) · Thornhold (ป่า) · Mirefen (บึง) · Frostmarch (หิมะ) · Emberwaste (เถ้า) — ล่องเรือข้ามทวีปได้ที่โรงเตี๊ยม ทวีปไกลๆ ซอมบี้เลเวลสูงกว่า<br>• <b>Asterion the Minotaur</b> (มอนสเตอร์ยูนีค ♉ บนแผนที่): ลดดาเมจที่ได้รับ 60% · สะท้อนดาเมจเต็ม (ก่อนลด) ใส่ผู้เล่นในระยะ 16 ม. หารกันถ้ามีหลายคน · ฟื้นเลือด 2% ทุก 5 วิ · 3 ร่าง เปลี่ยนเมื่อเลือดลด · กางโคลอสเซียมขังให้สู้ 1-1 · เลเวลเพิ่มวันละ 1 ตราบที่ยังไม่ถูกฆ่า<br>• <b>Nocturne the Moonwhale</b> (◐ บนแผนที่ เหนือทวีป Mirefen): วาฬบินยักษ์ ยิงกระสุนน้ำตลอด · ใกล้ตัวแล้วเดินช้าลง · เรียกอุกกาบาต · เรียกดวงจันทร์ทำให้เป็นกลางคืน · ตอนกลางคืน/มีพระจันทร์ พลัง ×2 และฟื้นเลือด 2%/4 วิ · ร่าง 2 เพลงทำให้ตาบอด · ร่าง 3 แบกพระจันทร์แดง (พลัง ×2 ตลอด) และมีพาสซีพกระแสโลหิต: ใครอยู่ในรัศมี 130 ม. เสียเลือดตลอดเวลา และโดนแผลเลือดไหลทุก 12 วิ · มันไม่ลงมาใกล้พื้นเลย ต้องใช้ธนู/เวท/Aspect · ถูกสโลว์ 45% แต่ Dash (Q) ยังพุ่งหนีได้เต็มระยะ<br>• <b>ค้างคาวเน่า</b> บินวนแล้วโฉบลงมา ตีได้ตอนมันลงต่ำ หรือยิงธนู<br>• <b>แซนด์บ็อกซ์</b>: เลือกจากเมนูหลัก ทดสอบมอนสเตอร์ทุกตัวได้ (F2) ไม่บันทึกและไม่กระทบเกมปกติ<br>• <b>Aspect</b> (ปุ่ม T): พลังพิเศษที่กดใช้ มีคูลดาวน์ และพัฒนาขึ้นเมื่อรอดชีวิตครบ 20 / 60 / 120 นาที ดูรายละเอียดที่หน้าอัพสเตท (U)<br>• <b>หลบ (Q)</b>: กลิ้งหลบไปทางที่กดเดิน ใช้สแตมินา 16 อมตะช่วงสั้นๆ ถ้าหลบตอนกำลังจะโดนตีพอดี เวลาจะช้าลงแวบหนึ่งและได้สแตมินาคืน<br>• <b>เก็บทรัพยากร</b>: เดินไปที่ต้นไม้ (ไม้) ก้อนหิน (หิน) พุ่มไม้ (เส้นใย สมุนไพร) ซากปรักหักพัง (เศษเหล็ก) แล้วกด E · ถือขวานตัดไม้ไวขึ้น · แต่ละจุดเก็บได้จำกัดและฟื้นในวันถัดไป<br>• <b>สร้างสิ่งของ (N)</b>: ยา ผ้าพันแผล อาวุธ เกราะ กระเป๋า · บางสูตรต้องอยู่ใกล้กองไฟหรือในเมือง<br>• <b>ซอมบี้มีสกิลเฉพาะตัว</b> (ดูใต้ชื่อ): Walker จับรัด/พุ่งกัด/อ้วกพิษ · Runner กระโจน/ข่วนรัว/หลบหลีก · Brute <b>ปีนต้นไม้แล้วดีดตัวลงมาทุบ</b> (เมื่อโดนตีหนัก) พุ่งชน กระทืบพื้น ขว้างหิน · Spitter พ่นรัว/บ่อกรด/กระโดดถอย · Crawler คว้าข้อเท้า/<b>แกล้งตาย</b> · ท่าตีปกติสุ่มทุกครั้ง: ปัดขวา ปัดซ้าย ทุบสองมือ งับ ทุบเหนือหัว · วงสีแดงบนพื้น = จุดที่กำลังจะโดนทุบ<br>• <b>ถูกจับ</b>: กด Space รัวๆ หรือโจมตีเพื่อดิ้นหลุด ไม่งั้นจะโดนกัด<br>• <b>กระโดด</b> (Space ใช้สแตมินา 8) ข้ามหิน ลังไม้ แนวกั้นเตี้ยๆ ได้ · กดโจมตีกลางอากาศ = ดิ่งทุบ แรงขึ้น 50% และทำให้ซอมบี้ล้ม<br>• <b>อารมณ์</b>: เครียด เศร้า เบื่อ มีความสุข มีผลต่อ STR/DEX ความเร็วการกระทำ XP และดาเมจ (ดูที่ H)<br>• <b>บาดแผลแบบ Project Zomboid</b>: โดนซอมบี้ตีอาจเกิดแผลที่อวัยวะต่างๆ (ถลอก ฉีกขาด ถูกกัด แผลลึก กระดูกหัก) แผลทำให้เลือดออก ต้องพันแผล แผลลึกต้องเย็บ กระดูกหักต้องดามเฝือก แผลที่ไม่ได้ฆ่าเชื้อหรือผ้าพันแผลสกปรกจะติดเชื้อ · <b>ถูกกัด</b>มีโอกาสสูงมากที่จะติดเชื้อซอมบี้ เชื้อจะลุกลามจนตายถ้าไม่มียาแก้เชื้อ · เกราะในช่องนั้นช่วยกันแผล<br>• <b>อาการ (Moodles)</b> ขวามือ: หิว กระหาย ง่วง หอบ เจ็บปวด เลือดออก ป่วย ตื่นตระหนก ของหนัก หนาว/ร้อน แต่ละอาการมี 4 ระดับ ทำให้ช้าลง ตีช้า ตีเบา หรือฟื้นสแตมินาช้า<br>• <b>นอนหลับ</b>ได้ทุกที่ (เวลาเร็วขึ้น 20 เท่า) แต่ซอมบี้อาจมาปลุก ถ้าแรงหมดจะหมดสติเอง · ทุกการกระทำใช้เวลา และขยับตัวจะยกเลิก<br>• ซอมบี้กระจายอยู่ทั่วโลก ซากเมืองและถนนมีเยอะที่สุด ฆ่าแล้วพื้นที่จะโล่งไปพักหนึ่ง ซอมบี้รับรู้ได้ใกล้ลง แต่การวิ่งและการต่อสู้มีเสียงดึงดูดพวกมัน<br>• <b>เอาชีวิตรอด</b>: ต้องกิน ดื่ม และพักผ่อน หิวทำให้สแตมินาลดและ HP ไม่ฟื้น กระหายทำให้ฟื้นสแตมินาช้า เหนื่อยทำให้เดินช้า ถ้าอาหารหรือน้ำหมดจะเสีย HP เรื่อยๆ · วิ่ง ต่อสู้ ทะเลทรายร้อน และหิมะหนาว ทำให้หมดเร็วขึ้น<br>• <b>สัตว์ป่า</b>: ล่ากวาง กระต่าย หมูป่า หมาป่า เพื่อเอาเนื้อและหนัง เนื้อดิบควรย่างก่อนกิน (กองไฟ หรือให้พ่อค้าย่าง) หมาป่าล่าเป็นฝูงโดยเฉพาะกลางคืน<br>• <b>เลเวลอัป</b> ได้ 3 แต้มสเตท อัพทันทีหรือเก็บไว้ก่อนก็ได้<br>• <b>Hardcore</b>: HP หมดคือจบ ตัวละครถูกลบ ของหายหมด<br>• <b>ซอมบี้ให้แค่ XP</b> ไม่ดรอปเงิน เงินได้จากหีบ เควส และการขายของ<br>• <b>ซอมบี้มีเลเวล</b> และเก็บเลเวลได้เอง: อยู่นานขึ้น กัดคุณ หรือกินศพพวกเดียวกันจะเลเวลอัป ตัวใหญ่และแรงขึ้น ตาส้มคือ Lv10+ ตาแดงคือ Lv20+<br>• ยิ่งไกลจาก Emberhold และยิ่งผ่านไปหลายวัน ซอมบี้ยิ่งเลเวลสูง<br>• <b>เชื้อซอมบี้</b>: โดนกัดแล้วเชื้อสะสม ดูด HP จนกว่าจะดื่มยาแก้เชื้อ<br>• <b>เกราะ</b> ลดดาเมจที่ได้รับ เกราะเหล็กหนักทำให้ช้าลงเล็กน้อย<br>• <b>กลางวัน/กลางคืน</b> สลับทุก 10 นาที กลางคืนมองเห็นสั้นลง ซอมบี้ดุและเยอะขึ้น · <b>Blood Moon</b> ทุกคืนที่ 3<br>• <b>ซากนคร</b> (▣ บนแผนที่) มีหีบเยอะ แต่ซอมบี้ก็หนาแน่นกว่าที่อื่น<br>• ซอมบี้ยกแขนง้างก่อนตี ถอยออกทันจะไม่โดน · ตีต่อเนื่อง 3 ครั้งเป็นคอมโบ<br>• <b>เมือง</b>เป็นเขตปลอดภัย ผูกพันศิลาเมืองได้ทีละ 1 เมืองเพื่อรับ perk</p>
 <p style="color:var(--mut);font-size:13px">Prototype Act I (เล่นคนเดียว) · ระบบออนไลน์, สิ่งก่อสร้างของผู้เล่น และ Act ถัดไปยังไม่อยู่ในเวอร์ชันนี้</p>`}
 function drawBigMap(){const cv=$('#bigmap');if(!cv)return;const g=cv.getContext('2d'),S=560,tp=(x,z)=>[(x/WORLD_R*.5+.5)*S,(z/WORLD_R*.5+.5)*S];
   g.imageSmoothingEnabled=true;g.drawImage(worldMap,0,0,S,S);g.font='600 13px Sarabun,sans-serif';g.textAlign='center';g.strokeStyle='#000';g.lineWidth=3;
@@ -2467,7 +2667,7 @@ function startPlay(p,fresh){for(const q of pools)scene.remove(q.m);pools.length=
   renderHot();renderChips();renderQuests();showBanner(fresh?`${P.name} ตื่นขึ้นใน Emberhold · ${RACES[P.race].th}`:`กลับมาแล้ว, ${P.name}`,true);
   if(fresh)setTimeout(()=>toast('เป้าหมายแรก: หา <b>Skill Book</b> และอุปกรณ์จากหีบสมบัติ (จุดเหลืองบนมินิแมพ) · กด I เพื่อเปิดหน้าต่างตัวละคร','#e0a542'),1500);
   setPause(!fallback&&!locked);$('#pmsg').textContent='คลิก "เล่นต่อ" เพื่อควบคุมกล้องด้วยเมาส์'}
-function die(){if(P.dead)return;if(SANDBOX){P.hp=ST.maxHp;P.down=0;P.grab=null;invuln=2;toast('แซนด์บ็อกซ์: ตายแล้วฟื้นทันที (ไม่มีผลกับเกมปกติ)','#9ad0ff');return}P.dead=true;P.deadT=0;sleeping=false;act=null;$('#sleepov').classList.add('hidden');$('#actbar').classList.add('hidden');mouseL=false;if(locked)document.exitPointerLock();if(mounted){mounted.rider=false;mounted=null}
+function die(){if(P.dead)return;if(NET.on&&!SANDBOX)setTimeout(()=>netLeave(true),NET.guest?5000:300);if(SANDBOX){P.hp=ST.maxHp;P.down=0;P.grab=null;invuln=2;toast('แซนด์บ็อกซ์: ตายแล้วฟื้นทันที (ไม่มีผลกับเกมปกติ)','#9ad0ff');return}P.dead=true;P.deadT=0;sleeping=false;act=null;$('#sleepov').classList.add('hidden');$('#actbar').classList.add('hidden');mouseL=false;if(locked)document.exitPointerLock();if(mounted){mounted.rider=false;mounted=null}
   const days=Math.floor((Wd.time-P.born)/DAY)+1,R=RACES[P.race];store.del(SKEY);saveWorld();
   let best=null;for(const it of [...P.bag,...Object.values(P.eq)])if(it&&(it.t==='w'||it.t==='a')&&(!best||it.r>best.r))best=it;
   $('#dcause').textContent='ถูกสังหารโดย: '+lastHit;
@@ -2484,6 +2684,7 @@ $('#bResume').onclick=()=>{if(!fallback)requestLock();else setPause(false)};
 $('#bHelp1').onclick=()=>{setPause(false);openPanel('help')};
 $('#bSet1').onclick=()=>{setPause(false);openPanel('settings')};
 $('#bSand').onclick=()=>startSandbox();
+$('#bOnline').onclick=()=>{$('#menu').classList.add('hidden');openPanel('online')};$('#bExport').onclick=exportSave;$('#bImport').onclick=importSave;
 $('#bSet0').onclick=()=>{$('#menu').classList.add('hidden');openPanel('settings')};
 document.addEventListener('click',e=>{if(e.target.closest('button'))sfx('ui')});
 $('#bHelp0').onclick=()=>{const m=$('#menu .mbox');if(m.querySelector('.helpbox')){m.querySelector('.helpbox').remove();return}const d=document.createElement('div');d.className='helpbox';d.style.cssText='text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;margin-top:14px;max-height:40vh;overflow:auto';d.innerHTML=helpHTML();m.appendChild(d)};
@@ -2518,9 +2719,9 @@ $('#bStart').onclick=()=>{if(cFate<0)return;const name=($('#pname').value.trim()
 let last=performance.now(),saveT=0,menuA=0;
 function frame(now){requestAnimationFrame(frame);const rdt=Math.min(.05,(now-last)/1000);last=now;let dt=rdt;if(hitStop>0){hitStop-=rdt;dt=rdt*.08}shake=Math.max(0,shake-rdt*1.6);
   const c0=cities[0];
-  if(state==='play'&&P&&!P.dead&&!paused){
+  if(state==='play'&&P&&!P.dead&&(!paused||NET.on)){NET.HP=P;
     Wd.time+=dt*(sleeping?SLEEP_SCALE:down('timeskip')?60:1);
-    updatePlayer(dt);updateAspect(dt);updateScars(dt);updateArena(dt);updateMeteors(dt);updateMoon(dt);const wdt=dt*(slowMo>0?.35:1);if(!P.dead){updateZombies(wdt);populate(dt);updateAnimals(wdt);spawnAnimals(dt);updateBirds(dt);updateFires(dt);updateProjs(wdt);findNearest();updateHUD(rdt);updateGrass();if(sleeping)P.noise=.5;updateAudio(rdt)}updateGore(dt);updateCorpses(dt);
+    updatePlayer(dt);updateAspect(dt);updateScars(dt);updateArena(dt);updateMeteors(dt);updateMoon(dt);const wdt=dt*(slowMo>0?.35:1);if(!P.dead){if(NET.guest){netGuestTick(dt);updBossBar()}else{updateZombies(wdt);populate(dt);updateAnimals(wdt);spawnAnimals(dt);if(NET.host){for(const r of NET.remotes.values())if(r.px&&!r.px.dead){r.animT=(r.animT||0)-dt;if(r.animT<=0){r.animT=2.4;const sv=P,sa=animT;P=r.px;animT=0;try{spawnAnimals(0)}finally{P=sv;animT=sa}}}netHostTick(dt)}}if(NET.on)rpTick(dt);updateBirds(dt);updateFires(dt);updateProjs(wdt);findNearest();updateHUD(rdt);updateGrass();if(sleeping)P.noise=.5;updateAudio(rdt)}updateGore(dt);updateCorpses(dt);
     focusX=P.x;focusZ=P.z;updateCamera();saveT+=dt;if(saveT>8){saveT=0;savePlayer()}}
   else if(state==='play'&&P){if(P.dead&&charModel){P.deadT=(P.deadT||0)+rdt;applyPose(rdt)}updateCamera()}
   else if(state==='menu'&&c0){menuA+=dt*.05;focusX=c0.x;focusZ=c0.z;camera.position.set(c0.x+Math.cos(menuA)*85,c0.h+38,c0.z+Math.sin(menuA)*85);camera.lookAt(c0.x,c0.h+4,c0.z)}
@@ -2539,7 +2740,7 @@ setTimeout(()=>{
   {const c=document.createElement('canvas');c.width=c.height=160;const g=c.getContext('2d'),d=g.createImageData(160,160);for(let i=0;i<d.data.length;i+=4){const v=Math.random()*255;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=255}g.putImageData(d,0,0);$('#grain').style.backgroundImage=`url(${c.toDataURL()})`}
   focusX=cities[0].x;focusZ=cities[0].z;updateChunks(400);
   state='menu';$('#loading').classList.add('hidden');toMenu();
-  window.__realm={get animals(){return animals},get CFG(){return CFG},get P(){return P},get Wd(){return Wd},cities,lair,zombies,ruinCenters,get fog(){return scene.fog},get state(){return state},setTime:t=>{Wd.time=t},biomeAt,baseH,urbanAt,dbg:{tp:(x,z)=>{P.x=x;P.z=z;P.y=groundH(x,z)},attack:()=>playerAttack(),interact:()=>interact(),near:()=>nearest&&nearest.kind,openPanel,grant:l=>grant(l,'debug'),ST:()=>ST,hurt:d=>hurtPlayer(d,'debug','hollowed'),hurt2:d=>hurtPlayer(d,'Lv1 Hollowed Walker','hollowed',{z:1,heavy:true}),setYaw:(y,p)=>{yaw=y;pitch=p},moveItem,quickUse,makeGear,makeBag,makeWeapon,gainXp:x=>gainXp(x),mz:(type,dx=5,dz=0)=>makeZombie(P.x+dx,P.z+dz,type,'mossbound'),sk:(z,id)=>startSkill(z,id),asp:()=>useAspect(),equipAll:()=>{for(const sl of ['head','chest','legs','feet','hands','off'])P.eq[sl]={t:'a',s:sl,b:sl==='off'?0:1,r:3,arm:10,aff:{}};rebuildChar()},clearFx:()=>{P.blindT=0;moonT=0;Wd.time=Math.floor(Wd.time/DAY)*DAY+.25*DAY},whale:()=>whale,whaleSk:(id)=>{if(whale)whale.ms={id,t:0}},whaleStep:(n,dt=.05)=>{const out=[];for(let i=0;i<n;i++){whaleUpdate(whale,dt,Math.hypot(P.x-whale.x,P.z-whale.z));out.push(whale.ms?whale.ms.id+':'+(whale.ms.ph||'')+':'+whale.phase:'-')}poseModel(whale);return[...new Set(out)].join(' ')},meteors:()=>meteors.length,moonT:()=>moonT,hitZ:(z,d)=>hitZombie(z,d),sb:id=>sbDo(id),mino:()=>mino,minoSk:(id,o)=>{if(mino){mino.ms=Object.assign({id,t:0},o||{})}},minoStep:(n,dt=.05)=>{const out=[];for(let i=0;i<n;i++){minoUpdate(mino,dt,Math.hypot(P.x-mino.x,P.z-mino.z));out.push(mino.ms?mino.ms.id+':'+(mino.ms.ph||'')+':'+mino.phase:'-')}poseModel(mino);return[...new Set(out)].join(' ')},arena:()=>arena&&{up:arena.up,R:arena.R},conts:()=>cities.map(c=>[c.name,contAt(c.x,c.z),Math.round(c.x),Math.round(c.z)]),lairs:()=>({lair,minoLair}),scars:()=>scars.length,impact:(x,z,r)=>impact(x,z,r),ferry:i=>ferryTo(i),finishAct:()=>{if(act)act.t=act.dur+1;return !!act},countC:c=>countC(c),addC:(c,n)=>addItem({t:'c',c,n}),dash:()=>doDash(),gnode:()=>gatherNode(),gather:o=>gather(o),craft:id=>craft(id),setFate:f=>{P.fate=f;aspCh=1;aspCd=0;refreshStats();renderChips()},aspState:()=>({aspCh,aspCd,slowMo,allies:allies.length,orbs:orbs.length,fields:fields.length,beacons:beacons.length,shroud:P.shroud,dashT}),zstep:(z,n=20,dt=.05)=>{const log=[];for(let i=0;i<n&&z.sk;i++){skillUpdate(z,dt,Math.hypot(P.x-z.x,P.z-z.z));log.push(z.sk?z.sk.id+':'+z.sk.ph+':'+(z.yo||0).toFixed(1):'end')}return log},get paused(){return paused}}};
+  window.__realm={get animals(){return animals},get CFG(){return CFG},get P(){return P},get Wd(){return Wd},cities,lair,zombies,ruinCenters,get fog(){return scene.fog},get state(){return state},setTime:t=>{Wd.time=t},biomeAt,baseH,urbanAt,dbg:{tp:(x,z)=>{P.x=x;P.z=z;P.y=groundH(x,z)},attack:()=>playerAttack(),interact:()=>interact(),near:()=>nearest&&nearest.kind,openPanel,grant:l=>grant(l,'debug'),ST:()=>ST,hurt:d=>hurtPlayer(d,'debug','hollowed'),hurt2:d=>hurtPlayer(d,'Lv1 Hollowed Walker','hollowed',{z:1,heavy:true}),setYaw:(y,p)=>{yaw=y;pitch=p},moveItem,quickUse,makeGear,makeBag,makeWeapon,gainXp:x=>gainXp(x),mz:(type,dx=5,dz=0)=>makeZombie(P.x+dx,P.z+dz,type,'mossbound'),sk:(z,id)=>startSkill(z,id),asp:()=>useAspect(),net:()=>NET,rpApply:(id,st)=>rpApply(id,st),myState:()=>myState(),chunkN:()=>chunks.size,netLeaveX:()=>netLeave(),netHost:()=>netHost(),netJoin:c=>netJoin(c),zs:()=>zombies,equipAll:()=>{for(const sl of ['head','chest','legs','feet','hands','off'])P.eq[sl]={t:'a',s:sl,b:sl==='off'?0:1,r:3,arm:10,aff:{}};rebuildChar()},clearFx:()=>{P.blindT=0;moonT=0;Wd.time=Math.floor(Wd.time/DAY)*DAY+.25*DAY},whale:()=>whale,whaleSk:(id)=>{if(whale)whale.ms={id,t:0}},whaleStep:(n,dt=.05)=>{const out=[];for(let i=0;i<n;i++){whaleUpdate(whale,dt,Math.hypot(P.x-whale.x,P.z-whale.z));out.push(whale.ms?whale.ms.id+':'+(whale.ms.ph||'')+':'+whale.phase:'-')}poseModel(whale);return[...new Set(out)].join(' ')},meteors:()=>meteors.length,moonT:()=>moonT,hitZ:(z,d)=>hitZombie(z,d),sb:id=>sbDo(id),mino:()=>mino,minoSk:(id,o)=>{if(mino){mino.ms=Object.assign({id,t:0},o||{})}},minoStep:(n,dt=.05)=>{const out=[];for(let i=0;i<n;i++){minoUpdate(mino,dt,Math.hypot(P.x-mino.x,P.z-mino.z));out.push(mino.ms?mino.ms.id+':'+(mino.ms.ph||'')+':'+mino.phase:'-')}poseModel(mino);return[...new Set(out)].join(' ')},arena:()=>arena&&{up:arena.up,R:arena.R},conts:()=>cities.map(c=>[c.name,contAt(c.x,c.z),Math.round(c.x),Math.round(c.z)]),lairs:()=>({lair,minoLair}),scars:()=>scars.length,impact:(x,z,r)=>impact(x,z,r),ferry:i=>ferryTo(i),finishAct:()=>{if(act)act.t=act.dur+1;return !!act},countC:c=>countC(c),addC:(c,n)=>addItem({t:'c',c,n}),dash:()=>doDash(),gnode:()=>gatherNode(),gather:o=>gather(o),craft:id=>craft(id),setFate:f=>{P.fate=f;aspCh=1;aspCd=0;refreshStats();renderChips()},aspState:()=>({aspCh,aspCd,slowMo,allies:allies.length,orbs:orbs.length,fields:fields.length,beacons:beacons.length,shroud:P.shroud,dashT}),zstep:(z,n=20,dt=.05)=>{const log=[];for(let i=0;i<n&&z.sk;i++){skillUpdate(z,dt,Math.hypot(P.x-z.x,P.z-z.z));log.push(z.sk?z.sk.id+':'+z.sk.ph+':'+(z.yo||0).toFixed(1):'end')}return log},get paused(){return paused}}};
   requestAnimationFrame(frame)},30);
 }
 </script>
